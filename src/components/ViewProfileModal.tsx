@@ -27,29 +27,29 @@ export function ViewProfileModal({ profile, onClose, onStartCall }: ViewProfileM
         exit={{ scale: 0.95, opacity: 0, y: 12 }}
         className="relative w-full max-w-md bg-white dark:bg-[#12151e] rounded-2xl shadow-2xl overflow-hidden border border-slate-200/80 dark:border-white/[0.08]"
       >
-        <div className="px-6 py-4 border-b border-slate-200/80 dark:border-white/[0.07] flex items-center justify-between bg-slate-50/80 dark:bg-white/[0.02]">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-[#343842] flex items-center justify-between bg-gray-50 dark:bg-[#1e2026]">
           <div className="flex items-center gap-3">
-            <div className={cn("p-2 rounded-xl text-white shadow-xs", profile.avatarColor || "bg-accent")}>
+            <div className={cn("p-2 rounded-lg text-white shadow-2xs", profile.avatarColor || "bg-accent")}>
               <User className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-text tracking-tight">Node Details</h2>
-              <p className="text-xs text-muted">Quantum Node Identity</p>
+              <h2 className="text-base font-bold text-text">Contact Info</h2>
+              <p className="text-xs text-muted">Connected Person</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="p-2 hover:bg-slate-200/60 dark:hover:bg-white/[0.06] rounded-lg text-muted hover:text-text transition-colors cursor-pointer"
+            className="p-2 hover:bg-gray-200 dark:hover:bg-[#343842] rounded-lg text-muted hover:text-text transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+        <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto bg-white dark:bg-[#22242a]">
           {/* Avatar Display */}
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-3">
             <div className={cn(
-              "w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center text-white text-4xl sm:text-5xl font-bold shadow-xl border-4 border-white dark:border-[#1a1f2e] overflow-hidden relative",
+              "w-24 h-24 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-md border-4 border-white dark:border-[#2a2d35] overflow-hidden relative",
               profile.avatarColor || "bg-accent"
             )}>
               {profile.avatarImage ? (
@@ -62,17 +62,11 @@ export function ViewProfileModal({ profile, onClose, onStartCall }: ViewProfileM
                 profile.username.charAt(0).toUpperCase() || '?'
               )}
             </div>
-            <div className="text-center space-y-1.5">
-              <h3 className="text-xl font-bold text-text flex items-center justify-center gap-2 tracking-tight">
+            <div className="text-center space-y-1">
+              <h3 className="text-xl font-bold text-text flex items-center justify-center gap-2">
                 {profile.username}
-                {profile.avatarImage && (
-                  <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                    Custom Avatar
-                  </span>
-                )}
               </h3>
-              <p className="text-xs font-mono text-muted">NODE_ID: {profile.id}</p>
-              <div className="inline-flex items-center gap-1.5 text-xs text-muted justify-center bg-slate-100 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.07] px-3 py-1 rounded-lg">
+              <div className="inline-flex items-center gap-1.5 text-xs text-muted justify-center bg-gray-100 dark:bg-[#2a2d35] border border-gray-200 dark:border-[#343842] px-3 py-1 rounded-md">
                 <Calendar className="w-3.5 h-3.5" />
                 Joined {new Date(profile.joinedAt).toLocaleDateString()}
               </div>
@@ -80,47 +74,46 @@ export function ViewProfileModal({ profile, onClose, onStartCall }: ViewProfileM
           </div>
 
           {/* Bio */}
-          <div className="space-y-2.5 pt-4 border-t border-slate-200/80 dark:border-white/[0.07]">
-            <label className="text-xs font-semibold text-muted flex items-center gap-1.5 ml-1">
-              <Info className="w-3.5 h-3.5" />
-              COMM TRANSMISSION BIO
+          <div className="space-y-2 pt-3 border-t border-gray-200 dark:border-[#343842]">
+            <label className="text-xs font-bold text-text block">
+              Status / Note
             </label>
-            <div className="bg-slate-50 dark:bg-[#0a0c12] border border-slate-200/80 dark:border-white/[0.07] rounded-xl px-4 py-3.5 text-sm text-text leading-relaxed min-h-[80px]">
-              {profile.bio || "No bio information provided by this node."}
+            <div className="bg-gray-50 dark:bg-[#18191c] border border-gray-200 dark:border-[#343842] rounded-lg px-4 py-3 text-sm text-text leading-relaxed min-h-[70px]">
+              {profile.bio || "No status note added."}
             </div>
           </div>
         </div>
 
-        <div className="px-6 py-4 bg-slate-50/80 dark:bg-white/[0.02] border-t border-slate-200/80 dark:border-white/[0.07] flex flex-wrap gap-2">
+        <div className="px-6 py-4 bg-gray-50 dark:bg-[#1e2026] border-t border-gray-200 dark:border-[#343842] flex flex-wrap gap-2">
           {onStartCall && (
             <>
               <button 
                 onClick={() => { onClose(); onStartCall('audio'); }}
-                className="flex-1 min-w-[90px] px-3 py-2.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                className="flex-1 min-w-[90px] px-3 py-2.5 text-xs font-semibold bg-success hover:bg-green-700 text-white rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
               >
                 <Phone className="w-3.5 h-3.5" />
-                Voice
+                Voice Call
               </button>
               <button 
                 onClick={() => { onClose(); onStartCall('video'); }}
-                className="flex-1 min-w-[90px] px-3 py-2.5 text-xs font-semibold bg-accent hover:bg-accent/90 text-white rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                className="flex-1 min-w-[90px] px-3 py-2.5 text-xs font-semibold bg-accent hover:bg-blue-700 text-white rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
               >
                 <Video className="w-3.5 h-3.5" />
-                Video
+                Video Call
               </button>
               <button 
                 onClick={() => { onClose(); onStartCall('screen'); }}
-                className="flex-1 min-w-[110px] px-3 py-2.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
-                title="Mirror your screen directly to this peer"
+                className="flex-1 min-w-[110px] px-3 py-2.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+                title="Share your screen with this person"
               >
                 <MonitorUp className="w-3.5 h-3.5" />
-                Mirror Screen
+                Share Screen
               </button>
             </>
           )}
           <button 
             onClick={onClose}
-            className="px-4 py-2.5 text-xs font-semibold bg-slate-100 dark:bg-white/[0.05] text-text hover:bg-slate-200 dark:hover:bg-white/[0.1] rounded-xl transition-all cursor-pointer"
+            className="px-4 py-2.5 text-xs font-semibold bg-white dark:bg-[#2a2d35] border border-gray-300 dark:border-[#3c404d] text-text hover:bg-gray-100 dark:hover:bg-[#343842] rounded-lg transition-all cursor-pointer"
           >
             Close
           </button>

@@ -41,22 +41,22 @@ export const DirectDownloadPromptModal: React.FC<DirectDownloadPromptModalProps>
           className="fixed inset-0 z-[270] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md"
         >
           <motion.div
-            initial={{ scale: 0.95, y: 12, opacity: 0 }}
+            initial={{ scale: 0.96, y: 10, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
-            exit={{ scale: 0.95, y: 12, opacity: 0 }}
+            exit={{ scale: 0.96, y: 10, opacity: 0 }}
             transition={{ type: "spring", damping: 26, stiffness: 360 }}
-            className="relative w-full max-w-md bg-white dark:bg-[#12151e] border border-slate-200/80 dark:border-white/[0.1] rounded-2xl p-6 shadow-2xl overflow-hidden text-text flex flex-col gap-4"
+            className="relative w-full max-w-md bg-white dark:bg-[#22242a] border border-gray-300 dark:border-[#343842] rounded-xl p-6 shadow-xl overflow-hidden text-text flex flex-col gap-4"
           >
             {/* Header Badge */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-accent/10 border border-accent/25 text-accent text-xs font-semibold">
+              <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-accent/10 border border-accent/25 text-accent text-xs font-semibold">
                 <HardDrive className="w-3.5 h-3.5" />
-                <span>Bypass RAM • Direct Streaming</span>
+                <span>Direct File Save</span>
               </div>
 
               <button
                 onClick={onDecline}
-                className="p-1.5 rounded-lg text-muted hover:text-text hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors cursor-pointer"
+                className="p-1.5 rounded-md text-muted hover:text-text hover:bg-gray-100 dark:hover:bg-[#2b2e37] transition-colors cursor-pointer"
                 title="Decline download"
               >
                 <X className="w-4 h-4" />
@@ -66,10 +66,10 @@ export const DirectDownloadPromptModal: React.FC<DirectDownloadPromptModalProps>
             {/* Prompt Content */}
             <div className="space-y-3">
               <div className="text-base sm:text-lg font-bold text-text leading-snug tracking-tight">
-                Incoming Direct Disk Transfer
+                Incoming File Ready to Save
               </div>
 
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#0a0c12] border border-slate-200/80 dark:border-white/[0.07] space-y-2">
+              <div className="p-4 rounded-lg bg-gray-50 dark:bg-[#18191d] border border-gray-200 dark:border-[#343842] space-y-2">
                 <div className="font-semibold text-sm text-text break-all">
                   {fileName}
                 </div>
@@ -83,7 +83,7 @@ export const DirectDownloadPromptModal: React.FC<DirectDownloadPromptModalProps>
               </div>
 
               {/* Platform Engine Status */}
-              <div className="p-3 rounded-xl bg-accent/[0.07] border border-accent/20 flex items-start gap-2.5 text-xs text-muted leading-relaxed">
+              <div className="p-3 rounded-lg bg-accent/[0.06] border border-accent/20 flex items-start gap-2.5 text-xs text-muted leading-relaxed">
                 {streamSupport.isIOS ? (
                   <Smartphone className="w-4 h-4 text-accent shrink-0 mt-0.5" />
                 ) : (
@@ -91,21 +91,17 @@ export const DirectDownloadPromptModal: React.FC<DirectDownloadPromptModalProps>
                 )}
                 <div>
                   <div className="font-semibold text-text text-xs flex items-center gap-1.5">
-                    <span>{streamSupport.label}</span>
-                    <span className="px-1.5 py-0.5 bg-accent/15 text-accent rounded text-[10px] uppercase font-bold">Active</span>
+                    <span>Large File Support</span>
+                    <span className="px-1.5 py-0.5 bg-accent/15 text-accent rounded text-[10px] uppercase font-bold">Ready</span>
                   </div>
                   <div className="text-[11px] text-muted mt-0.5">
-                    {streamSupport.hasNativePicker
-                      ? "Direct streaming to selected local file. Browser RAM heap bypassed."
-                      : streamSupport.hasOPFS
-                      ? "Origin Private File System (OPFS) direct disk pipeline active. Protects iOS/mobile tabs from memory crashes."
-                      : "Memory-guarded stream active. Protected against mobile memory termination."}
+                    This file will save directly to your device storage so even very large files download smoothly.
                   </div>
                 </div>
               </div>
 
               <p className="text-xs text-muted leading-relaxed">
-                The sender is currently <strong className="text-accent">waiting for you to accept</strong> this transfer. Click download below to initiate the direct stream.
+                <strong className="text-text">{senderName}</strong> is waiting for you to accept this file. Click the download button below to start saving it.
               </p>
             </div>
 
@@ -113,23 +109,23 @@ export const DirectDownloadPromptModal: React.FC<DirectDownloadPromptModalProps>
             <div className="flex items-center gap-3 pt-2">
               <button
                 onClick={onDecline}
-                className="flex-1 py-2.5 px-4 rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-100 dark:bg-white/[0.04] hover:bg-slate-200 dark:hover:bg-white/[0.08] text-xs font-semibold text-text transition-colors cursor-pointer"
+                className="flex-1 py-2.5 px-4 rounded-lg border border-gray-300 dark:border-[#343842] bg-gray-100 dark:bg-[#2b2e37] hover:bg-gray-200 dark:hover:bg-[#343842] text-xs font-semibold text-text transition-colors cursor-pointer"
               >
                 Decline
               </button>
 
               <button
                 onClick={onAccept}
-                className="flex-2 py-2.5 px-4 rounded-xl bg-accent hover:bg-accent/90 text-white text-xs font-semibold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                className="flex-2 py-2.5 px-4 rounded-lg bg-accent hover:bg-accent/90 text-white text-xs font-semibold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Download className="w-4 h-4" />
-                <span>{streamSupport.isIOS ? "Download to Device" : "Download to Computer"}</span>
+                <span>{streamSupport.isIOS ? "Save to Device" : "Save to Computer"}</span>
               </button>
             </div>
 
             <div className="text-[11px] text-muted text-center flex items-center justify-center gap-1.5 pt-1">
               <ShieldCheck className="w-3.5 h-3.5 text-success" />
-              <span>Zero-RAM Disk Pipeline • Anti-Crash Guard Engaged</span>
+              <span>Private Device-to-Device File Transfer</span>
             </div>
           </motion.div>
         </motion.div>

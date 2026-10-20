@@ -53,28 +53,31 @@ export const QRUtilityNode: React.FC = () => {
       animate={{ opacity: 1, scale: 1 }}
       className="grid grid-cols-12 gap-6 h-full overflow-y-auto pb-20 lg:pb-0 relative"
     >
-      <div className="col-span-12 lg:col-span-5 flex flex-col gap-6">
+      <div className="col-span-12 lg:col-span-5 flex flex-col gap-5">
         {/* Source Data Input */}
-        <div className="glass-panel p-6 flex flex-col shadow-sm">
-          <div className="flex items-center gap-2.5 mb-4 text-text">
+        <div className="glass-panel p-6 flex flex-col">
+          <div className="flex items-center gap-2.5 mb-3 text-text">
             <div className="w-7 h-7 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center text-accent">
               <Type className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-semibold tracking-tight">Source Data</h3>
+            <div>
+              <h3 className="text-sm font-bold">Enter Link or Text</h3>
+              <p className="text-xs text-muted">Type any website URL, Wi-Fi password, or note</p>
+            </div>
           </div>
           
           <textarea 
             value={data}
             onChange={(e) => setData(e.target.value)}
-            placeholder="Enter URL or text to encode..."
-            className="w-full bg-slate-50 dark:bg-[#0a0c12] border border-slate-200/80 dark:border-white/[0.08] text-text p-4 rounded-xl min-h-[120px] outline-none focus:border-accent/60 resize-none placeholder:text-muted/60 mb-4 font-mono text-xs leading-relaxed transition-colors"
+            placeholder="Type or paste a website link or text here..."
+            className="w-full bg-gray-50 dark:bg-[#18191c] border border-gray-300 dark:border-[#343842] text-text p-3.5 rounded-lg min-h-[120px] outline-none focus:border-accent resize-none placeholder:text-muted/60 mb-3 text-sm leading-relaxed transition-colors"
           />
 
-          <div className="flex justify-between items-center bg-slate-100/70 dark:bg-white/[0.03] px-3 py-2 rounded-xl border border-slate-200/80 dark:border-white/[0.07]">
-            <span className="text-xs text-muted font-mono tabular-nums">Length: {data.length} chars</span>
+          <div className="flex justify-between items-center bg-gray-50 dark:bg-[#18191c] px-3 py-2 rounded-lg border border-gray-200 dark:border-[#343842]">
+            <span className="text-xs text-muted font-mono tabular-nums">{data.length} characters</span>
             <button 
               onClick={() => setData("")}
-              className="text-xs text-red-600 dark:text-red-400 hover:bg-red-500/15 transition-colors flex items-center gap-1.5 font-medium bg-red-500/10 border border-red-500/20 px-2.5 py-1 rounded-lg cursor-pointer"
+              className="text-xs text-red-600 dark:text-red-400 hover:bg-red-500/15 transition-colors flex items-center gap-1 font-medium bg-red-500/10 border border-red-500/20 px-2.5 py-1 rounded-md cursor-pointer"
             >
               <RefreshCw className="w-3 h-3" /> Clear
             </button>
@@ -82,19 +85,22 @@ export const QRUtilityNode: React.FC = () => {
         </div>
 
         {/* Config Panel */}
-        <div className="glass-panel p-6 flex-1 flex flex-col shadow-sm">
-          <div className="flex items-center gap-2.5 mb-6 text-text">
-            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/[0.08] flex items-center justify-center text-muted">
+        <div className="glass-panel p-6 flex-1 flex flex-col">
+          <div className="flex items-center gap-2.5 mb-5 text-text">
+            <div className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-[#2a2d35] border border-gray-300 dark:border-[#3c404d] flex items-center justify-center text-muted">
               <Maximize2 className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-semibold tracking-tight">Configuration</h3>
+            <div>
+              <h3 className="text-sm font-bold">Save or Copy QR Code</h3>
+              <p className="text-xs text-muted">Adjust image size and download</p>
+            </div>
           </div>
 
           <div className="space-y-6">
             <div>
-              <div className="flex justify-between text-xs font-medium text-muted mb-3">
-                <span>Output Dimension</span>
-                <span className="text-accent font-mono tabular-nums">{size}px</span>
+              <div className="flex justify-between text-xs font-medium text-muted mb-2.5">
+                <span>Image Size</span>
+                <span className="text-accent font-mono font-bold tabular-nums">{size} × {size} px</span>
               </div>
               <input 
                 type="range"
@@ -103,31 +109,31 @@ export const QRUtilityNode: React.FC = () => {
                 step="32"
                 value={size}
                 onChange={(e) => setSize(parseInt(e.target.value))}
-                className="w-full accent-accent bg-slate-200 dark:bg-white/10 h-1.5 rounded-full cursor-pointer"
+                className="w-full accent-accent bg-gray-200 dark:bg-[#2a2d35] h-2 rounded-full cursor-pointer"
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2.5">
               <button 
                 onClick={copyToClipboard}
-                className="flex flex-col items-center justify-center gap-2 py-4 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.06] hover:border-accent/40 hover:text-accent transition-all text-xs font-medium text-text cursor-pointer"
+                className="flex flex-col items-center justify-center gap-1.5 py-3.5 px-2 rounded-lg bg-gray-50 dark:bg-[#2a2d35] border border-gray-300 dark:border-[#3c404d] hover:border-accent hover:text-accent transition-all text-xs font-semibold text-text cursor-pointer"
               >
                 {copied ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
-                Copy Raw
+                <span>{copied ? "Copied!" : "Copy Text"}</span>
               </button>
               <button 
                 onClick={() => generatePreview('png')}
-                className="flex flex-col items-center justify-center gap-2 py-4 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.06] hover:border-accent/40 transition-all text-xs font-medium text-text cursor-pointer"
+                className="flex flex-col items-center justify-center gap-1.5 py-3.5 px-2 rounded-lg bg-accent text-white hover:bg-blue-700 transition-all text-xs font-semibold cursor-pointer shadow-2xs"
               >
-                <Eye className="w-4 h-4 text-accent" />
-                PNG Export
+                <Download className="w-4 h-4" />
+                <span>Save PNG</span>
               </button>
               <button 
                 onClick={() => generatePreview('svg')}
-                className="flex flex-col items-center justify-center gap-2 py-4 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.06] hover:border-success/40 transition-all text-xs font-medium text-text cursor-pointer"
+                className="flex flex-col items-center justify-center gap-1.5 py-3.5 px-2 rounded-lg bg-gray-50 dark:bg-[#2a2d35] border border-gray-300 dark:border-[#3c404d] hover:border-success hover:text-success transition-all text-xs font-semibold text-text cursor-pointer"
               >
-                <Eye className="w-4 h-4 text-success" />
-                SVG Export
+                <Download className="w-4 h-4 text-success" />
+                <span>Save SVG</span>
               </button>
             </div>
           </div>
@@ -135,20 +141,20 @@ export const QRUtilityNode: React.FC = () => {
       </div>
 
       {/* Viewport */}
-      <div className="col-span-12 lg:col-span-7 glass-panel relative flex items-center justify-center overflow-hidden p-12 min-h-[400px] shadow-sm">
-        <div className="absolute top-5 left-5 text-xs text-muted flex items-center gap-2 font-medium bg-slate-100 dark:bg-white/[0.04] px-3 py-1.5 rounded-lg border border-slate-200/80 dark:border-white/[0.07]">
-          <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
-          Live Matrix Preview
+      <div className="col-span-12 lg:col-span-7 glass-panel relative flex items-center justify-center overflow-hidden p-8 sm:p-12 min-h-[380px]">
+        <div className="absolute top-4 left-4 text-xs text-muted flex items-center gap-2 font-medium bg-gray-100 dark:bg-[#2a2d35] px-3 py-1.5 rounded-lg border border-gray-300 dark:border-[#3c404d]">
+          <div className="h-2 w-2 rounded-full bg-success" />
+          QR Code Preview
         </div>
 
-        <div className="bg-white p-5 sm:p-6 rounded-2xl relative shadow-xl ring-1 ring-slate-900/5 group transition-transform hover:scale-[1.01] w-fit max-w-full flex items-center justify-center aspect-square mx-auto">
+        <div className="bg-white p-5 sm:p-6 rounded-xl relative shadow-md border border-gray-200 w-fit max-w-full flex items-center justify-center aspect-square mx-auto">
           <QRCodeSVG 
             ref={qrRef}
             value={data || " "}
             size={size}
             level="H"
             bgColor="#ffffff"
-            fgColor="#090a0f"
+            fgColor="#111827"
             includeMargin={false}
             style={{ width: '100%', height: '100%', maxWidth: `${size}px`, maxHeight: `${size}px` }}
           />
@@ -160,13 +166,13 @@ export const QRUtilityNode: React.FC = () => {
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute inset-0 z-50 bg-white dark:bg-[#0f1219] flex flex-col p-4 sm:p-8 border border-slate-200/80 dark:border-white/[0.08] shadow-2xl rounded-2xl overflow-y-auto"
+          className="absolute inset-0 z-50 bg-white dark:bg-[#22242a] flex flex-col p-4 sm:p-8 border border-gray-300 dark:border-[#343842] shadow-xl rounded-xl overflow-y-auto"
         >
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6 border-b border-slate-200/80 dark:border-white/[0.08] pb-5">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6 border-b border-gray-200 dark:border-[#343842] pb-4">
             <div className="flex flex-col">
-              <h2 className="text-lg sm:text-xl font-bold text-text tracking-tight">QR Export Preview</h2>
-              <p className="text-xs text-muted mt-1 font-mono">
-                Drag image to save • Format: {preview.type.toUpperCase()}
+              <h2 className="text-lg sm:text-xl font-bold text-text">Download QR Code Image</h2>
+              <p className="text-xs text-muted mt-0.5">
+                Format: {preview.type.toUpperCase()} ({size} × {size} px)
               </p>
             </div>
 
@@ -174,23 +180,20 @@ export const QRUtilityNode: React.FC = () => {
               <a 
                 href={preview.url} 
                 download={preview.filename}
-                className="flex-1 sm:flex-none justify-center flex items-center gap-2 py-2 px-4 sm:py-2.5 sm:px-5 rounded-xl bg-success text-white font-semibold text-xs hover:bg-emerald-600 transition-colors shadow-xs"
+                className="flex-1 sm:flex-none justify-center flex items-center gap-2 py-2 px-4 sm:py-2.5 sm:px-5 rounded-lg bg-success text-white font-semibold text-xs hover:bg-green-700 transition-colors shadow-2xs"
               >
-                <Download className="w-4 h-4" /> Download
+                <Download className="w-4 h-4" /> Save Image
               </a>
               <button 
                 onClick={() => setPreview(null)}
-                className="flex-1 sm:flex-none justify-center flex items-center gap-2 py-2 px-4 sm:py-2.5 sm:px-5 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08] text-text font-semibold text-xs hover:bg-slate-200 dark:hover:bg-white/[0.1] transition-colors cursor-pointer"
+                className="flex-1 sm:flex-none justify-center flex items-center gap-2 py-2 px-4 sm:py-2.5 sm:px-5 rounded-lg bg-gray-100 dark:bg-[#2a2d35] border border-gray-300 dark:border-[#3c404d] text-text font-semibold text-xs hover:bg-gray-200 dark:hover:bg-[#343842] transition-colors cursor-pointer"
               >
-                <X className="w-4 h-4" /> Close
+                <X className="w-4 h-4" /> Back
               </button>
             </div>
           </div>
 
-          <div className="flex-1 border border-slate-200/80 dark:border-white/[0.07] bg-slate-50 dark:bg-[#090a0f] rounded-2xl flex items-center justify-center relative overflow-hidden group p-6">
-            <div className="absolute top-5 left-1/2 -translate-x-1/2 bg-white/90 dark:bg-[#161a24]/90 backdrop-blur-md border border-slate-200/80 dark:border-white/[0.1] px-4 py-2 rounded-xl flex gap-2 items-center text-xs text-text font-medium shadow-md z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-              <GripHorizontal className="w-4 h-4 text-accent" /> Drag to Desktop
-            </div>
+          <div className="flex-1 border border-gray-200 dark:border-[#343842] bg-gray-50 dark:bg-[#18191c] rounded-xl flex items-center justify-center relative overflow-hidden group p-6">
             <img 
               src={preview.url} 
               alt="QR Preview" 
@@ -198,7 +201,7 @@ export const QRUtilityNode: React.FC = () => {
               onDragStart={(e) => {
                 e.dataTransfer.setData("DownloadURL", `image/${preview.type}:${preview.filename}:${preview.url}`);
               }}
-              className="max-w-full max-h-full object-contain cursor-grab active:cursor-grabbing rounded-xl bg-white p-4 shadow-xl"
+              className="max-w-full max-h-full object-contain cursor-grab active:cursor-grabbing rounded-lg bg-white p-4 shadow-md border border-gray-200"
             />
           </div>
         </motion.div>

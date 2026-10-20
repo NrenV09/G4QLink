@@ -13,61 +13,44 @@
   --color-text: var(--color-text-val);
   --color-card: var(--color-card-val);
   
-  --font-sans: "Plus Jakarta Sans", "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
 }
 
 :root {
-  --color-bg-val: #f8fafc;
-  --color-surface-val: rgba(255, 255, 255, 0.82);
-  --color-surface-brighter-val: #ffffff;
+  --color-bg-val: #f3f4f6;
+  --color-surface-val: #ffffff;
+  --color-surface-brighter-val: #f9fafb;
   --color-accent-val: #2563eb;
-  --color-success-val: #10b981;
-  --color-border-val: rgba(15, 23, 42, 0.08);
-  --color-muted-val: #64748b;
-  --color-text-val: #0f172a;
+  --color-success-val: #16a34a;
+  --color-border-val: #d1d5db;
+  --color-muted-val: #4b5563;
+  --color-text-val: #111827;
   --color-card-val: #ffffff;
 
-  --bg-color: #f8fafc;
-  --bg-grad-1: rgba(37, 99, 235, 0.05);
-  --bg-grad-2: rgba(16, 185, 129, 0.04);
+  --bg-color: #f3f4f6;
 }
 
 html.dark {
-  --color-bg-val: #090a0f;
-  --color-surface-val: #11131a;
-  --color-surface-brighter-val: #171a24;
+  --color-bg-val: #18191c;
+  --color-surface-val: #22242a;
+  --color-surface-brighter-val: #2a2d35;
   --color-accent-val: #3b82f6;
-  --color-success-val: #10b981;
-  --color-border-val: rgba(255, 255, 255, 0.08);
-  --color-muted-val: #94a3b8;
-  --color-text-val: #f1f5f9;
-  --color-card-val: #11131a;
+  --color-success-val: #22c55e;
+  --color-border-val: #343842;
+  --color-muted-val: #9ca3af;
+  --color-text-val: #f3f4f6;
+  --color-card-val: #22242a;
 
-  --bg-color: #090a0f;
-  --bg-grad-1: rgba(59, 130, 246, 0.06);
-  --bg-grad-2: rgba(16, 185, 129, 0.035);
+  --bg-color: #18191c;
 }
 
 @layer base {
-  * {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  *::-webkit-scrollbar {
-    display: none;
-  }
-
   body {
     background-color: var(--bg-color);
-    background-image: 
-      radial-gradient(circle at 15% 0%, var(--bg-grad-1) 0%, transparent 45%),
-      radial-gradient(circle at 85% 100%, var(--bg-grad-2) 0%, transparent 45%);
-    background-attachment: fixed;
     color: var(--color-text);
     font-family: var(--font-sans);
-    letter-spacing: 0.005em;
+    letter-spacing: -0.005em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -77,12 +60,11 @@ html.dark {
   }
 
   button {
-    transition: background-color 0.16s cubic-bezier(0.16, 1, 0.3, 1),
-                border-color 0.16s cubic-bezier(0.16, 1, 0.3, 1),
-                color 0.16s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
-                box-shadow 0.16s cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: background-color 0.15s ease,
+                border-color 0.15s ease,
+                color 0.15s ease,
+                box-shadow 0.15s ease,
+                opacity 0.15s ease;
   }
 
   @keyframes fade-in {
@@ -104,7 +86,7 @@ html.dark {
 
   @keyframes blink-caret {
     from, to { border-color: transparent }
-    50% { border-color: #10b981 }
+    50% { border-color: #16a34a }
   }
 
   .animate-typing {
@@ -113,17 +95,17 @@ html.dark {
   }
 
   .fade-transition {
-    animation: fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: fade-in 0.15s ease both;
   }
 }
 
 @layer utilities {
   .glass-panel {
-    @apply border border-slate-200/80 dark:border-white/[0.08] bg-white/85 dark:bg-[#11131a]/90 backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] dark:shadow-[0_10px_32px_rgba(0,0,0,0.45)] rounded-2xl;
+    @apply border border-gray-300/90 dark:border-[#343842] bg-white dark:bg-[#22242a] shadow-[0_1px_3px_rgba(0,0,0,0.06)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] rounded-xl;
   }
   
   .glass-panel-heavy {
-    @apply border border-slate-200 dark:border-white/[0.1] bg-white/95 dark:bg-[#141720]/95 backdrop-blur-2xl shadow-[0_8px_36px_rgba(0,0,0,0.08)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.6)] rounded-2xl;
+    @apply border border-gray-300 dark:border-[#3c404d] bg-white dark:bg-[#22242a] shadow-lg rounded-xl;
   }
 
   .status-dot {

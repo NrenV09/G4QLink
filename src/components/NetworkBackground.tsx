@@ -146,5 +146,5 @@ export function NetworkBackground({ connectedCount }: { connectedCount: number }
     };
   }, [connectedCount]);
 
-  return <canvas ref={canvasRef} className="fixed inset-0 z-[-1] pointer-events-none opacity-30" />;
+  return <canvas ref={canvasRef} className="fixed inset-0 z-[-1] pointer-events-none opacity-[0.08] dark:opacity-[0.06]" />;
 }

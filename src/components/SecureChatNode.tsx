@@ -292,60 +292,60 @@ export const SecureChatNode: React.FC<SecureChatNodeProps> = ({
       className="h-full flex flex-col w-full max-w-none mx-auto glass-panel shadow-sm overflow-hidden"
     >
       {/* Header */}
-      <div className="px-4 py-3 border-b border-slate-200/80 dark:border-white/[0.07] bg-slate-50/60 dark:bg-white/[0.02] flex items-center justify-between">
+      <div className="px-4 py-3 border-b border-gray-200 dark:border-[#343842] bg-gray-50 dark:bg-[#1e2026] flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center text-accent">
             <Shield className="w-4 h-4" />
           </div>
-          <h2 className="text-sm sm:text-base font-semibold text-text tracking-tight">
-            Secure Group Chat
+          <h2 className="text-sm sm:text-base font-bold text-text">
+            Chat & Calls
           </h2>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           {isConnected && (
-            <div className="flex items-center gap-1.5 mr-1 sm:mr-2 border-r border-slate-200/80 dark:border-white/[0.08] pr-2 sm:pr-3">
+            <div className="flex items-center gap-1.5 mr-1 sm:mr-2 border-r border-gray-300 dark:border-[#343842] pr-2 sm:pr-3">
               <button 
                 onClick={() => startCall?.('audio')} 
-                className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-white/[0.04] hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all text-xs font-medium flex items-center gap-1.5 cursor-pointer border border-slate-200/80 dark:border-white/[0.08] active:scale-95 group"
-                title="Start Group Audio Call"
+                className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#2a2d35] hover:bg-success hover:text-white hover:border-success transition-all text-xs font-semibold flex items-center gap-1.5 cursor-pointer border border-gray-300 dark:border-[#3c404d] shadow-2xs active:scale-95 group"
+                title="Start an Audio Call"
               >
-                <Phone className="w-3.5 h-3.5 text-emerald-500 group-hover:text-white transition-colors" />
-                <span className="hidden sm:inline text-[11px]">Group Audio</span>
+                <Phone className="w-3.5 h-3.5 text-success group-hover:text-white transition-colors" />
+                <span className="hidden sm:inline text-xs">Voice Call</span>
               </button>
               
               <button 
                 onClick={() => startCall?.('video')} 
-                className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-white/[0.04] hover:bg-accent hover:text-white hover:border-accent transition-all text-xs font-medium flex items-center gap-1.5 cursor-pointer border border-slate-200/80 dark:border-white/[0.08] active:scale-95 group"
-                title="Start Group Video Call"
+                className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#2a2d35] hover:bg-accent hover:text-white hover:border-accent transition-all text-xs font-semibold flex items-center gap-1.5 cursor-pointer border border-gray-300 dark:border-[#3c404d] shadow-2xs active:scale-95 group"
+                title="Start a Video Call"
               >
                 <Video className="w-3.5 h-3.5 text-accent group-hover:text-white transition-colors" />
-                <span className="hidden sm:inline text-[11px]">Group Video</span>
+                <span className="hidden sm:inline text-xs">Video Call</span>
               </button>
 
               <button 
                 onClick={onToggleBandwidthOptimized} 
                 className={cn(
-                  "px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 cursor-pointer border transition-all active:scale-95",
+                  "px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 cursor-pointer border transition-all active:scale-95 shadow-2xs",
                   bandwidthOptimized 
-                    ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30" 
-                    : "bg-slate-100 dark:bg-white/[0.04] text-muted hover:text-text border-slate-200/80 dark:border-white/[0.08]"
+                    ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30 font-semibold" 
+                    : "bg-white dark:bg-[#2a2d35] text-muted hover:text-text border-gray-300 dark:border-[#3c404d]"
                 )}
-                title={bandwidthOptimized ? "Bandwidth Saver ACTIVE (360p / 15fps capped)" : "Bandwidth Saver: Caps bitrate & fps when >=3 participants connect"}
+                title={bandwidthOptimized ? "Data Saver is ON (uses less internet data during group calls)" : "Turn on Data Saver for slower internet connections"}
               >
                 <Gauge className="w-3.5 h-3.5" />
-                <span className="hidden md:inline text-[11px]">
-                  {bandwidthOptimized ? "Saver: ON" : "Bandwidth Saver"}
+                <span className="hidden md:inline text-xs">
+                  {bandwidthOptimized ? "Data Saver: ON" : "Data Saver"}
                 </span>
               </button>
             </div>
           )}
-          <div className="flex items-center gap-2 bg-slate-100 dark:bg-[#0f1219] px-2.5 py-1 rounded-lg border border-slate-200/80 dark:border-white/[0.07]">
+          <div className="flex items-center gap-2 bg-white dark:bg-[#2a2d35] px-2.5 py-1 rounded-lg border border-gray-300 dark:border-[#3c404d]">
             <span className={cn(
-              "h-1.5 w-1.5 rounded-full",
-              isConnected ? "bg-success animate-pulse" : "bg-red-500"
+              "h-2 w-2 rounded-full",
+              isConnected ? "bg-success" : "bg-gray-400"
             )} />
-            <span className="text-[10px] text-text font-mono font-semibold uppercase tracking-wider">
-              {isConnected ? "P2P DIRECT LINK" : "OFFLINE"}
+            <span className="text-xs text-text font-semibold">
+              {isConnected ? "Connected" : "Offline"}
             </span>
           </div>
         </div>
@@ -353,16 +353,16 @@ export const SecureChatNode: React.FC<SecureChatNodeProps> = ({
 
       {/* Role Banner */}
       <div className={cn(
-        "border-b border-slate-200/80 dark:border-white/[0.06] px-4 py-2 flex gap-2.5 text-[11px] font-medium items-center justify-center transition-colors",
-        role === 'host' ? "bg-accent/[0.07] text-accent" : "bg-success/[0.07] text-success"
+        "border-b border-gray-200 dark:border-[#343842] px-4 py-2 flex gap-2 text-xs font-medium items-center justify-center transition-colors",
+        role === 'host' ? "bg-accent/10 text-accent" : "bg-success/10 text-success"
       )}>
         <Users className="w-3.5 h-3.5 shrink-0" />
         <span>
           {role === 'host' 
-            ? `Host Node: Relaying secure messages between ${connectedPeers} active peer(s).` 
+            ? `Hosting Room: Connected with ${connectedPeers} ${connectedPeers === 1 ? 'person' : 'people'}.` 
             : role === 'join' && isConnected
-              ? "Join Node: Connected to Host. Messages are relayed to the group."
-              : "No active connections. Please establish a tunnel in the Transceiver tab."}
+              ? "Connected to room. Your messages are shared directly with everyone in the room."
+              : "Not connected yet. Go to the 'Share & Connect' tab to connect with someone first."}
         </span>
       </div>
 
@@ -390,19 +390,21 @@ export const SecureChatNode: React.FC<SecureChatNodeProps> = ({
       </AnimatePresence>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 flex flex-col bg-slate-50/30 dark:bg-[#0a0c12]/40">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 flex flex-col bg-gray-50/60 dark:bg-[#18191c]">
         <AnimatePresence>
           {messages.length === 0 && (
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex-1 flex flex-col items-center justify-center text-muted/60"
+              className="flex-1 flex flex-col items-center justify-center text-muted"
             >
-              <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.07] flex items-center justify-center mb-3">
-                <Shield className="w-6 h-6 text-muted" />
+              <div className="w-12 h-12 rounded-full bg-white dark:bg-[#22242a] border border-gray-200 dark:border-[#343842] flex items-center justify-center mb-3 shadow-2xs">
+                <Shield className="w-6 h-6 text-accent" />
               </div>
-              <span className="text-xs font-semibold uppercase tracking-wider text-text/70">End-to-End Encrypted Channel</span>
-              <span className="text-[11px] mt-1 text-muted">Awaiting secure peer messages...</span>
+              <span className="text-sm font-bold text-text">No messages yet</span>
+              <span className="text-xs mt-1 text-muted">
+                {isConnected ? "Say hello or record a voice note below!" : "Connect with a friend in 'Share & Connect' to start chatting."}
+              </span>
             </motion.div>
           )}
 
@@ -413,12 +415,12 @@ export const SecureChatNode: React.FC<SecureChatNodeProps> = ({
             return (
               <motion.div 
                 key={msg.id}
-                initial={{ opacity: 0, y: 8 }}
+                initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
-                  "max-w-[88%] sm:max-w-[76%] px-3.5 py-2.5 text-sm shadow-xs",
+                  "max-w-[88%] sm:max-w-[75%] px-4 py-2.5 text-sm shadow-2xs",
                   msg.sender === "system" 
-                    ? "max-w-full text-center bg-slate-100 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/[0.07] text-muted w-full my-1.5 text-xs font-medium rounded-xl" 
+                    ? "max-w-full text-center bg-white dark:bg-[#22242a] border border-gray-200 dark:border-[#343842] text-muted w-full my-1.5 text-xs font-medium rounded-lg" 
                     : cn(
                         "text-white", 
                         colorClass, 
@@ -429,20 +431,20 @@ export const SecureChatNode: React.FC<SecureChatNodeProps> = ({
                 {msg.sender !== "system" && (
                   <div 
                     className={cn(
-                      "text-[10px] font-semibold uppercase tracking-wider mb-1 flex items-center gap-1.5",
+                      "text-[11px] font-semibold mb-1 flex items-center gap-1.5",
                       "text-white/90",
-                      msg.sender !== "me" && msg.senderId && "cursor-pointer hover:opacity-80 transition-opacity"
+                      msg.sender !== "me" && msg.senderId && "cursor-pointer hover:underline"
                     )}
                     onClick={() => msg.sender !== "me" && msg.senderId && onClickProfile?.(msg.senderId)}
                   >
                     {msg.senderAvatar ? (
-                      <div className="w-4 h-4 rounded-full overflow-hidden border border-white/40 flex-shrink-0 shadow-xs">
+                      <div className="w-4 h-4 rounded-full overflow-hidden border border-white/40 flex-shrink-0">
                         <img src={msg.senderAvatar} alt={msg.senderName || 'Avatar'} className="w-full h-full object-cover" />
                       </div>
                     ) : null}
-                    <span>{msg.senderName || (msg.sender === "me" ? "LOCAL" : "PEER")}</span>
+                    <span>{msg.sender === "me" ? "You" : (msg.senderName || "Friend")}</span>
                     <span className="opacity-60">•</span>
-                    <span className="opacity-75 font-mono tabular-nums">{msg.timestamp.toLocaleTimeString([], { hour12: false })}</span>
+                    <span className="opacity-80 text-[10px] font-mono tabular-nums">{msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
                 )}
 
@@ -472,15 +474,15 @@ export const SecureChatNode: React.FC<SecureChatNodeProps> = ({
       </div>
 
       {/* Input / Voice Recording Bar */}
-      <div className="p-3 sm:p-3.5 bg-slate-50/80 dark:bg-[#0f1219]/90 border-t border-slate-200/80 dark:border-white/[0.07]">
+      <div className="p-3 sm:p-3.5 bg-white dark:bg-[#22242a] border-t border-gray-200 dark:border-[#343842]">
         {isRecording ? (
           /* Press to Speak Active Recording Bar */
-          <div className="flex items-center gap-3 bg-red-500/10 dark:bg-red-500/15 border border-red-500/30 rounded-xl px-4 py-2.5 animate-in fade-in duration-200">
+          <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2.5 animate-in fade-in duration-200">
             {/* Live recording indicator & timer */}
             <div className="flex items-center gap-2 shrink-0">
               <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
-              <span className="text-xs font-mono font-semibold tabular-nums text-red-600 dark:text-red-400">
-                {formatRecTime(recordingSeconds)}
+              <span className="text-xs font-mono font-bold tabular-nums text-red-600 dark:text-red-400">
+                Recording {formatRecTime(recordingSeconds)}
               </span>
             </div>
 
@@ -500,60 +502,58 @@ export const SecureChatNode: React.FC<SecureChatNodeProps> = ({
 
             {/* Recording Controls */}
             <div className="flex items-center gap-2 shrink-0">
-              {/* Cancel Button */}
               <button
                 type="button"
                 onClick={cancelRecording}
                 className="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-500/20 transition-colors cursor-pointer"
-                title="Discard recording"
+                title="Cancel recording"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
 
-              {/* Stop and Send Button (Press again to stop) */}
               <button
                 type="button"
                 onClick={stopAndSend}
                 disabled={isProcessing}
-                className="px-3.5 py-1.5 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer disabled:opacity-50"
-                title="Press again to stop and send"
+                className="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-50"
+                title="Send Voice Note"
               >
                 <Square className="w-3.5 h-3.5 fill-current" />
-                <span>{isProcessing ? "Sending..." : "Stop & Send"}</span>
+                <span>{isProcessing ? "Sending..." : "Send Voice Note"}</span>
               </button>
             </div>
           </div>
         ) : (
           /* Normal Message Input Bar */
           <form className="flex gap-2" onSubmit={handleSubmit}>
-            {/* Press to Speak Mic Button (Click once to start recording) */}
             <button 
               type="button"
               disabled={!isConnected}
               onClick={startRecording}
               className={cn(
-                "p-2.5 rounded-xl border transition-all flex items-center justify-center cursor-pointer disabled:opacity-40 select-none",
-                "bg-white dark:bg-[#161a24] border-slate-200/80 dark:border-white/[0.08] text-muted hover:text-accent hover:border-accent/40 hover:bg-accent/10 active:scale-95"
+                "px-3 py-2.5 rounded-lg border transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-40 select-none text-xs font-medium",
+                "bg-gray-50 dark:bg-[#2a2d35] border-gray-300 dark:border-[#3c404d] text-text hover:border-accent hover:text-accent"
               )}
-              title="Press to speak (click again to stop & send)"
+              title="Record a voice message"
             >
               <Mic className="w-4 h-4" />
+              <span className="hidden sm:inline">Voice Note</span>
             </button>
 
             <input 
               value={text}
               onChange={(e) => setText(e.target.value)}
               disabled={!isConnected}
-              className="flex-1 bg-white dark:bg-[#161a24] border border-slate-200/80 dark:border-white/[0.08] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-accent/60 disabled:opacity-50 transition-all placeholder:text-muted/60 text-text"
-              placeholder={isConnected ? "Type message or press mic to speak..." : "Tunnel unavailable. Connect in Transceiver."}
+              className="flex-1 bg-gray-50 dark:bg-[#18191c] border border-gray-300 dark:border-[#343842] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-accent disabled:opacity-50 transition-all placeholder:text-muted/70 text-text"
+              placeholder={isConnected ? "Write a message..." : "Connect with someone first to chat..."}
             />
 
             <button 
               disabled={!isConnected || !text.trim()}
-              className="px-4 py-2.5 rounded-xl bg-accent text-white hover:bg-accent/90 disabled:opacity-40 disabled:hover:bg-accent transition-all flex items-center justify-center shadow-xs font-semibold gap-2 cursor-pointer"
+              className="px-4 py-2.5 rounded-lg bg-accent text-white hover:bg-blue-700 disabled:opacity-40 transition-all flex items-center justify-center shadow-2xs font-semibold gap-1.5 cursor-pointer text-xs"
             >
               <Send className="w-4 h-4" />
-              <span className="hidden sm:inline text-xs">Send</span>
+              <span>Send</span>
             </button>
           </form>
         )}

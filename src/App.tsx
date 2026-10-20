@@ -3018,151 +3018,142 @@ export default function App() {
       </AnimatePresence>
       <NetworkBackground connectedCount={connectedCount} />
       
-      {/* Header */}
-      <header className="z-10 h-auto md:h-16 py-2.5 md:py-0 border-b border-slate-200/80 dark:border-white/[0.07] bg-white/85 dark:bg-[#0c0e14]/90 backdrop-blur-2xl flex flex-wrap md:flex-nowrap items-center justify-between px-3 md:px-6 lg:px-8 flex-shrink-0 relative gap-x-4 gap-y-2.5 md:gap-y-0">
-        <div className="flex items-center gap-2.5 md:gap-3.5 flex-shrink-0 min-w-0">
-          <button 
-            id="simulation-toggle-btn"
-            onClick={toggleSimulation}
-            className={cn(
-               "w-9 h-9 lg:w-10 lg:h-10 border rounded-xl flex items-center justify-center font-medium text-xl flex-shrink-0 transition-all cursor-pointer",
-               isSimulation 
-                 ? "bg-accent text-white border-accent shadow-sm shadow-accent/25" 
-                 : "bg-slate-100 dark:bg-[#161923] border-slate-200/80 dark:border-white/[0.08] text-accent hover:bg-accent/10 hover:border-accent/30"
-            )}
-            title={isSimulation ? "Simulation Active (Click to Disable)" : "Simulation Mode (Click to Enable)"}
-            aria-label="Toggle simulation mode"
-          >
-            <RefreshCw className={cn("w-4 h-4", isSimulation && "animate-spin")} />
-          </button>
+      {/* Classic Header Toolbar */}
+      <header className="z-10 h-auto md:h-16 py-2.5 md:py-0 border-b border-gray-300 dark:border-[#343842] bg-white dark:bg-[#22242a] flex flex-wrap md:flex-nowrap items-center justify-between px-3 md:px-6 flex-shrink-0 relative gap-x-4 gap-y-2.5 md:gap-y-0 shadow-2xs">
+        <div className="flex items-center gap-3 flex-shrink-0 min-w-0">
           <div 
-            className="min-w-0 cursor-pointer select-none relative group" 
+            className="min-w-0 cursor-pointer select-none relative group flex items-center gap-2.5" 
             onClick={handleTitleClick}
             title={titleTapCount > 0 ? `${10 - titleTapCount} taps left to unlock easter egg` : "Quantum Link"}
           >
+            <div className="w-9 h-9 rounded-lg bg-accent text-white flex items-center justify-center font-bold text-sm shadow-2xs shrink-0">
+              QL
+            </div>
             <motion.div
               animate={titleTapCount > 0 ? { scale: [1, 0.96, 1] } : {}}
               transition={{ duration: 0.12 }}
             >
-              <h1 className="text-sm md:text-base lg:text-[17px] font-bold tracking-tight text-text whitespace-nowrap flex items-center gap-2">
-                <span className="hidden sm:inline">Quantum Link</span>
-                <span className="sm:hidden">Q-Link</span>
-                <span className="text-[11px] text-muted font-mono font-normal">v7.8.4</span>
+              <h1 className="text-sm md:text-base font-bold tracking-tight text-text whitespace-nowrap flex items-center gap-2">
+                <span>Quantum Link</span>
                 {titleTapCount >= 3 && (
                   <motion.span
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0, opacity: 0 }}
-                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-accent/15 text-accent border border-accent/30 text-[10px] font-mono font-bold tabular-nums"
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-accent/15 text-accent border border-accent/30 text-[10px] font-mono font-bold tabular-nums"
                   >
                     {10 - titleTapCount}
                   </motion.span>
                 )}
               </h1>
-              <div className="text-[10px] lg:text-[11px] text-muted flex items-center gap-1.5 mt-0.5 whitespace-nowrap">
+              <div className="text-[11px] text-muted flex items-center gap-1.5 whitespace-nowrap">
                 <span className={cn(
-                  "h-1.5 w-1.5 rounded-full flex-shrink-0",
-                  status === "connected" ? "bg-success" : status === "handshaking" ? "bg-accent animate-pulse" : "bg-slate-400 dark:bg-slate-600"
+                  "h-2 w-2 rounded-full flex-shrink-0",
+                  status === "connected" ? "bg-success" : status === "handshaking" ? "bg-accent animate-pulse" : "bg-gray-400 dark:bg-gray-500"
                 )} />
                 <span className="truncate font-medium">
-                  {status === "connected" ? (isSimulation ? "Network Simulated" : "Network Secured") : status === "handshaking" ? "Syncing..." : "Disconnected"}
+                  {status === "connected" ? (isSimulation ? "Demo Connected" : `Connected (${connectedCount} ${connectedCount === 1 ? 'person' : 'people'})`) : status === "handshaking" ? "Connecting..." : "Not Connected"}
                 </span>
               </div>
             </motion.div>
           </div>
+
+          <button 
+            id="simulation-toggle-btn"
+            onClick={toggleSimulation}
+            className={cn(
+               "px-2.5 py-1.5 border rounded-lg flex items-center gap-1.5 font-medium text-xs flex-shrink-0 transition-all cursor-pointer",
+               isSimulation 
+                 ? "bg-accent text-white border-accent shadow-2xs" 
+                 : "bg-gray-100 dark:bg-[#2a2d35] border-gray-300 dark:border-[#3c404d] text-text hover:bg-gray-200 dark:hover:bg-[#343842]"
+            )}
+            title={isSimulation ? "Demo Mode is ON (Click to turn off)" : "Try Demo Mode with simulated people"}
+            aria-label="Toggle simulation mode"
+          >
+            <RefreshCw className={cn("w-3.5 h-3.5", isSimulation && "animate-spin")} />
+            <span className="hidden sm:inline">{isSimulation ? "Demo: ON" : "Try Demo"}</span>
+          </button>
         </div>
 
         <div className="w-full md:w-auto md:flex-1 flex justify-center min-w-0 order-last md:order-none pb-0.5 md:pb-0">
-          <nav className="flex w-max justify-center gap-1 p-1 bg-slate-100/90 dark:bg-[#141720] border border-slate-200/80 dark:border-white/[0.07] rounded-xl z-[20] shrink-0 mx-auto overflow-x-auto scrollbar-hide">
+          <nav className="flex w-max justify-center gap-1 p-1 bg-gray-100 dark:bg-[#18191c] border border-gray-300 dark:border-[#343842] rounded-lg z-[20] shrink-0 mx-auto overflow-x-auto scrollbar-hide">
             <button 
               onClick={() => setActiveTab("p2p")}
               className={cn(
-                "nav-tab px-3.5 lg:px-4 py-1.5 text-xs font-semibold transition-all rounded-lg whitespace-nowrap shrink-0 cursor-pointer",
+                "nav-tab px-3.5 lg:px-4 py-1.5 text-xs font-semibold transition-all rounded-md whitespace-nowrap shrink-0 cursor-pointer",
                 activeTab === "p2p" 
-                  ? "bg-white dark:bg-[#222736] text-text shadow-xs border border-slate-200/60 dark:border-white/[0.08]" 
+                  ? "bg-white dark:bg-[#2a2d35] text-accent dark:text-white shadow-2xs border border-gray-300/80 dark:border-[#3c404d]" 
                   : "text-muted hover:text-text"
               )}
             >
-              Transceiver
-            </button>
-            <button 
-              onClick={() => { setActiveTab("qr"); addLog("Entering QR Utility", "info"); }}
-              className={cn(
-                "nav-tab px-3.5 lg:px-4 py-1.5 text-xs font-semibold transition-all rounded-lg whitespace-nowrap shrink-0 cursor-pointer",
-                activeTab === "qr" 
-                  ? "bg-white dark:bg-[#222736] text-text shadow-xs border border-slate-200/60 dark:border-white/[0.08]" 
-                  : "text-muted hover:text-text"
-              )}
-            >
-              QR Utility
+              Share & Connect
             </button>
             <button 
               onClick={() => { setActiveTab("chat"); setUnreadChatCount(0); }}
               className={cn(
-                "nav-tab px-3.5 lg:px-4 py-1.5 text-xs font-semibold transition-all rounded-lg whitespace-nowrap shrink-0 relative cursor-pointer",
+                "nav-tab px-3.5 lg:px-4 py-1.5 text-xs font-semibold transition-all rounded-md whitespace-nowrap shrink-0 relative cursor-pointer",
                 activeTab === "chat" 
-                  ? "bg-white dark:bg-[#222736] text-text shadow-xs border border-slate-200/60 dark:border-white/[0.08]" 
+                  ? "bg-white dark:bg-[#2a2d35] text-accent dark:text-white shadow-2xs border border-gray-300/80 dark:border-[#3c404d]" 
                   : "text-muted hover:text-text"
               )}
             >
-              Secure Chat
+              Chat & Calls
               {unreadChatCount > 0 && activeTab !== "chat" && (
-                <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-4 h-4 px-1 bg-red-500 text-white text-[9px] font-mono font-bold rounded-full tabular-nums">
+                <span className="ml-1.5 inline-flex items-center justify-center min-w-4 h-4 px-1 bg-red-600 text-white text-[10px] font-bold rounded-full tabular-nums">
                   {unreadChatCount > 9 ? '9+' : unreadChatCount}
                 </span>
               )}
               {isCallActive && (
-                <span className="absolute -bottom-0.5 -right-0.5 flex items-center justify-center w-2.5 h-2.5 bg-accent animate-pulse rounded-full border border-white dark:border-[#141720]" />
+                <span className="ml-1.5 inline-block w-2 h-2 bg-success animate-pulse rounded-full" />
               )}
+            </button>
+            <button 
+              onClick={() => { setActiveTab("qr"); addLog("Entering QR Utility", "info"); }}
+              className={cn(
+                "nav-tab px-3.5 lg:px-4 py-1.5 text-xs font-semibold transition-all rounded-md whitespace-nowrap shrink-0 cursor-pointer",
+                activeTab === "qr" 
+                  ? "bg-white dark:bg-[#2a2d35] text-accent dark:text-white shadow-2xs border border-gray-300/80 dark:border-[#3c404d]" 
+                  : "text-muted hover:text-text"
+              )}
+            >
+              QR Code Maker
             </button>
             <button 
               onClick={() => setActiveTab("base64")}
               className={cn(
-                "nav-tab px-3.5 lg:px-4 py-1.5 text-xs font-semibold transition-all rounded-lg whitespace-nowrap shrink-0 cursor-pointer",
+                "nav-tab px-3.5 lg:px-4 py-1.5 text-xs font-semibold transition-all rounded-md whitespace-nowrap shrink-0 cursor-pointer",
                 activeTab === "base64" 
-                  ? "bg-white dark:bg-[#222736] text-text shadow-xs border border-slate-200/60 dark:border-white/[0.08]" 
+                  ? "bg-white dark:bg-[#2a2d35] text-accent dark:text-white shadow-2xs border border-gray-300/80 dark:border-[#3c404d]" 
                   : "text-muted hover:text-text"
               )}
             >
-              Base64
+              Text Encoder
             </button>
           </nav>
         </div>
 
-        <div className="flex gap-2 md:gap-2.5 items-center flex-shrink-0 ml-auto md:ml-0">
+        <div className="flex gap-2 items-center flex-shrink-0 ml-auto md:ml-0">
           {/* Active Call Background Indicator (PiP mode indicator) */}
           {isCallActive && isCallMinimized && (
             <button
               onClick={() => setIsCallMinimized(false)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/25 transition-all text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0"
-              title="Call is active in background. Click to maximize full meeting view."
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-success text-white hover:bg-green-700 transition-all text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 shadow-2xs"
+              title="Return to active call"
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-              <span className="hidden sm:inline">Active Call</span>
+              <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+              <span className="hidden sm:inline">Return to Call</span>
               <Maximize2 className="w-3.5 h-3.5" />
             </button>
           )}
 
-          {/* Info Button */}
-          <button
-            onClick={() => {
-              setInfoModalTab('guide');
-              setShowInfoModal(true);
-            }}
-            className="w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center text-muted hover:text-text transition-colors border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/80 dark:bg-[#161923] hover:bg-slate-200/70 dark:hover:bg-[#1f2433] rounded-xl cursor-pointer flex-shrink-0"
-            title="App Manual, Connection Guide & Legal / Privacy Hub (Info)"
-            aria-label="App Manual, Connection Guide and Legal & Privacy Hub"
-          >
-            <Info className="w-4 h-4" />
-          </button>
-
+          {/* Profile Button with Name */}
           <button
             onClick={() => setShowProfileModal(true)}
-            className="flex items-center justify-center rounded-xl p-0.5 border border-transparent hover:border-slate-300 dark:hover:border-white/15 transition-all group cursor-pointer"
-            title="Open Profile Menu & Picture Settings"
+            className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-gray-300 dark:border-[#343842] bg-gray-50 dark:bg-[#2a2d35] hover:bg-gray-100 dark:hover:bg-[#343842] transition-all cursor-pointer"
+            title="Edit Your Name & Profile Picture"
           >
             <div className={cn(
-              "w-8 h-8 lg:w-9 lg:h-9 rounded-xl flex items-center justify-center text-white text-xs md:text-sm font-bold shadow-xs overflow-hidden relative",
+              "w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold overflow-hidden relative shrink-0",
               profile.avatarColor
             )}>
               {profile.avatarImage ? (
@@ -3171,12 +3162,30 @@ export default function App() {
                 profile.username.charAt(0).toUpperCase()
               )}
             </div>
+            <span className="hidden lg:inline text-xs font-medium text-text max-w-[100px] truncate">
+              {profile.username}
+            </span>
+          </button>
+
+          {/* Help / Guide Button */}
+          <button
+            onClick={() => {
+              setInfoModalTab('guide');
+              setShowInfoModal(true);
+            }}
+            className="px-2.5 h-9 flex items-center justify-center gap-1.5 text-text hover:bg-gray-100 dark:hover:bg-[#343842] transition-colors border border-gray-300 dark:border-[#343842] bg-gray-50 dark:bg-[#2a2d35] rounded-lg cursor-pointer flex-shrink-0 text-xs font-medium"
+            title="How to Use & Help Guide"
+            aria-label="Help and User Guide"
+          >
+            <Info className="w-4 h-4 text-accent" />
+            <span className="hidden sm:inline">Help</span>
           </button>
           
+          {/* Theme Toggle */}
           <button
             onClick={() => document.documentElement.classList.toggle('dark')}
-            className="w-9 h-9 lg:w-10 lg:h-10 flex items-center justify-center text-muted hover:text-text transition-colors border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/80 dark:bg-[#161923] hover:bg-slate-200/70 dark:hover:bg-[#1f2433] rounded-xl cursor-pointer flex-shrink-0"
-            title="Toggle Dark Mode"
+            className="w-9 h-9 flex items-center justify-center text-text hover:bg-gray-100 dark:hover:bg-[#343842] transition-colors border border-gray-300 dark:border-[#343842] bg-gray-50 dark:bg-[#2a2d35] rounded-lg cursor-pointer flex-shrink-0"
+            title="Switch Light / Dark Theme"
           >
             <Moon className="w-4 h-4 dark:hidden" />
             <Sun className="w-4 h-4 hidden dark:block" />
@@ -3190,10 +3199,10 @@ export default function App() {
           {activeTab === "qr" ? (
             <motion.div 
               key="qr" 
-              initial={{ opacity: 0, y: 10 }} 
+              initial={{ opacity: 0, y: 6 }} 
               animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -10 }} 
-              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ opacity: 0, y: -6 }} 
+              transition={{ duration: 0.15 }}
               className="h-full w-full"
             >
               <QRUtilityNode />
@@ -3201,10 +3210,10 @@ export default function App() {
           ) : activeTab === "chat" ? (
             <motion.div 
               key="chat" 
-              initial={{ opacity: 0, y: 10 }} 
+              initial={{ opacity: 0, y: 6 }} 
               animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -10 }} 
-              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ opacity: 0, y: -6 }} 
+              transition={{ duration: 0.15 }}
               className="h-full w-full"
             >
               <SecureChatNode 
@@ -3225,10 +3234,10 @@ export default function App() {
           ) : activeTab === "base64" ? (
             <motion.div 
               key="base64" 
-              initial={{ opacity: 0, y: 10 }} 
+              initial={{ opacity: 0, y: 6 }} 
               animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -10 }} 
-              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ opacity: 0, y: -6 }} 
+              transition={{ duration: 0.15 }}
               className="h-full w-full"
             >
               <Base64ToolNode />
@@ -3236,10 +3245,10 @@ export default function App() {
           ) : activeTab === "registry" ? (
             <motion.div 
               key="nexus-registry" 
-              initial={{ opacity: 0, y: 10 }} 
+              initial={{ opacity: 0, y: 6 }} 
               animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -10 }} 
-              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ opacity: 0, y: -6 }} 
+              transition={{ duration: 0.15 }}
               className="h-full w-full overflow-hidden"
             >
               <NexusFailoverHUD 
@@ -3262,55 +3271,26 @@ export default function App() {
           ) : role ? (
             <motion.div 
               key="p2p-active"
-              initial={{ opacity: 0, y: 10 }} 
+              initial={{ opacity: 0, y: 6 }} 
               animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -10 }} 
-              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ opacity: 0, y: -6 }} 
+              transition={{ duration: 0.15 }}
               className="grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-[1fr_auto] gap-5 h-full lg:overflow-hidden overflow-y-auto pb-20 lg:pb-0"
             >
-              {/* Top/First Section: Connection Matrix & Peer Registry Banner */}
+              {/* Left Column: Step-by-Step Connection Setup */}
               <section className="col-span-1 lg:col-span-4 flex flex-col gap-4 flex-shrink-0 lg:overflow-y-auto scrollbar-hide">
-                {/* Synchronized Nexus Peer Registry Status Card */}
-                <div 
-                  onClick={() => setShowFailoverMenu(true)}
-                  className="glass-panel p-4 flex items-center justify-between border border-slate-200/80 dark:border-white/[0.08] hover:border-accent/40 dark:hover:border-accent/40 transition-all cursor-pointer group flex-shrink-0"
-                  title="Click to view full Synchronized Nexus Peer Registry"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent flex-shrink-0">
-                      <ShieldCheck className="w-4 h-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-xs font-semibold text-text flex items-center gap-2 truncate">
-                        <span>Synchronized Peer Registry</span>
-                        <span className="text-[11px] text-accent font-mono tabular-nums">
-                          · {connectedCount > 0 ? `${connectedCount + 1} Nodes` : "Standalone"}
-                        </span>
-                      </div>
-                      <div className="text-[11px] text-muted truncate mt-0.5">
-                        {connectedCount > 0 ? "Authoritative WebRTC cluster active" : "Deterministic failover & quorum engine"}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 text-accent text-xs font-semibold flex-shrink-0 ml-2">
-                    <span className="hidden sm:inline text-[11px]">Inspect</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </div>
-
-                <div className="glass-panel p-5 flex-shrink-0">
-                  <div className="flex items-center justify-between mb-3.5 flex-wrap gap-2">
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">Connection Mode</h3>
+                {/* Mode Switcher Card */}
+                <div className="glass-panel p-4 flex-shrink-0">
+                  <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                    <h3 className="text-sm font-bold text-text">Connection Setup</h3>
                     <button
-                      onClick={() => setShowFailoverMenu(true)}
-                      className="text-xs font-medium text-accent hover:underline flex items-center gap-1.5 cursor-pointer"
-                      title="Open Synchronized Nexus Peer Registry"
+                      onClick={() => { setRole(null); resetAll(); setQrPayload(""); setPasteBuffer(""); }}
+                      className="text-xs font-medium text-muted hover:text-text hover:underline cursor-pointer"
                     >
-                      <Users className="w-3.5 h-3.5" />
-                      <span>Peer Registry</span>
+                      ← Back to Start
                     </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-2.5 p-1 bg-slate-100/80 dark:bg-[#0b0d13] rounded-xl border border-slate-200/70 dark:border-white/[0.06]">
+                  <div className="grid grid-cols-2 gap-2 p-1 bg-gray-100 dark:bg-[#18191c] rounded-lg border border-gray-300 dark:border-[#343842]">
                     <button 
                       type="button"
                       disabled={isPeerConnectedToHost}
@@ -3319,11 +3299,11 @@ export default function App() {
                         setRole("host"); 
                         resetAll(); 
                       }}
-                      title={isPeerConnectedToHost ? "Disconnect from the handshake menu before hosting a channel" : undefined}
+                      title={isPeerConnectedToHost ? "Disconnect first before hosting a room" : undefined}
                       className={cn(
-                        "py-2 px-3 text-xs font-semibold transition-all rounded-lg flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0",
+                        "py-2 px-3 text-xs font-semibold transition-all rounded-md flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0",
                         role === "host" 
-                          ? "bg-accent text-white shadow-xs" 
+                          ? "bg-accent text-white shadow-2xs" 
                           : (
                             isPeerConnectedToHost
                               ? "text-muted/40 cursor-not-allowed"
@@ -3332,67 +3312,78 @@ export default function App() {
                       )}
                     >
                       {isPeerConnectedToHost && <Lock className="w-3.5 h-3.5 text-muted/60 flex-shrink-0" />}
-                      <span>Host Channel</span>
+                      <span>Create a Room (Host)</span>
                     </button>
                     <button 
                       onClick={() => { setRole("join"); resetAll(); }}
                       className={cn(
-                        "py-2 px-3 text-xs font-semibold transition-all rounded-lg whitespace-nowrap shrink-0 cursor-pointer",
+                        "py-2 px-3 text-xs font-semibold transition-all rounded-md whitespace-nowrap shrink-0 cursor-pointer",
                         role === "join" 
-                          ? "bg-success text-white shadow-xs" 
+                          ? "bg-success text-white shadow-2xs" 
                           : "text-muted hover:text-text"
                       )}
                     >
-                      Join Session
+                      Join a Room (Guest)
                     </button>
                   </div>
                 </div>
 
-                <div className="glass-panel flex-1 flex flex-col relative overflow-hidden lg:min-h-0 min-h-[400px]">
-                  <div className="flex-1 overflow-y-auto p-5 flex flex-col items-center w-full text-center">
-                    <div className="text-xs font-semibold uppercase tracking-wider text-muted self-start w-full text-left mb-5 pb-3 border-b border-slate-200/80 dark:border-white/[0.07]">
-                      Handshake Port
-                    </div>
-
+                {/* Step-by-Step Guide Card */}
+                <div className="glass-panel flex-1 flex flex-col relative overflow-hidden lg:min-h-0 min-h-[420px]">
+                  <div className="flex-1 overflow-y-auto p-5 flex flex-col w-full">
                     {status === "connected" && role === "join" ? (
-                      <div className="flex flex-col items-center justify-center flex-1 py-6">
-                        <div className="w-20 h-20 bg-success/10 border border-success/25 rounded-2xl flex items-center justify-center text-success mb-4">
-                          <CheckCircle2 className="w-10 h-10" />
+                      <div className="flex flex-col items-center justify-center flex-1 py-8 text-center">
+                        <div className="w-16 h-16 bg-success/15 border border-success/30 rounded-full flex items-center justify-center text-success mb-4">
+                          <CheckCircle2 className="w-9 h-9" />
                         </div>
-                        <p className="text-text font-bold text-base">Tunnel Secured</p>
-                        <p className="text-muted text-xs mt-1">Direct peer-to-peer link active</p>
-                        <button 
-                          onClick={() => { setRole(null); resetAll(); setQrPayload(""); setPasteBuffer(""); setMessages([]); setLogs([]); }}
-                          className="mt-6 text-xs text-red-500 hover:text-white bg-red-500/10 hover:bg-red-500 border border-red-500/20 rounded-xl px-5 py-2.5 flex items-center gap-2 font-semibold transition-colors cursor-pointer"
-                        >
-                          <X className="w-4 h-4" /> Disconnect Session
-                        </button>
+                        <p className="text-text font-bold text-lg">You're Connected!</p>
+                        <p className="text-muted text-xs mt-1 max-w-xs leading-relaxed">
+                          You can now send files using the panel on the right, or switch to the <strong>Chat & Calls</strong> tab to talk.
+                        </p>
+                        <div className="flex gap-2.5 mt-6">
+                          <button 
+                            onClick={() => setActiveTab("chat")}
+                            className="text-xs text-white bg-accent hover:bg-blue-700 rounded-lg px-4 py-2.5 font-semibold transition-colors cursor-pointer shadow-2xs"
+                          >
+                            Open Chat & Calls
+                          </button>
+                          <button 
+                            onClick={() => { setRole(null); resetAll(); setQrPayload(""); setPasteBuffer(""); setMessages([]); setLogs([]); }}
+                            className="text-xs text-red-600 dark:text-red-400 hover:bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2.5 flex items-center gap-1.5 font-semibold transition-colors cursor-pointer"
+                          >
+                            <X className="w-4 h-4" /> Disconnect
+                          </button>
+                        </div>
                       </div>
                     ) : (
-                      <div className="w-full flex flex-col items-center">
+                      <div className="w-full flex flex-col">
                         {role === 'host' ? (
-                          <div className="w-full flex flex-col items-center">
+                          <div className="w-full flex flex-col">
+                            {/* Connected People List when Hosting */}
                             {connectedCount > 0 && (
-                              <div className="mb-5 w-full text-center">
-                                <div className="p-4 border border-accent/25 bg-accent/[0.06] mb-3 rounded-xl">
-                                  <p className="text-accent font-semibold text-xs mb-1">Host Mode Active</p>
-                                  <p className="text-muted text-xs mb-3">Relaying connections for <span className="font-mono font-semibold text-text tabular-nums">{connectedCount}</span> peer(s).</p>
+                              <div className="mb-5 w-full">
+                                <div className="p-3.5 border border-success/30 bg-success/10 mb-3 rounded-lg flex items-center justify-between gap-2">
+                                  <div>
+                                    <p className="text-success font-bold text-xs">Room Active ({connectedCount} connected)</p>
+                                    <p className="text-muted text-[11px] mt-0.5">You can share files or invite more people below.</p>
+                                  </div>
                                   <button 
                                     onClick={() => { setRole(null); resetAll(); setQrPayload(""); setPasteBuffer(""); setMessages([]); setLogs([]); setConnectedPeers(0); }}
-                                    className="text-xs text-red-500 hover:text-white bg-red-500/10 hover:bg-red-500 border border-red-500/20 rounded-xl px-4 py-2 flex items-center gap-1.5 mx-auto font-semibold transition-colors cursor-pointer"
+                                    className="text-xs text-red-600 dark:text-red-400 hover:bg-red-500 hover:text-white border border-red-500/30 rounded-lg px-3 py-1.5 flex items-center gap-1 font-semibold transition-colors cursor-pointer shrink-0"
                                   >
-                                    <X className="w-3.5 h-3.5" /> Stop Hosting
+                                    <X className="w-3.5 h-3.5" /> Close Room
                                   </button>
                                 </div>
-                                <div className="text-left w-full border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/70 dark:bg-[#0b0d13]/80 p-3.5 max-h-48 overflow-y-auto rounded-xl">
-                                  <p className="text-xs font-semibold text-muted uppercase tracking-wider mb-2.5 pb-2 border-b border-slate-200/70 dark:border-white/[0.06]">Connected Peers</p>
+                                <div className="text-left w-full border border-gray-200 dark:border-[#343842] bg-gray-50 dark:bg-[#18191c] p-3 max-h-44 overflow-y-auto rounded-lg">
+                                  <p className="text-xs font-bold text-text mb-2 pb-1.5 border-b border-gray-200 dark:border-[#343842]">Connected People</p>
                                   {(Object.entries(peerProfiles) as [string, UserProfile][]).map(([id, p]) => (
-                                    <div key={id} className="flex justify-between items-center mb-2 last:mb-0 bg-white dark:bg-[#151822] p-2.5 rounded-xl border border-slate-200/70 dark:border-white/[0.06] transition-colors">
+                                    <div key={id} className="flex justify-between items-center mb-2 last:mb-0 bg-white dark:bg-[#22242a] p-2 rounded-lg border border-gray-200 dark:border-[#343842]">
                                       <button 
                                         className="flex gap-2.5 items-center hover:opacity-85 transition-opacity text-left cursor-pointer outline-none min-w-0"
                                         onClick={() => setSelectedPeerProfile(p)}
+                                        title="Click to view profile or start a call"
                                       >
-                                        <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden", p.avatarColor)}>
+                                        <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden", p.avatarColor)}>
                                           {p.avatarImage ? (
                                             <img src={p.avatarImage} alt={p.username} className="w-full h-full object-cover" />
                                           ) : (
@@ -3401,14 +3392,14 @@ export default function App() {
                                         </div>
                                         <div className="flex flex-col min-w-0">
                                           <span className="text-text text-xs font-semibold truncate max-w-[120px]">{p.username}</span>
-                                          <span className="text-muted text-[10px] font-mono mt-0.5 truncate max-w-[110px]">{p.bio}</span>
+                                          <span className="text-muted text-[11px] truncate max-w-[110px]">{p.bio || "Connected"}</span>
                                         </div>
                                       </button>
                                       <button 
                                         onClick={() => disconnectPeer(id)}
-                                        className="text-xs text-red-500 hover:text-white bg-red-500/10 hover:bg-red-500 border border-red-500/20 px-3 py-1.5 transition-colors font-semibold rounded-lg cursor-pointer shrink-0"
+                                        className="text-xs text-red-600 dark:text-red-400 hover:bg-red-500 hover:text-white border border-red-500/30 px-2.5 py-1 transition-colors font-medium rounded-md cursor-pointer shrink-0"
                                       >
-                                        Kick
+                                        Remove
                                       </button>
                                     </div>
                                   ))}
@@ -3416,106 +3407,156 @@ export default function App() {
                               </div>
                             )}
 
+                            {/* Step 1 for Host */}
+                            <div className="mb-2">
+                              <div className="flex items-center gap-2 mb-1.5">
+                                <span className="w-5 h-5 rounded-full bg-accent text-white text-xs font-bold flex items-center justify-center shrink-0">1</span>
+                                <h4 className="text-xs font-bold text-text">Share Your Invite Code</h4>
+                              </div>
+                              <p className="text-xs text-muted mb-3 leading-relaxed">
+                                Show this QR code to your friend, or copy the Invite Code and send it to them via any messaging app.
+                              </p>
+                            </div>
+
                             {qrPayload ? (
-                              <>
+                              <div className="flex flex-col items-center bg-gray-50 dark:bg-[#18191c] p-4 rounded-xl border border-gray-200 dark:border-[#343842]">
                                 <div 
-                                  className="bg-white p-4 rounded-2xl relative shadow-lg border border-slate-200/80 dark:border-white/15 mt-2 cursor-pointer hover:scale-[1.01] transition-transform"
+                                  className="bg-white p-3.5 rounded-xl shadow-xs border border-gray-200 cursor-pointer"
                                   onClick={() => {
                                     navigator.clipboard.writeText(qrPayload);
-                                    addLog("Offer string copied to clipboard", "ok");
+                                    addLog("Invite code copied to clipboard", "ok");
                                   }}
-                                  title="Click to copy protocol matrix"
+                                  title="Click to copy Invite Code"
                                 >
-                                  <QRCodeSVG value={qrPayload} size={220} level="L" marginSize={2} />
+                                  <QRCodeSVG value={qrPayload} size={190} level="L" marginSize={2} />
                                 </div>
-                                <div className="flex gap-2 mt-4 w-full max-w-[252px]">
-                                  <button 
-                                    onClick={createHostOffer}
-                                    className="flex-1 py-2.5 px-3 bg-slate-100 dark:bg-[#171a24] hover:bg-slate-200/80 dark:hover:bg-[#1f2432] border border-slate-200/80 dark:border-white/[0.08] rounded-xl text-text text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap"
-                                  >
-                                    Regenerate Offer
-                                  </button>
+                                <div className="flex gap-2 mt-3.5 w-full">
                                   <button 
                                     onClick={() => {
-                                      if (navigator.share) {
-                                        navigator.share({ title: 'Host Matrix', text: qrPayload }).catch(() => {
-                                          navigator.clipboard.writeText(qrPayload);
-                                          addLog("Offer string copied to clipboard", "ok");
-                                        });
-                                      } else {
-                                        navigator.clipboard.writeText(qrPayload);
-                                        addLog("Offer string copied to clipboard", "ok");
-                                      }
+                                      navigator.clipboard.writeText(qrPayload);
+                                      addLog("Invite code copied to clipboard", "ok");
                                     }}
-                                    className="flex justify-center items-center px-3.5 py-2.5 bg-slate-100 dark:bg-[#171a24] hover:bg-slate-200/80 dark:hover:bg-[#1f2432] border border-slate-200/80 dark:border-white/[0.08] rounded-xl text-accent transition-colors cursor-pointer"
-                                    title="Share / Copy Protocol Data"
+                                    className="flex-1 py-2.5 px-3 bg-accent hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
                                   >
-                                    <Copy className="w-4 h-4" />
+                                    <Copy className="w-3.5 h-3.5" />
+                                    <span>Copy Invite Code</span>
+                                  </button>
+                                  <button 
+                                    onClick={createHostOffer}
+                                    className="py-2.5 px-3 bg-white dark:bg-[#2a2d35] hover:bg-gray-100 dark:hover:bg-[#343842] border border-gray-300 dark:border-[#3c404d] rounded-lg text-text text-xs font-medium transition-colors cursor-pointer whitespace-nowrap"
+                                    title="Generate a fresh Invite Code"
+                                  >
+                                    New Code
                                   </button>
                                 </div>
-                              </>
+                              </div>
                             ) : (
                               <button 
                                 onClick={createHostOffer}
-                                className="w-full py-3.5 px-4 mt-1 border border-dashed border-slate-300 dark:border-white/[0.14] bg-slate-50/70 dark:bg-[#151822]/70 rounded-xl hover:border-accent/60 hover:bg-accent/[0.04] transition-all text-text text-xs font-semibold flex items-center justify-center gap-2.5 cursor-pointer"
+                                className="w-full py-3 px-4 bg-accent hover:bg-blue-700 text-white rounded-lg transition-all text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
                               >
-                                {connectedCount > 0 ? "Add Another Peer (Generate QR)" : "Initialize Offer Matrix"}
-                                {connectedCount > 0 ? <UserPlus className="w-4 h-4 text-accent" /> : <RefreshCw className="w-4 h-4 text-accent" />}
+                                {connectedCount > 0 ? <UserPlus className="w-4 h-4" /> : <RefreshCw className="w-4 h-4" />}
+                                <span>{connectedCount > 0 ? "Invite Another Person" : "Generate Invite Code & QR"}</span>
                               </button>
                             )}
                           </div>
                         ) : (
-                          <div className="w-full flex flex-col items-center">
+                          /* Guest / Join Flow */
+                          <div className="w-full flex flex-col">
                             {qrPayload ? (
-                              <>
-                                <div 
-                                  className="bg-white p-4 rounded-2xl relative shadow-lg border border-slate-200/80 dark:border-white/15 mt-2 cursor-pointer hover:scale-[1.01] transition-transform"
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(qrPayload);
-                                    addLog("Answer string copied to clipboard", "ok");
-                                  }}
-                                  title="Click to copy protocol matrix"
-                                >
-                                  <QRCodeSVG value={qrPayload} size={220} level="L" marginSize={2} />
+                              <div className="flex flex-col">
+                                <div className="flex items-center gap-2 mb-1.5">
+                                  <span className="w-5 h-5 rounded-full bg-success text-white text-xs font-bold flex items-center justify-center shrink-0">2</span>
+                                  <h4 className="text-xs font-bold text-text">Send Reply Code Back to Host</h4>
                                 </div>
-                                <p className="mt-5 text-xs font-semibold text-success bg-success/10 border border-success/20 rounded-xl p-3.5 w-full">
-                                  Answer generated. Present to host.
+                                <p className="text-xs text-muted mb-3 leading-relaxed">
+                                  Almost done! Have the Host scan this QR code, or click <strong>Copy Reply Code</strong> and send it back to the Host.
                                 </p>
-                              </>
+                                <div className="flex flex-col items-center bg-gray-50 dark:bg-[#18191c] p-4 rounded-xl border border-gray-200 dark:border-[#343842]">
+                                  <div 
+                                    className="bg-white p-3.5 rounded-xl shadow-xs border border-gray-200 cursor-pointer"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(qrPayload);
+                                      addLog("Reply code copied to clipboard", "ok");
+                                    }}
+                                    title="Click to copy Reply Code"
+                                  >
+                                    <QRCodeSVG value={qrPayload} size={190} level="L" marginSize={2} />
+                                  </div>
+                                  <button 
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(qrPayload);
+                                      addLog("Reply code copied to clipboard", "ok");
+                                    }}
+                                    className="w-full mt-3.5 py-2.5 px-4 bg-success hover:bg-green-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+                                  >
+                                    <Copy className="w-3.5 h-3.5" />
+                                    <span>Copy Reply Code</span>
+                                  </button>
+                                </div>
+                                <div className="mt-3 text-xs font-medium text-success bg-success/10 border border-success/25 rounded-lg p-3 text-center">
+                                  Waiting for the Host to paste your Reply Code...
+                                </div>
+                              </div>
                             ) : (
-                              <button 
-                                onClick={() => setScannerType('offer')}
-                                className="w-full py-3.5 px-4 border border-dashed border-slate-300 dark:border-white/[0.14] bg-slate-50/70 dark:bg-[#151822]/70 rounded-xl hover:border-accent/60 hover:bg-accent/[0.04] transition-all text-text text-xs font-semibold cursor-pointer"
-                              >
-                                Scan Peer Matrix
-                              </button>
+                              <div className="flex flex-col">
+                                <div className="flex items-center gap-2 mb-1.5">
+                                  <span className="w-5 h-5 rounded-full bg-success text-white text-xs font-bold flex items-center justify-center shrink-0">1</span>
+                                  <h4 className="text-xs font-bold text-text">Enter Host's Invite Code</h4>
+                                </div>
+                                <p className="text-xs text-muted mb-3 leading-relaxed">
+                                  Scan the QR code shown on the Host's screen, or paste the Invite Code they sent you below.
+                                </p>
+                                <button 
+                                  onClick={() => setScannerType('offer')}
+                                  className="w-full py-3 px-4 bg-white dark:bg-[#2a2d35] border border-gray-300 dark:border-[#3c404d] rounded-lg hover:bg-gray-50 dark:hover:bg-[#343842] transition-all text-text text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+                                >
+                                  <Monitor className="w-4 h-4 text-accent" />
+                                  <span>Scan Host's QR Code with Camera</span>
+                                </button>
+                              </div>
                             )}
                           </div>
                         )}
 
-                        <div className="w-full mt-6 pt-6 border-t border-slate-200/80 dark:border-white/[0.07] space-y-3.5 pb-10 lg:pb-2 flex-shrink-0">
+                        {/* Step 2 / Code Input Box */}
+                        <div className="w-full mt-5 pt-5 border-t border-gray-200 dark:border-[#343842] space-y-3 pb-8 lg:pb-2 flex-shrink-0">
+                          {role === 'host' && (
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="w-5 h-5 rounded-full bg-success text-white text-xs font-bold flex items-center justify-center shrink-0">2</span>
+                              <h4 className="text-xs font-bold text-text">Confirm Friend's Reply Code</h4>
+                            </div>
+                          )}
+                          {role === 'host' && (
+                            <p className="text-xs text-muted leading-relaxed">
+                              After your friend accepts your invite, paste their Reply Code here (or scan their QR) to finish connecting:
+                            </p>
+                          )}
+
                           <textarea 
-                            placeholder="Paste handshake token or protocol data..."
+                            placeholder={role === 'host' ? "Paste your friend's Reply Code here..." : "Or paste the Host's Invite Code here..."}
                             value={pasteBuffer}
                             onChange={(e) => setPasteBuffer(e.target.value)}
-                            className="w-full bg-slate-100/70 dark:bg-[#0b0d13] border border-slate-200/80 dark:border-white/[0.08] text-text text-xs font-mono p-3.5 rounded-xl min-h-24 outline-none focus:border-accent resize-none placeholder:text-muted/60 transition-colors"
+                            className="w-full bg-gray-50 dark:bg-[#18191c] border border-gray-300 dark:border-[#343842] text-text text-xs font-mono p-3 rounded-lg min-h-20 outline-none focus:border-accent resize-none placeholder:text-muted/70 transition-colors"
                           />
                           
                           {role === 'host' && (
                             <div className="flex gap-2 w-full">
                               <button 
                                 onClick={() => setScannerType('answer')}
-                                className="flex-shrink-0 w-11 flex items-center justify-center bg-slate-100 dark:bg-[#161923] border border-slate-200/80 dark:border-white/[0.08] hover:bg-slate-200/70 dark:hover:bg-[#1f2433] transition-colors rounded-xl text-text cursor-pointer"
-                                title="Scan Answer QR Code"
+                                className="flex-shrink-0 px-3 py-2.5 flex items-center justify-center gap-1.5 bg-white dark:bg-[#2a2d35] border border-gray-300 dark:border-[#3c404d] hover:bg-gray-50 dark:hover:bg-[#343842] transition-colors rounded-lg text-text text-xs font-medium cursor-pointer"
+                                title="Scan Friend's Reply QR Code"
                               >
-                                <Monitor className="w-4 h-4" />
+                                <Monitor className="w-4 h-4 text-accent" />
+                                <span>Scan QR</span>
                               </button>
                               <button 
                                 disabled={!pasteBuffer}
                                 onClick={() => handleReceivedAnswer()}
-                                className="flex-1 py-2.5 px-4 rounded-xl bg-success hover:bg-success/90 text-white text-xs font-semibold transition-colors disabled:opacity-40 flex items-center justify-center gap-2 cursor-pointer"
+                                className="flex-1 py-2.5 px-4 rounded-lg bg-success hover:bg-green-700 text-white text-xs font-semibold transition-colors disabled:opacity-40 flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
                               >
-                                Sync Answer Protocol <ArrowRight className="w-4 h-4" />
+                                <span>Connect Person</span>
+                                <ArrowRight className="w-4 h-4" />
                               </button>
                             </div>
                           )}
@@ -3524,9 +3565,10 @@ export default function App() {
                             <button 
                               disabled={!pasteBuffer}
                               onClick={() => handleReceivedOffer(pasteBuffer)}
-                              className="w-full py-2.5 px-4 rounded-xl bg-accent hover:bg-accent/90 text-white text-xs font-semibold transition-colors disabled:opacity-40 flex items-center justify-center gap-2 cursor-pointer"
+                              className="w-full py-2.5 px-4 rounded-lg bg-accent hover:bg-blue-700 text-white text-xs font-semibold transition-colors disabled:opacity-40 flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
                             >
-                              Process Offer <Hexagon className="w-4 h-4 fill-white/20" />
+                              <span>Accept Invite Code</span>
+                              <ArrowRight className="w-4 h-4" />
                             </button>
                           )}
                         </div>
@@ -3536,99 +3578,109 @@ export default function App() {
                 </div>
               </section>
 
-              {/* Rest of the Sections: File Payload & Logs */}
-              <section className="col-span-1 lg:col-span-8 flex flex-col lg:flex-row gap-5 lg:overflow-hidden min-h-[760px] lg:min-h-0">
+              {/* Right Column: File Sharing & Activity History */}
+              <section className="col-span-1 lg:col-span-8 flex flex-col lg:flex-row gap-5 lg:overflow-hidden min-h-[720px] lg:min-h-0">
                 <div className="flex-1 flex flex-col lg:flex-row gap-5 lg:overflow-hidden">
-                  {/* File Bay */}
+                  {/* Shared Files Panel */}
                   <div className="flex-1 glass-panel flex flex-col lg:overflow-y-auto scrollbar-hide min-h-[400px] lg:min-h-0">
-                    <div className="px-5 py-3.5 border-b border-slate-200/80 dark:border-white/[0.07] bg-slate-50/50 dark:bg-[#141720]/60 backdrop-blur-md flex justify-between items-center sticky top-0 z-10 rounded-t-2xl">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-muted">File Drop Zone</span>
-                      <span className="text-xs font-medium flex items-center gap-1.5 text-muted">
+                    <div className="px-5 py-3.5 border-b border-gray-200 dark:border-[#343842] bg-gray-50 dark:bg-[#1e2026] flex justify-between items-center sticky top-0 z-10 rounded-t-xl">
+                      <span className="text-sm font-bold text-text">Send & Receive Files</span>
+                      <span className="text-xs font-medium flex items-center gap-1.5">
                         <span className={cn(
                           "w-2 h-2 rounded-full",
-                          status === "connected" ? "bg-success" : "bg-slate-400 dark:bg-slate-600"
+                          status === "connected" ? "bg-success" : "bg-gray-400 dark:bg-gray-500"
                         )} />
                         <span className={cn(status === "connected" ? "text-success font-semibold" : "text-muted")}>
-                          {status === "connected" ? "Online" : "Offline"}
+                          {status === "connected" ? "Ready to Share" : "Waiting for Connection"}
                         </span>
                       </span>
                     </div>
 
                     <div className="flex-1 p-5 overflow-hidden flex flex-col">
-                      <div className="flex flex-wrap items-center justify-between mb-3.5 gap-2">
+                      {/* Simple File Options Bar */}
+                      <div className="flex flex-wrap items-center justify-between mb-4 gap-2 pb-3 border-b border-gray-200 dark:border-[#343842]">
                         <div className="flex items-center gap-2">
-                          <button 
-                            onClick={handleClearCache} 
-                            className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-[#161923] border border-slate-200/80 dark:border-white/[0.08] hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-500 transition-colors text-text cursor-pointer text-xs font-medium flex items-center gap-1.5 whitespace-nowrap shrink-0"
-                            title="Purge entire app-cache-v1 bucket and all sandbox files from disk"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            <span>Clear Cache</span>
-                          </button>
-                          <div 
-                            className="text-xs font-mono text-muted bg-slate-100/70 dark:bg-[#0b0d13] border border-slate-200/70 dark:border-white/[0.06] px-3 py-1.5 rounded-xl flex items-center gap-1.5 tabular-nums"
-                            title="Disk storage used by cached files in app-cache-v1"
-                          >
-                            <HardDrive className="w-3.5 h-3.5 text-accent" />
-                            <span>Cache: <strong className="text-text font-semibold">{cacheSizeMB} MB</strong></span>
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2.5">
-                          <button
-                            type="button"
-                            onClick={() => setDirectDownloads(!directDownloads)}
-                            className={cn(
-                              "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border cursor-pointer whitespace-nowrap shrink-0",
-                              directDownloads 
-                                ? "bg-accent/15 border-accent/40 text-accent" 
-                                : "bg-slate-100 dark:bg-[#161923] border-slate-200/80 dark:border-white/[0.08] text-muted hover:text-text"
-                            )}
-                            title="Direct disk streaming: Bypasses RAM and drop zone sandboxing, instantly prompts receiver browser to download straight to disk."
-                          >
-                            <HardDrive className="w-3.5 h-3.5" />
-                            <span>Direct Disk Stream</span>
-                            <span className={cn("w-1.5 h-1.5 rounded-full", directDownloads ? "bg-accent" : "bg-slate-400 dark:bg-slate-600")} />
-                          </button>
-                          <label className="flex items-center gap-2 text-xs text-muted cursor-pointer hover:text-text transition-colors select-none">
+                          <label className="flex items-center gap-2 text-xs font-medium text-text cursor-pointer select-none bg-gray-100 dark:bg-[#2a2d35] px-3 py-1.5 rounded-lg border border-gray-300 dark:border-[#3c404d]">
                             <input 
                               type="checkbox" 
                               checked={autoDownload} 
                               onChange={(e) => setAutoDownload(e.target.checked)} 
-                              className="rounded border-slate-300 dark:border-white/20 bg-transparent text-accent focus:ring-accent"
+                              className="rounded border-gray-300 dark:border-gray-600 text-accent focus:ring-accent"
                             />
-                            Auto-download
+                            <span>Auto-save received files</span>
                           </label>
+                          <button
+                            type="button"
+                            onClick={() => setDirectDownloads(!directDownloads)}
+                            className={cn(
+                              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border cursor-pointer whitespace-nowrap shrink-0",
+                              directDownloads 
+                                ? "bg-accent/15 border-accent text-accent font-semibold" 
+                                : "bg-gray-100 dark:bg-[#2a2d35] border-gray-300 dark:border-[#3c404d] text-muted hover:text-text"
+                            )}
+                            title="Streams large files directly to your Downloads folder without using browser memory"
+                          >
+                            <HardDrive className="w-3.5 h-3.5" />
+                            <span>Large File Mode: {directDownloads ? "ON" : "OFF"}</span>
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted font-mono tabular-nums">
+                            Saved: {cacheSizeMB} MB
+                          </span>
+                          {files.length > 0 && (
+                            <button 
+                              onClick={handleClearCache} 
+                              className="px-2.5 py-1 rounded-lg bg-white dark:bg-[#2a2d35] border border-gray-300 dark:border-[#3c404d] hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-500 transition-colors text-muted cursor-pointer text-xs font-medium flex items-center gap-1 whitespace-nowrap shrink-0"
+                              title="Clear shared file list and temporary storage"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Clear List</span>
+                            </button>
+                          )}
                         </div>
                       </div>
+
+                      {/* Classic Drag & Drop Upload Box */}
                       <div 
                         onDragOver={(e) => { e.preventDefault(); setIsDraggingOver(true); }}
                         onDragLeave={() => setIsDraggingOver(false)}
                         onDrop={(e) => { e.preventDefault(); setIsDraggingOver(false); if (e.dataTransfer.files) handleFilesSelected(Array.from(e.dataTransfer.files)); }}
                         className={cn(
-                          "relative border border-dashed rounded-2xl h-36 flex flex-col items-center justify-center transition-all cursor-pointer mb-4 overflow-hidden group",
-                          isDraggingOver 
-                            ? "border-accent bg-accent/[0.06] text-accent" 
-                            : "border-slate-300 dark:border-white/[0.12] bg-slate-50/60 dark:bg-[#0b0d13]/60 text-muted hover:border-accent/50 hover:bg-accent/[0.02] hover:text-text"
+                          "relative border-2 border-dashed rounded-xl h-36 flex flex-col items-center justify-center transition-all cursor-pointer mb-4 overflow-hidden group px-4 text-center",
+                          status !== 'connected'
+                            ? "border-gray-300 dark:border-[#343842] bg-gray-50 dark:bg-[#18191c] text-muted opacity-75"
+                            : isDraggingOver 
+                              ? "border-accent bg-accent/10 text-accent" 
+                              : "border-gray-300 dark:border-[#3c404d] bg-gray-50/70 dark:bg-[#18191c] text-muted hover:border-accent hover:bg-blue-50/30 dark:hover:bg-[#262932] hover:text-text"
                         )}
                       >
                         <DataStream active={isTransferring} />
                         <input 
                           type="file" 
                           multiple 
-                          className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                          className="absolute inset-0 opacity-0 cursor-pointer z-10 disabled:cursor-not-allowed"
                           disabled={status !== 'connected'}
                           onChange={(e) => { if (e.target.files) handleFilesSelected(Array.from(e.target.files)); }}
                         />
-                        <div className="w-10 h-10 rounded-xl bg-slate-200/70 dark:bg-white/[0.05] border border-slate-300/60 dark:border-white/[0.07] flex items-center justify-center mb-2.5 transition-transform group-hover:-translate-y-0.5 text-accent">
+                        <div className="w-10 h-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center mb-2 text-accent">
                           <Send className="w-4 h-4" />
                         </div>
-                        <div className="text-sm font-semibold text-text mb-0.5">
-                          {isDraggingOver ? "Drop files to transmit" : "Click or drag files to transmit"}
+                        <div className="text-sm font-bold text-text mb-0.5">
+                          {status !== 'connected'
+                            ? "Connect with a person on the left to send files"
+                            : isDraggingOver
+                              ? "Drop files here to send now"
+                              : "Click to Choose Files, or Drag & Drop Here"}
                         </div>
-                        <div className="text-xs text-muted">Encrypted peer-to-peer stream</div>
+                        <div className="text-xs text-muted">
+                          {status === 'connected' ? "Send photos, videos, documents, or any file directly" : "Files are sent directly from your device to theirs"}
+                        </div>
                       </div>
 
-                      <div className="flex-1 overflow-y-auto space-y-2.5 pr-0.5 scrollbar-hide">
+                      {/* Shared Files List */}
+                      <div className="flex-1 overflow-y-auto space-y-2.5 pr-0.5">
                         {transfer && (
                           <PacketTransferAnimation transfer={transfer} myUsername={profile.username} onCancel={handleCancelTransfer} />
                         )}
@@ -3662,7 +3714,7 @@ export default function App() {
                                   }
                                 }
                               }}
-                              className="bg-slate-50/80 dark:bg-[#151822]/90 border border-slate-200/80 dark:border-white/[0.07] hover:border-slate-300 dark:hover:border-white/[0.15] p-3.5 rounded-xl flex items-center justify-between gap-3 transition-all cursor-pointer group"
+                              className="bg-white dark:bg-[#18191c] border border-gray-200 dark:border-[#343842] hover:border-accent dark:hover:border-accent p-3 rounded-lg flex items-center justify-between gap-3 transition-all cursor-pointer group shadow-2xs"
                             >
                               {/* Left: Thumbnail / File Icon */}
                               <div className="shrink-0" onClick={(e) => { if (isVideo) e.stopPropagation(); }}>
@@ -3670,12 +3722,12 @@ export default function App() {
                                   <VideoDropZonePreview file={file} />
                                 ) : (
                                   <div className={cn(
-                                    "w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border",
+                                    "w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border",
                                     isPdf 
                                       ? "bg-red-500/10 border-red-500/20 text-red-500"
                                       : isHtml
                                       ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
-                                      : "bg-white dark:bg-[#0d0f17] border-slate-200/70 dark:border-white/[0.07]",
+                                      : "bg-gray-50 dark:bg-[#22242a] border-gray-200 dark:border-[#343842]",
                                     !isPdf && !isHtml && (file.direction === 'in' ? "text-success" : "text-accent")
                                   )}>
                                     {isPdf ? (
@@ -3697,34 +3749,16 @@ export default function App() {
                                   <span className="text-sm font-semibold truncate text-text" title={file.name}>
                                     {file.name}
                                   </span>
-                                  {isPdf && (
-                                    <span className="shrink-0 text-[10px] font-mono text-red-400">
-                                      · PDF
-                                    </span>
-                                  )}
-                                  {isHtml && (
-                                    <span className="shrink-0 text-[10px] font-mono text-amber-400">
-                                      · HTML
-                                    </span>
-                                  )}
                                 </div>
                                 <div className="text-xs text-muted mt-0.5 flex items-center gap-1.5 text-nowrap truncate">
                                   <span className="shrink-0 font-mono tabular-nums text-text/80">{formatBytes(file.size)}</span>
-                                  <span className="opacity-40">·</span>
-                                  <span className="truncate">{file.direction === 'in' ? `From ${file.senderName}` : "Sent by you"}</span>
-                                  {file.cacheUrl && !isPdf && !isHtml && !isVideo && (
-                                    <>
-                                      <span className="opacity-40">·</span>
-                                      <span className="shrink-0 text-[11px] font-mono text-accent">
-                                        Cached
-                                      </span>
-                                    </>
-                                  )}
+                                  <span>•</span>
+                                  <span className="truncate">{file.direction === 'in' ? `Received from ${file.senderName}` : "Sent by you"}</span>
                                 </div>
                               </div>
 
                               {/* Right: Actions */}
-                              <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+                              <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
                                 <button
                                   type="button"
                                   onClick={async (e) => {
@@ -3746,16 +3780,17 @@ export default function App() {
                                       }, 5000);
                                     }
                                   }}
-                                  className="p-2 rounded-lg text-muted hover:text-accent hover:bg-accent/10 transition-colors cursor-pointer"
-                                  title="Download file"
+                                  className="px-2.5 py-1.5 rounded-md bg-gray-100 dark:bg-[#2a2d35] text-text hover:bg-accent hover:text-white transition-colors cursor-pointer text-xs font-medium flex items-center gap-1"
+                                  title="Save file to your device"
                                 >
-                                  <Download className="w-4 h-4" />
+                                  <Download className="w-3.5 h-3.5" />
+                                  <span className="hidden sm:inline">Save</span>
                                 </button>
                                 <button
                                   type="button"
                                   onClick={(e) => handleDeleteSandboxFile(file, e)}
-                                  className="p-2 rounded-lg text-muted hover:text-red-500 hover:bg-red-500/10 transition-colors opacity-60 group-hover:opacity-100 cursor-pointer"
-                                  title="Delete cached file from disk"
+                                  className="p-1.5 rounded-md text-muted hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                                  title="Remove from list"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </button>
@@ -3765,62 +3800,61 @@ export default function App() {
                         })}
 
                         {files.length === 0 && !transfer && (
-                          <div className="h-full flex flex-col items-center justify-center opacity-50 py-12">
-                            <FileText className="w-10 h-10 mb-2.5 text-muted stroke-[1.5]" />
-                            <span className="text-xs font-medium text-muted">No files transferred in this session</span>
+                          <div className="h-full flex flex-col items-center justify-center text-muted py-12">
+                            <FileText className="w-10 h-10 mb-2 text-muted/50 stroke-[1.5]" />
+                            <span className="text-xs font-medium">No files shared yet</span>
+                            <span className="text-[11px] text-muted/70 mt-0.5">Files you send or receive will appear here</span>
                           </div>
                         )}
                       </div>
                     </div>
                   </div>
 
-                  {/* Signal Feed */}
-                  <div className="w-full lg:w-76 flex-shrink-0 glass-panel flex flex-col min-h-[350px] lg:min-h-0">
-                    <div className="px-4 py-3.5 border-b border-slate-200/80 dark:border-white/[0.07] bg-slate-50/50 dark:bg-[#141720]/60 backdrop-blur-md sticky top-0 z-10 flex-shrink-0 rounded-t-2xl flex justify-between items-center">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-muted">Activity Log</span>
+                  {/* Connection History Sidebar */}
+                  <div className="w-full lg:w-72 flex-shrink-0 glass-panel flex flex-col min-h-[300px] lg:min-h-0">
+                    <div className="px-4 py-3.5 border-b border-gray-200 dark:border-[#343842] bg-gray-50 dark:bg-[#1e2026] sticky top-0 z-10 flex-shrink-0 rounded-t-xl flex justify-between items-center">
+                      <span className="text-sm font-bold text-text">Recent Activity</span>
                       <button
                         onClick={() => setShowFailoverMenu(true)}
-                        className="px-2.5 py-1 rounded-lg hover:bg-accent/15 transition-colors bg-accent/10 border border-accent/20 flex items-center gap-1.5 cursor-pointer text-xs font-medium text-accent"
-                        title="Open Synchronized Nexus Peer Registry & Failover Control"
+                        className="px-2.5 py-1 rounded-md hover:bg-gray-200 dark:hover:bg-[#343842] transition-colors bg-white dark:bg-[#2a2d35] border border-gray-300 dark:border-[#3c404d] flex items-center gap-1 cursor-pointer text-xs font-medium text-text"
+                        title="View Connected Network & Advanced Options"
                       >
-                        <ShieldCheck className="w-3.5 h-3.5 text-accent" />
-                        <span className="text-[11px] font-semibold">Registry</span>
+                        <Users className="w-3.5 h-3.5 text-accent" />
+                        <span className="text-[11px]">Network</span>
                       </button>
                     </div>
-                    <div className="flex-1 p-3.5 text-xs overflow-y-auto scrollbar-hide flex flex-col gap-2 relative">
+                    <div className="flex-1 p-3 text-xs overflow-y-auto flex flex-col gap-2 relative">
                       {[...logs, ...messages.filter(m => m.sender !== 'system').map(m => ({ 
                         text: m.text, 
                         type: m.sender === 'me' ? 'me_msg' : 'peer_msg', 
                         timestamp: m.timestamp,
                         name: m.senderName
                       } as any))].sort((a: any, b: any) => a.timestamp.getTime() - b.timestamp.getTime()).map((entry: any, i) => (
-                        <div key={i} className="flex gap-2.5 items-start bg-slate-50/80 dark:bg-[#151822]/80 p-2.5 rounded-xl border border-slate-200/70 dark:border-white/[0.06]">
-                          <span className="text-muted/70 text-[11px] shrink-0 mt-0.5 font-mono tabular-nums">
-                            {entry.timestamp.toLocaleTimeString([], { hour12: false })}
+                        <div key={i} className="flex gap-2 items-start bg-gray-50 dark:bg-[#18191c] p-2.5 rounded-lg border border-gray-200 dark:border-[#343842]">
+                          <span className="text-muted text-[10px] shrink-0 mt-0.5 font-mono tabular-nums">
+                            {entry.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                           {entry.type === 'me_msg' || entry.type === 'peer_msg' ? (
                             <div className="flex flex-col min-w-0">
-                              <span className={cn("text-[10px] font-bold uppercase tracking-wider mb-0.5", entry.type === 'me_msg' ? "text-accent" : "text-success")}>
-                                {entry.name ? (entry.name as string).substring(0, 12) : entry.type === 'me_msg' ? 'Local' : 'Peer'}
+                              <span className={cn("text-[11px] font-bold mb-0.5", entry.type === 'me_msg' ? "text-accent" : "text-success")}>
+                                {entry.name ? (entry.name as string).substring(0, 14) : entry.type === 'me_msg' ? 'You' : 'Friend'}
                               </span>
-                              <span className="text-text font-medium break-words">{entry.text}</span>
+                              <span className="text-text break-words">{entry.text}</span>
                             </div>
                           ) : (
-                            <div className="flex gap-2 items-baseline min-w-0">
+                            <div className="flex gap-1.5 items-baseline min-w-0">
                               <span className={cn(
-                                "text-[10px] font-mono font-bold uppercase tracking-wider shrink-0",
-                                entry.type === 'err' ? "text-red-400" : entry.type === 'ok' ? "text-emerald-400" : "text-accent"
-                              )}>
-                                {entry.type}
-                              </span>
-                              <span className="text-text/90 font-medium leading-relaxed break-words">{entry.text}</span>
+                                "w-1.5 h-1.5 rounded-full shrink-0 translate-y-[-1px]",
+                                entry.type === 'err' ? "bg-red-500" : entry.type === 'ok' ? "bg-success" : "bg-accent"
+                              )} />
+                              <span className="text-text leading-relaxed break-words">{entry.text}</span>
                             </div>
                           )}
                         </div>
                       ))}
                       {logs.length === 0 && messages.length === 0 && (
-                        <div className="text-muted/60 text-xs flex items-center justify-center p-6 border border-dashed border-slate-200 dark:border-white/[0.07] mt-auto rounded-xl">
-                          No recent activity
+                        <div className="text-muted text-xs flex items-center justify-center p-6 border border-dashed border-gray-200 dark:border-[#343842] my-auto rounded-lg text-center">
+                          Connection updates and shared file events will show here.
                         </div>
                       )}
                     </div>
@@ -3829,73 +3863,98 @@ export default function App() {
               </section>
             </motion.div>
           ) : (
+            /* Classic, Friendly Home / Welcome Screen */
             <motion.section 
               key="role-select"
               initial={false}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.98 }}
+              exit={{ opacity: 0, scale: 0.99 }}
               className="flex flex-col h-full overflow-y-auto pb-24 lg:pb-0 z-20"
             >
-              <div className="m-auto flex flex-col items-center gap-8 w-full max-w-4xl py-8 lg:py-0 px-4">
+              <div className="m-auto flex flex-col items-center gap-6 w-full max-w-3xl py-6 lg:py-0 px-4">
                 <div className="text-center max-w-xl">
-                  <h2 className="text-3xl sm:text-4xl font-bold text-text tracking-tight mb-2.5" style={{ textWrap: 'balance' }}>
-                    Select Access Node
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold mb-3">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Private, Direct Device-to-Device Sharing</span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-text tracking-tight mb-2">
+                    How would you like to connect?
                   </h2>
-                  <p className="text-muted text-sm font-medium leading-relaxed">
-                    Choose your peer topology role to initialize a direct, zero-server WebRTC handshake.
+                  <p className="text-muted text-sm leading-relaxed">
+                    Share files of any size, chat, or make voice and video calls directly with friends or across your own devices—no account or cloud upload needed.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full mt-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-1">
                   <RoleCard 
-                    num="01"
+                    num="Option 1"
                     icon={<Monitor className="w-6 h-6" />}
-                    title="Host Station"
-                    desc="Generate a cryptographic synchronization matrix and open a direct transmission port."
+                    title="Create a Room (Host)"
+                    desc="Start a new room and get a QR code or Invite Code to share with the person you want to connect with."
+                    actionLabel="Start a Room →"
                     onClick={() => setRole("host")}
                     color="accent"
                   />
                   <RoleCard 
-                    num="02"
-                    icon={<RefreshCw className="w-6 h-6" />}
-                    title="Join Station"
-                    desc="Scan a peer QR matrix or paste an offer token to establish an encrypted tunnel."
+                    num="Option 2"
+                    icon={<UserPlus className="w-6 h-6" />}
+                    title="Join a Room (Guest)"
+                    desc="Already have an Invite Code or QR code from someone else? Scan or paste it here to connect."
+                    actionLabel="Join with Code →"
                     onClick={() => setRole("join")}
                     color="success"
                   />
                 </div>
 
-                <button
-                  onClick={() => setShowFailoverMenu(true)}
-                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white/80 dark:bg-[#141720] border border-slate-200/80 dark:border-white/[0.08] hover:border-accent/40 dark:hover:border-accent/40 text-text text-xs font-semibold transition-all cursor-pointer shadow-xs"
-                  title="View Synchronized Nexus Peer Registry"
-                >
-                  <Users className="w-4 h-4 text-accent" />
-                  <span>Explore Synchronized Peer Registry & Failover Simulation</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-muted" />
-                </button>
+                {/* Simple 3-Step How It Works Bar */}
+                <div className="w-full glass-panel p-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted">
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-5 gap-y-2">
+                    <span className="font-semibold text-text">How it works:</span>
+                    <span className="flex items-center gap-1.5">
+                      <strong className="w-4 h-4 rounded-full bg-gray-200 dark:bg-[#2a2d35] text-text inline-flex items-center justify-center text-[10px]">1</strong>
+                      One person creates a room
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <strong className="w-4 h-4 rounded-full bg-gray-200 dark:bg-[#2a2d35] text-text inline-flex items-center justify-center text-[10px]">2</strong>
+                      Exchange the Invite & Reply codes
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <strong className="w-4 h-4 rounded-full bg-gray-200 dark:bg-[#2a2d35] text-text inline-flex items-center justify-center text-[10px]">3</strong>
+                      Send files & chat directly
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setShowFailoverMenu(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-[#2a2d35] hover:bg-gray-200 dark:hover:bg-[#343842] border border-gray-300 dark:border-[#3c404d] text-text text-xs font-medium transition-colors cursor-pointer shrink-0"
+                    title="Open Advanced Network & Room Settings"
+                  >
+                    <Users className="w-3.5 h-3.5 text-accent" />
+                    <span>Network Settings</span>
+                  </button>
+                </div>
               </div>
             </motion.section>
           )}
         </AnimatePresence>
       </main>
 
-      {/* Footer */}
-      <footer className="z-10 min-h-8 py-2 md:py-1.5 border-t border-slate-200/80 dark:border-white/[0.06] bg-white/80 dark:bg-[#090a0f]/90 backdrop-blur-md flex flex-wrap sm:flex-nowrap items-center px-4 md:px-8 justify-center sm:justify-between text-[11px] text-muted flex-shrink-0 font-mono gap-2 sm:gap-4">
-        <div className="hidden md:block">
-          Status: <span className="text-text font-medium">{status === "connected" ? "Connected" : "Standby"}</span>
+      {/* Classic Footer Status Bar */}
+      <footer className="z-10 min-h-8 py-1.5 border-t border-gray-300 dark:border-[#343842] bg-white dark:bg-[#22242a] flex flex-wrap sm:flex-nowrap items-center px-4 md:px-6 justify-center sm:justify-between text-xs text-muted flex-shrink-0 gap-2 sm:gap-4">
+        <div className="hidden md:flex items-center gap-2">
+          <span>Connection:</span>
+          <span className="text-text font-semibold">{status === "connected" ? "Connected & Encrypted" : "Ready"}</span>
         </div>
-        <div className="flex gap-3 sm:gap-4 flex-wrap justify-center text-center items-center">
-          <span>WebRTC DataChannel</span>
-          <span className="opacity-40 hidden sm:inline">·</span>
-          <span className="hidden sm:inline">Local-Only Ephemeral Keys</span>
+        <div className="flex gap-3 flex-wrap justify-center text-center items-center text-[11px]">
+          <span>Direct Peer-to-Peer Transfer</span>
+          <span className="opacity-40 hidden sm:inline">•</span>
+          <span className="hidden sm:inline">End-to-End Encrypted</span>
         </div>
         <div className="flex items-center gap-2">
           <span className={cn(
             "w-2 h-2 rounded-full",
-            status === "connected" ? "bg-success" : "bg-slate-400 dark:bg-slate-600"
+            status === "connected" ? "bg-success" : "bg-gray-400 dark:bg-gray-500"
           )} />
-          <span>Tunnel {status === "connected" ? "Active" : "Standby"}</span>
+          <span>{status === "connected" ? "Online" : "Standby"}</span>
         </div>
       </footer>
       
@@ -3926,25 +3985,25 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-6 lg:p-8 bg-black/70 backdrop-blur-md"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-6 lg:p-8 bg-black/60 backdrop-blur-xs"
           >
             <motion.div 
-              initial={{ scale: 0.96, y: 12 }}
+              initial={{ scale: 0.98, y: 8 }}
               animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.96, y: 12 }}
-              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full max-w-6xl h-full md:h-[90vh] flex flex-col bg-white dark:bg-[#0d0f17] text-text md:rounded-2xl border border-slate-200 dark:border-white/[0.08] shadow-2xl overflow-hidden relative"
+              exit={{ scale: 0.98, y: 8 }}
+              transition={{ duration: 0.15 }}
+              className="w-full max-w-6xl h-full md:h-[90vh] flex flex-col bg-white dark:bg-[#22242a] text-text md:rounded-xl border border-gray-300 dark:border-[#343842] shadow-2xl overflow-hidden relative"
             >
-              <div className="flex justify-between items-center px-5 py-4 border-b border-slate-200 dark:border-white/[0.08] bg-slate-50/80 dark:bg-[#131620]">
-                <h2 className="text-base font-bold flex items-center gap-2.5 text-text">
+              <div className="flex justify-between items-center px-5 py-3.5 border-b border-gray-200 dark:border-[#343842] bg-gray-50 dark:bg-[#1e2026]">
+                <h2 className="text-base font-bold flex items-center gap-2 text-text">
                   <ShieldCheck className="w-5 h-5 text-accent"/>
-                  <span>Nexus Failover Control</span>
+                  <span>Network Status & Group Room Controls</span>
                 </h2>
-                <button onClick={() => setShowFailoverMenu(false)} className="p-2 rounded-xl hover:bg-slate-200/60 dark:hover:bg-white/[0.08] transition cursor-pointer text-text" title="Close Failover Menu">
+                <button onClick={() => setShowFailoverMenu(false)} className="p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-[#343842] transition cursor-pointer text-text" title="Close">
                   <X className="w-4 h-4 text-muted hover:text-text transition-colors" />
                 </button>
               </div>
-              <div className="flex-1 overflow-hidden relative bg-slate-100/60 dark:bg-[#090a0f]">
+              <div className="flex-1 overflow-hidden relative bg-gray-100 dark:bg-[#18191c]">
                 <NexusFailoverHUD 
                   localUsername={profile.username}
                   localAvatarColor={profile.avatarColor}
@@ -3971,13 +4030,13 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-6 lg:p-8 bg-black/75 backdrop-blur-md"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-6 lg:p-8 bg-black/60 backdrop-blur-xs"
           >
             <motion.div 
-              initial={{ scale: 0.96, y: 12 }}
+              initial={{ scale: 0.98, y: 8 }}
               animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.96, y: 12 }}
-              className="w-full max-w-5xl h-full md:h-[90vh] flex flex-col bg-[#0b0d14] rounded-2xl border border-white/[0.08] shadow-2xl overflow-hidden relative"
+              exit={{ scale: 0.98, y: 8 }}
+              className="w-full max-w-5xl h-full md:h-[90vh] flex flex-col bg-[#18191c] rounded-xl border border-[#343842] shadow-2xl overflow-hidden relative"
             >
               <NexusNetworkMap 
                 localProfile={profile}
@@ -4018,19 +4077,19 @@ export default function App() {
         {showSimWarning && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
           >
-            <div className="bg-white dark:bg-[#12151f] max-w-md p-6 rounded-2xl border border-slate-200 dark:border-white/[0.1] shadow-2xl">
-              <h3 className="text-lg font-bold mb-2.5 flex items-center gap-2.5 text-text">
+            <div className="bg-white dark:bg-[#22242a] max-w-md p-6 rounded-xl border border-gray-300 dark:border-[#343842] shadow-2xl">
+              <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-text">
                 <RefreshCw className="text-accent w-5 h-5"/>
-                <span>Enable Simulation Mode?</span>
+                <span>Start Demo Mode?</span>
               </h3>
               <p className="text-muted text-sm mb-6 leading-relaxed">
-                Enabling simulation mode will disconnect existing live tunnel(s) and initialize a sandboxed 4-node test cluster.
+                Starting Demo Mode will disconnect your current session and create a sample room with simulated people so you can test file sharing and chat.
               </p>
               <div className="flex justify-end gap-2.5">
-                <button onClick={() => setShowSimWarning(false)} className="px-4 py-2 rounded-xl text-xs font-semibold text-muted hover:text-text hover:bg-slate-100 dark:hover:bg-white/[0.06] transition cursor-pointer">Cancel</button>
-                <button onClick={() => toggleSimulation(true)} className="px-4 py-2 rounded-xl text-xs font-semibold bg-accent text-white hover:bg-accent/90 transition cursor-pointer shadow-sm">Enable Simulation</button>
+                <button onClick={() => setShowSimWarning(false)} className="px-4 py-2 rounded-lg text-xs font-semibold text-text bg-gray-100 dark:bg-[#2a2d35] hover:bg-gray-200 dark:hover:bg-[#343842] transition cursor-pointer">Cancel</button>
+                <button onClick={() => toggleSimulation(true)} className="px-4 py-2 rounded-lg text-xs font-semibold bg-accent text-white hover:bg-blue-700 transition cursor-pointer shadow-2xs">Start Demo</button>
               </div>
             </div>
           </motion.div>
@@ -4059,7 +4118,7 @@ export default function App() {
           if (peerProfiles[cleanId]?.username) return peerProfiles[cleanId].username;
           const matched = (Object.values(peerProfiles) as UserProfile[]).find(p => p.id === peerId || p.id === profId || p.id === cleanId);
           if (matched?.username) return matched.username;
-          return 'Remote Node';
+          return 'Connected Friend';
         }}
         onEndCall={endCall}
         onToggleTrack={handleToggleTrack}
@@ -4087,11 +4146,11 @@ export default function App() {
 
       {/* Safe iPadOS / iOS 1-Tap Download Prompt */}
       {iosDownloadPrompt && (
-        <div className="fixed bottom-6 right-6 z-50 max-w-sm w-[calc(100vw-3rem)] p-4 rounded-2xl bg-white dark:bg-[#141722] border border-accent/40 shadow-2xl backdrop-blur-xl flex flex-col gap-3">
+        <div className="fixed bottom-6 right-6 z-50 max-w-sm w-[calc(100vw-3rem)] p-4 rounded-xl bg-white dark:bg-[#22242a] border border-gray-300 dark:border-[#343842] shadow-xl flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-text font-bold text-sm">
               <span className="w-2 h-2 rounded-full bg-success" />
-              <span>Transfer Complete</span>
+              <span>File Ready to Save</span>
             </div>
             <button 
               type="button"
@@ -4108,7 +4167,7 @@ export default function App() {
             {iosDownloadPrompt.name}
           </div>
           <p className="text-[11px] text-muted">
-            Safari on iPadOS requires a 1-tap gesture to save files directly to iPad Files.
+            Tap below to save this file directly to your device.
           </p>
           <a
             href={iosDownloadPrompt.url}
@@ -4121,10 +4180,10 @@ export default function App() {
                 }
               }, 1500);
             }}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-accent text-white font-semibold text-xs shadow-sm hover:bg-accent/90 transition-all cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-accent text-white font-semibold text-xs shadow-2xs hover:bg-blue-700 transition-all cursor-pointer"
           >
             <Download className="w-4 h-4" />
-            <span>Save to iPad Files ({formatBytes(iosDownloadPrompt.blob.size)})</span>
+            <span>Save File ({formatBytes(iosDownloadPrompt.blob.size)})</span>
           </a>
         </div>
       )}
@@ -4132,11 +4191,12 @@ export default function App() {
   );
 }
 
-function RoleCard({ num, icon, title, desc, onClick, color }: { 
+function RoleCard({ num, icon, title, desc, actionLabel, onClick, color }: { 
   num: string, 
   icon: React.ReactNode, 
   title: string, 
   desc: string, 
+  actionLabel?: string,
   onClick: () => void,
   color: 'accent' | 'success'
 }) {
@@ -4144,25 +4204,37 @@ function RoleCard({ num, icon, title, desc, onClick, color }: {
     <button 
       onClick={onClick}
       className={cn(
-        "glass-panel flex-1 p-7 sm:p-8 text-left transition-all group cursor-pointer border border-slate-200/80 dark:border-white/[0.08] relative overflow-hidden",
+        "glass-panel flex-1 p-6 sm:p-7 text-left transition-all group cursor-pointer border-2 relative overflow-hidden flex flex-col justify-between",
         color === 'accent' 
-          ? "hover:border-accent/50 dark:hover:border-accent/50" 
-          : "hover:border-success/50 dark:hover:border-success/50"
+          ? "border-gray-200 dark:border-[#343842] hover:border-accent dark:hover:border-accent" 
+          : "border-gray-200 dark:border-[#343842] hover:border-success dark:hover:border-success"
       )}
     >
-      <div className="flex justify-between items-start mb-6">
-        <div className={cn(
-          "w-12 h-12 rounded-xl flex items-center justify-center transition-colors border",
-          color === 'accent' 
-            ? "bg-accent/10 border-accent/20 text-accent group-hover:bg-accent group-hover:text-white" 
-            : "bg-success/10 border-success/20 text-success group-hover:bg-success group-hover:text-white"
-        )}>
-          {icon}
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <div className={cn(
+            "w-12 h-12 rounded-xl flex items-center justify-center transition-colors border",
+            color === 'accent' 
+              ? "bg-accent/10 border-accent/25 text-accent group-hover:bg-accent group-hover:text-white" 
+              : "bg-success/10 border-success/25 text-success group-hover:bg-success group-hover:text-white"
+          )}>
+            {icon}
+          </div>
+          <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-gray-100 dark:bg-[#2a2d35] text-muted">{num}</span>
         </div>
-        <span className="text-xs font-mono font-semibold text-muted/60 tabular-nums">{num}</span>
+        <h3 className="text-lg sm:text-xl font-bold mb-2 tracking-tight text-text">{title}</h3>
+        <p className="text-xs sm:text-sm font-normal text-muted leading-relaxed mb-5">{desc}</p>
       </div>
-      <h3 className="text-lg sm:text-xl font-bold mb-2 tracking-tight text-text transition-colors">{title}</h3>
-      <p className="text-xs sm:text-sm font-normal text-muted leading-relaxed">{desc}</p>
+      {actionLabel && (
+        <div className={cn(
+          "inline-flex items-center gap-1.5 text-xs font-bold py-2 px-3.5 rounded-lg w-fit transition-colors",
+          color === 'accent'
+            ? "bg-accent text-white group-hover:bg-blue-700"
+            : "bg-success text-white group-hover:bg-green-700"
+        )}>
+          <span>{actionLabel}</span>
+        </div>
+      )}
     </button>
   );
 }

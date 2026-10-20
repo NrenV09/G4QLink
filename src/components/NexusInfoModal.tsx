@@ -63,31 +63,31 @@ export const NexusInfoModal: React.FC<NexusInfoModalProps> = ({
           animate={{ scale: 1, y: 0, opacity: 1 }}
           exit={{ scale: 0.96, y: 12, opacity: 0 }}
           transition={{ type: "spring", damping: 28, stiffness: 350 }}
-          className="relative w-full max-w-2xl max-h-[88vh] flex flex-col bg-white dark:bg-[#121316] border border-zinc-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden text-text"
+          className="relative w-full max-w-2xl max-h-[88vh] flex flex-col bg-white dark:bg-[#22242a] border border-gray-300 dark:border-[#343842] rounded-xl shadow-2xl overflow-hidden text-text"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-200 dark:border-white/10 bg-zinc-50/90 dark:bg-surface/50 backdrop-blur flex-shrink-0">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-[#343842] bg-gray-50 dark:bg-[#1e2026] flex-shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-sky-500/15 border border-sky-500/30 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-lg bg-accent/15 border border-accent/25 text-accent flex items-center justify-center shrink-0">
                 <Info className="w-4 h-4" />
               </div>
               <div>
                 <h2 className="text-base sm:text-lg font-bold tracking-tight text-text flex items-center gap-2">
-                  Quantum Link Guide
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                    P2P Mesh
+                  How to Use Quantum Link
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                    Easy Guide
                   </span>
                 </h2>
                 <p className="text-xs text-muted">
-                  Direct peer-to-peer file transfer, voice, video & chat with zero servers
+                  Share files, chat, and make voice or video calls directly between devices
                 </p>
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:text-text hover:bg-zinc-200/60 dark:hover:bg-white/10 transition-colors border border-zinc-200 dark:border-border/60 cursor-pointer"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:text-text hover:bg-gray-200/60 dark:hover:bg-[#2b2e37] transition-colors border border-gray-200 dark:border-[#343842] cursor-pointer"
               aria-label="Close dialog"
             >
               <X className="w-4 h-4" />
@@ -95,18 +95,18 @@ export const NexusInfoModal: React.FC<NexusInfoModalProps> = ({
           </div>
 
           {/* Simple Segmented Navigation */}
-          <div className="flex items-center gap-1.5 px-5 py-2.5 border-b border-zinc-200 dark:border-border/40 bg-zinc-100/70 dark:bg-surface/30 flex-shrink-0">
+          <div className="flex items-center gap-1.5 px-5 py-2.5 border-b border-gray-200 dark:border-[#343842] bg-gray-100/70 dark:bg-[#18191d] flex-shrink-0">
             <button
               onClick={() => setActiveTab('guide')}
               className={cn(
                 "flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
                 activeTab === 'guide'
-                  ? "bg-accent text-white shadow-sm"
+                  ? "bg-accent text-white shadow-xs"
                   : "text-muted hover:text-text hover:bg-black/5 dark:hover:bg-white/5"
               )}
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>How It Works</span>
+              <span>How to Connect</span>
             </button>
 
             <button
@@ -114,12 +114,12 @@ export const NexusInfoModal: React.FC<NexusInfoModalProps> = ({
               className={cn(
                 "flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
                 activeTab === 'features'
-                  ? "bg-accent text-white shadow-sm"
+                  ? "bg-accent text-white shadow-xs"
                   : "text-muted hover:text-text hover:bg-black/5 dark:hover:bg-white/5"
               )}
             >
               <Layers className="w-3.5 h-3.5" />
-              <span>Features</span>
+              <span>What You Can Do</span>
             </button>
 
             <button
@@ -127,7 +127,7 @@ export const NexusInfoModal: React.FC<NexusInfoModalProps> = ({
               className={cn(
                 "flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
                 activeTab === 'privacy'
-                  ? "bg-emerald-600 text-white shadow-sm"
+                  ? "bg-emerald-600 text-white shadow-xs"
                   : "text-muted hover:text-text hover:bg-black/5 dark:hover:bg-white/5"
               )}
             >
@@ -145,76 +145,76 @@ export const NexusInfoModal: React.FC<NexusInfoModalProps> = ({
                 {/* 3 Step Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {/* Step 1 */}
-                  <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-surface border border-zinc-200/80 dark:border-border/70 flex flex-col justify-between">
+                  <div className="p-3.5 rounded-lg bg-gray-50 dark:bg-[#18191d] border border-gray-200 dark:border-[#343842] flex flex-col justify-between">
                     <div>
-                      <div className="w-7 h-7 rounded-lg bg-accent text-white flex items-center justify-center text-xs font-bold mb-2.5 shadow-sm">
+                      <div className="w-7 h-7 rounded-md bg-accent text-white flex items-center justify-center text-xs font-bold mb-2.5 shadow-xs">
                         1
                       </div>
                       <h4 className="text-xs font-bold text-text mb-1 flex items-center gap-1.5">
                         <Wifi className="w-3.5 h-3.5 text-accent" />
-                        Host Room
+                        Create a Room
                       </h4>
                       <p className="text-[11px] text-muted leading-relaxed">
-                        Device A clicks <strong>Host Mesh Room</strong> to generate a room QR code and Offer token.
+                        On Device 1, click <strong>Create a Room</strong> to show an invite QR code or invite code.
                       </p>
                     </div>
                   </div>
 
                   {/* Step 2 */}
-                  <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-surface border border-zinc-200/80 dark:border-border/70 flex flex-col justify-between">
+                  <div className="p-3.5 rounded-lg bg-gray-50 dark:bg-[#18191d] border border-gray-200 dark:border-[#343842] flex flex-col justify-between">
                     <div>
-                      <div className="w-7 h-7 rounded-lg bg-accent text-white flex items-center justify-center text-xs font-bold mb-2.5 shadow-sm">
+                      <div className="w-7 h-7 rounded-md bg-accent text-white flex items-center justify-center text-xs font-bold mb-2.5 shadow-xs">
                         2
                       </div>
                       <h4 className="text-xs font-bold text-text mb-1 flex items-center gap-1.5">
                         <QrCode className="w-3.5 h-3.5 text-accent" />
-                        Join & Scan
+                        Join a Room
                       </h4>
                       <p className="text-[11px] text-muted leading-relaxed">
-                        Device B clicks <strong>Join Mesh Room</strong>, scans the QR code, and shows the Answer token.
+                        On Device 2, click <strong>Join a Room</strong>, scan the invite QR code, and show your reply code.
                       </p>
                     </div>
                   </div>
 
                   {/* Step 3 */}
-                  <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-surface border border-zinc-200/80 dark:border-border/70 flex flex-col justify-between">
+                  <div className="p-3.5 rounded-lg bg-gray-50 dark:bg-[#18191d] border border-gray-200 dark:border-[#343842] flex flex-col justify-between">
                     <div>
-                      <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold mb-2.5 shadow-sm">
+                      <div className="w-7 h-7 rounded-md bg-emerald-600 text-white flex items-center justify-center text-xs font-bold mb-2.5 shadow-xs">
                         3
                       </div>
                       <h4 className="text-xs font-bold text-text mb-1 flex items-center gap-1.5">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                        Connected!
+                        Start Sharing!
                       </h4>
                       <p className="text-[11px] text-muted leading-relaxed">
-                        Device A scans the Answer. The connection is live. You can now drop files, chat, and call!
+                        Device 1 scans the reply code. Both devices are now connected for file sharing, chat, and calls!
                       </p>
                     </div>
                   </div>
                 </div>
 
                 {/* Direct Disk Stream Feature */}
-                <div className="p-4 rounded-xl bg-sky-50 dark:bg-sky-500/10 border border-sky-200 dark:border-sky-500/20 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="p-4 rounded-lg bg-blue-50 dark:bg-accent/10 border border-blue-200 dark:border-accent/25 flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-md bg-accent/15 text-accent flex items-center justify-center shrink-0 mt-0.5">
                     <HardDrive className="w-4 h-4" />
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs font-bold text-text">Direct Disk Downloads (No File Size Limits)</div>
+                    <div className="text-xs font-bold text-text">Send Files of Any Size</div>
                     <p className="text-[11px] text-muted leading-relaxed">
-                      Files stream chunk-by-chunk straight to your device’s storage instead of buffering into browser memory. This lets you transfer 5GB+ videos, archives, and files without crashing or running out of RAM.
+                      Enable <strong>Direct Save</strong> to save incoming files straight to your computer or phone storage, allowing you to send large videos, photos, and folders smoothly.
                     </p>
                   </div>
                 </div>
 
                 {/* Offline Wi-Fi Highlight */}
-                <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-md bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
                     <Radio className="w-4 h-4" />
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs font-bold text-text">Works Completely Offline on Local Wi-Fi</div>
+                    <div className="text-xs font-bold text-text">Works Over Local Wi-Fi Without Internet</div>
                     <p className="text-[11px] text-muted leading-relaxed">
-                      No internet? Connect both devices to the same local Wi-Fi router or mobile hotspot. Devices establish direct LAN connections with zero external server dependencies and blazing local speeds.
+                      If both devices are on the same Wi-Fi network or mobile hotspot, files transfer directly over your local network at high speed.
                     </p>
                   </div>
                 </div>
