@@ -3024,7 +3024,7 @@ export default function App() {
           <div 
             className="min-w-0 cursor-pointer select-none relative group flex items-center gap-2.5" 
             onClick={handleTitleClick}
-            title={titleTapCount > 0 ? `${10 - titleTapCount} taps left to unlock easter egg` : "PEER CONNECT"}
+            title={titleTapCount > 0 ? `${10 - titleTapCount} taps left to unlock easter egg` : "Peer Connect"}
           >
             <div className="w-9 h-9 rounded-lg bg-accent text-white flex items-center justify-center font-bold text-sm shadow-2xs shrink-0">
               PC
@@ -3034,7 +3034,7 @@ export default function App() {
               transition={{ duration: 0.12 }}
             >
               <h1 className="text-sm md:text-base font-bold tracking-tight text-text whitespace-nowrap flex items-center gap-2">
-                <span>PEER CONNECT</span>
+                <span>Peer Connect</span>
                 {titleTapCount >= 3 && (
                   <motion.span
                     initial={{ scale: 0, opacity: 0 }}
