@@ -86,8 +86,8 @@ export function IncomingCallModal({
 
             <p className="text-xs text-white/50 mb-8 max-w-[240px]">
               {isScreen 
-                ? 'Real-time peer-to-peer screen mirroring over Quantum Link.' 
-                : 'End-to-end encrypted direct peer connection over Quantum Link matrix.'}
+                ? 'Real-time peer-to-peer screen mirroring over Peer Connect.' 
+                : 'End-to-end encrypted direct peer connection over Peer Connect.'}
             </p>
 
             {/* Action Buttons */}

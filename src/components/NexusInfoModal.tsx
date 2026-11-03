@@ -74,7 +74,7 @@ export const NexusInfoModal: React.FC<NexusInfoModalProps> = ({
               </div>
               <div>
                 <h2 className="text-base sm:text-lg font-bold tracking-tight text-text flex items-center gap-2">
-                  How to Use Quantum Link
+                  How to Use Peer Connect
                   <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                     Easy Guide
                   </span>

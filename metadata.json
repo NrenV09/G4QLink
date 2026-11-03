@@ -1,5 +1,5 @@
 {
-  "name": "Argon Quantum Link",
+  "name": "PEER CONNECT",
   "description": "Secure P2P file transfer and encrypted communication suite with QR-based handshaking.",
   "requestFramePermissions": [
     "camera",

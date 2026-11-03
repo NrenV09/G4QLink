@@ -180,7 +180,7 @@ export const LegalComplianceView: React.FC = () => {
             )}
           </div>
           <p className="text-xs text-gray-600 dark:text-zinc-400 leading-relaxed">
-            Quantum Link uses zero tracking or advertising cookies. The storage categories below are strictly client-side browser mechanisms for storing your custom username and sandboxed files.
+            Peer Connect uses zero tracking or advertising cookies. The storage categories below are strictly client-side browser mechanisms for storing your custom username and sandboxed files.
           </p>
 
           <div className="space-y-3 text-xs">
@@ -364,7 +364,7 @@ export const LegalComplianceView: React.FC = () => {
           {/* Quick Contact & Source Footer */}
           <div className="pt-4 border-t border-gray-200 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500 dark:text-zinc-400">
             <div>
-              Maintainer: <strong className="text-gray-900 dark:text-white">Quantum Link Development Collective</strong> • legal@quantumlink.dev
+              Maintainer: <strong className="text-gray-900 dark:text-white">Peer Connect Development Collective</strong> • legal@quantumlink.dev
             </div>
             <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-semibold">
               <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />

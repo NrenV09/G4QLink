@@ -46,7 +46,7 @@ export const POLICY_SECTIONS: PolicySection[] = [
       {
         heading: '1. Core Philosophy: Absolute Zero Data Collection',
         paragraphs: [
-          'Quantum Link is built on an uncompromising privacy foundation: we do not collect, monitor, log, sell, or store your personal files, chat messages, or audio/video streams on any centralized servers. All communication takes place directly between connected devices using WebRTC (Web Real-Time Communication).',
+          'Peer Connect is built on an uncompromising privacy foundation: we do not collect, monitor, log, sell, or store your personal files, chat messages, or audio/video streams on any centralized servers. All communication takes place directly between connected devices using WebRTC (Web Real-Time Communication).',
           'Unlike cloud file storage providers or centralized messaging platforms, our infrastructure never sees the contents of your transfers or communications. The software operates as an air-gappable, client-side single-page utility.'
         ]
       },
@@ -77,7 +77,7 @@ export const POLICY_SECTIONS: PolicySection[] = [
       {
         heading: '4. Rights Under GDPR & CCPA/CPRA',
         paragraphs: [
-          'Under the General Data Protection Regulation (GDPR Articles 15-22) and California Consumer Privacy Act (CCPA/CPRA), users possess rights to access, rectify, or delete their personal data. Because Quantum Link retains zero centralized user data, there are no databases from which to query or delete records.',
+          'Under the General Data Protection Regulation (GDPR Articles 15-22) and California Consumer Privacy Act (CCPA/CPRA), users possess rights to access, rectify, or delete their personal data. Because Peer Connect retains zero centralized user data, there are no databases from which to query or delete records.',
           'We do not sell, share, or monetize user data under any circumstances ("Do Not Sell or Share My Personal Information" - 100% compliant by design).'
         ]
       }
@@ -95,13 +95,13 @@ export const POLICY_SECTIONS: PolicySection[] = [
       {
         heading: '1. Agreement to Terms',
         paragraphs: [
-          'By accessing, deploying, or utilizing Quantum Link, you acknowledge that you have read, understood, and agreed to be bound by these Terms and Conditions. If you disagree with any portion of these terms, you must discontinue using the application immediately.'
+          'By accessing, deploying, or utilizing Peer Connect, you acknowledge that you have read, understood, and agreed to be bound by these Terms and Conditions. If you disagree with any portion of these terms, you must discontinue using the application immediately.'
         ]
       },
       {
         heading: '2. Permitted and Lawful Use',
         paragraphs: [
-          'Quantum Link is designed for lawful peer-to-peer file transfer, collaborative work, and encrypted direct communication. You agree that you are solely responsible for all content, payloads, text messages, and streams transmitted from your device.'
+          'Peer Connect is designed for lawful peer-to-peer file transfer, collaborative work, and encrypted direct communication. You agree that you are solely responsible for all content, payloads, text messages, and streams transmitted from your device.'
         ],
         subsections: [
           {
@@ -118,7 +118,7 @@ export const POLICY_SECTIONS: PolicySection[] = [
       {
         heading: '3. Disclaimer of Warranties & Limitation of Liability',
         paragraphs: [
-          'Quantum Link is provided strictly "AS IS" and "AS AVAILABLE", without warranties of any kind, whether express, implied, statutory, or otherwise, including but not limited to the implied warranties of merchantability, fitness for a particular purpose, and non-infringement.',
+          'Peer Connect is provided strictly "AS IS" and "AS AVAILABLE", without warranties of any kind, whether express, implied, statutory, or otherwise, including but not limited to the implied warranties of merchantability, fitness for a particular purpose, and non-infringement.',
           'Under no circumstances shall the creators, maintainers, or open-source contributors be liable for any direct, indirect, incidental, consequential, special, or punitive damages arising from the loss of data, transmission interruptions, hardware failure, or unauthorized peer actions.'
         ]
       }
@@ -136,7 +136,7 @@ export const POLICY_SECTIONS: PolicySection[] = [
       {
         heading: '1. Zero Tracking Cookies Declaration',
         paragraphs: [
-          'Quantum Link does NOT utilize HTTP tracking cookies, advertising cookies, behavioral fingerprinting pixels, or third-party analytical cookies of any kind. Your browsing activity is never tracked across sessions or shared with advertisers.'
+          'Peer Connect does NOT utilize HTTP tracking cookies, advertising cookies, behavioral fingerprinting pixels, or third-party analytical cookies of any kind. Your browsing activity is never tracked across sessions or shared with advertisers.'
         ]
       },
       {
@@ -178,7 +178,7 @@ export const POLICY_SECTIONS: PolicySection[] = [
       {
         heading: '1. 100% Free Software — Zero Cost',
         paragraphs: [
-          'Quantum Link is open-source software provided entirely free of charge. There are no registration fees, premium tiers, hidden subscriptions, paywalls, or in-app microtransactions.'
+          'Peer Connect is open-source software provided entirely free of charge. There are no registration fees, premium tiers, hidden subscriptions, paywalls, or in-app microtransactions.'
         ]
       },
       {
@@ -190,7 +190,7 @@ export const POLICY_SECTIONS: PolicySection[] = [
       {
         heading: '3. Future Commercial Extensions Disclaimer',
         paragraphs: [
-          'In the event that third-party vendors build paid plugins or hosted signaling infrastructure upon Quantum Link, refund terms must be settled directly with those respective providers under their own contractual terms.'
+          'In the event that third-party vendors build paid plugins or hosted signaling infrastructure upon Peer Connect, refund terms must be settled directly with those respective providers under their own contractual terms.'
         ]
       }
     ]
@@ -313,7 +313,7 @@ export const POLICY_SECTIONS: PolicySection[] = [
       {
         heading: '1. Zero Synthetic Testimonials or Fake Ratings',
         paragraphs: [
-          'Quantum Link does not display fake customer reviews, paid influencers, or artificial 5-star badges. Any performance benchmarks reported reflect actual WebRTC DataChannel throughput tests conducted over modern Wi-Fi and 5G networks.'
+          'Peer Connect does not display fake customer reviews, paid influencers, or artificial 5-star badges. Any performance benchmarks reported reflect actual WebRTC DataChannel throughput tests conducted over modern Wi-Fi and 5G networks.'
         ]
       },
       {
@@ -337,7 +337,7 @@ export const POLICY_SECTIONS: PolicySection[] = [
       {
         heading: '1. Project Maintainer & Open Source Entity',
         paragraphs: [
-          'Quantum Link is maintained as an open-source decentralized communications software project by the Quantum Link Development Collective.',
+          'Peer Connect is maintained as an open-source decentralized communications software project by the Peer Connect Development Collective.',
           'Project Lead & Contact Email: legal@quantumlink.dev'
         ]
       },
@@ -367,7 +367,7 @@ export const POLICY_SECTIONS: PolicySection[] = [
       {
         heading: '1. Software License (MIT License)',
         paragraphs: [
-          'Quantum Link source code is distributed under the permissive MIT Open Source License. Permission is hereby granted, free of charge, to any person obtaining a copy of this software to deal in the Software without restriction, including the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies.'
+          'Peer Connect source code is distributed under the permissive MIT Open Source License. Permission is hereby granted, free of charge, to any person obtaining a copy of this software to deal in the Software without restriction, including the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies.'
         ]
       },
       {
@@ -394,14 +394,14 @@ export const POLICY_SECTIONS: PolicySection[] = [
       {
         heading: '1. End-to-End Encryption & Cryptography Export Notice',
         paragraphs: [
-          'Quantum Link leverages native browser WebRTC implementations incorporating standard DTLS (Datagram Transport Layer Security) and SRTP (Secure Real-time Transport Protocol) with AES-128 / AES-256 GCM encryption.',
+          'Peer Connect leverages native browser WebRTC implementations incorporating standard DTLS (Datagram Transport Layer Security) and SRTP (Secure Real-time Transport Protocol) with AES-128 / AES-256 GCM encryption.',
           'Because cryptography is executed entirely by the end user\'s standard web browser under general publicly available software exemptions, this distribution complies with US EAR (Export Administration Regulations) Section 740.13(e) and the Wassenaar Arrangement for publicly available cryptographic tools.'
         ]
       },
       {
         heading: '2. User Payload Risk & Law Enforcement Compliance',
         paragraphs: [
-          'Because Quantum Link has no central server, database, or decryption keys, it is technically impossible for the maintainers to intercept, monitor, decrypt, or produce records of peer-to-peer data in response to subpoenas or legal requests.',
+          'Because Peer Connect has no central server, database, or decryption keys, it is technically impossible for the maintainers to intercept, monitor, decrypt, or produce records of peer-to-peer data in response to subpoenas or legal requests.',
           'Users are individually accountable under the laws of their local jurisdiction for the nature and legality of files and communications they transmit.'
         ]
       }

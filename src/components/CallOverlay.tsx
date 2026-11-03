@@ -840,7 +840,7 @@ export function CallOverlay({
                           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                         </span>
                         <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 hidden xs:inline" />
-                        <span className="font-semibold tracking-wider text-[11px] sm:text-xs">QUANTUM LINK</span>
+                        <span className="font-semibold tracking-wider text-[11px] sm:text-xs">PEER CONNECT</span>
                         <span className="text-emerald-500/40">•</span>
                         <span className="text-zinc-400 truncate hidden sm:inline">
                           E2EE {type === 'video' ? 'Video' : 'Audio'}

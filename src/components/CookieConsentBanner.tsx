@@ -84,7 +84,7 @@ export const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({ onOpen
             </div>
 
             <p className="text-xs text-muted leading-relaxed">
-              Quantum Link stores essential connection parameters and offline sandbox file cache directly on your device disk. No personal data ever touches a remote server.
+              Peer Connect stores essential connection parameters and offline sandbox file cache directly on your device disk. No personal data ever touches a remote server.
             </p>
 
             <div className="flex items-center justify-between gap-2 pt-1">

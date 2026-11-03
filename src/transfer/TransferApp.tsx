@@ -1181,8 +1181,8 @@ export default function App() {
           </button>
           <div className="min-w-0">
             <h1 className="text-sm md:text-base lg:text-lg font-semibold tracking-tight text-text whitespace-nowrap">
-              <span className="hidden sm:inline">Quantum Link</span>
-              <span className="sm:hidden">Q-Link</span>
+              <span className="hidden sm:inline">PEER CONNECT</span>
+              <span className="sm:hidden">PEER CONNECT</span>
               <span className="text-[10px] lg:text-xs text-muted font-normal ml-1 lg:ml-2">v7.8.4</span>
             </h1>
             <div className="text-[9px] md:text-[10px] lg:text-xs text-muted flex items-center gap-1 lg:gap-2 mt-0.5 whitespace-nowrap">
