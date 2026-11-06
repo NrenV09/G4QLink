@@ -2999,7 +2999,7 @@ export default function App() {
   const isPeerConnectedToHost = role === 'join' && (status === 'connected' || connectedCount > 0);
 
   return (
-    <div className="h-screen w-full overflow-hidden flex flex-col relative text-[14px] bg-transparent text-text antialiased">
+    <div className="h-[100dvh] w-full overflow-hidden flex flex-col relative text-[14px] bg-transparent text-text antialiased">
       <AnimatePresence>
         {showProfileModal && (
           <ProfileModal 
@@ -3055,17 +3055,18 @@ export default function App() {
 
       <NetworkBackground connectedCount={connectedCount} />
       
-      {/* Android 16 Material You (M3 Expressive) Top App Bar */}
+      {/* Android 16 Material You (M3 Expressive) Top App Bar - Responsive for Portrait Mobile & Desktop */}
       <header
-        className="z-10 h-auto md:h-18 py-2.5 md:py-0 border-b flex flex-wrap md:flex-nowrap items-center justify-between px-4 md:px-6 flex-shrink-0 relative gap-x-4 gap-y-2.5 md:gap-y-0"
+        className="z-20 w-full h-auto md:h-18 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 md:py-0 border-b flex flex-wrap md:flex-nowrap items-center justify-between px-3 sm:px-4 md:px-6 flex-shrink-0 relative gap-x-2 sm:gap-x-3 gap-y-2 md:gap-y-0"
         style={{
           backgroundColor: 'var(--md-sys-color-surface-container-low)',
           borderColor: 'var(--md-sys-color-outline-variant)',
         }}
       >
-        <div className="flex items-center gap-3 flex-shrink-0 min-w-0">
+        {/* Left Brand Cluster */}
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 md:flex-initial order-1">
           <div 
-            className="min-w-0 cursor-pointer select-none relative group flex items-center gap-3" 
+            className="min-w-0 cursor-pointer select-none relative group flex items-center gap-2 sm:gap-3" 
             onClick={handleTitleClick}
             title={titleTapCount > 0 ? `${10 - titleTapCount} taps left to unlock easter egg` : "Quantum Link"}
           >
@@ -3075,17 +3076,18 @@ export default function App() {
               size="sm"
             />
             <motion.div
+              className="min-w-0"
               animate={titleTapCount > 0 ? { scale: [1, 0.96, 1] } : {}}
               transition={{ duration: 0.12 }}
             >
-              <h1 className="text-base md:text-lg font-bold tracking-tight text-text whitespace-nowrap flex items-center gap-2">
-                <span>Quantum Link</span>
+              <h1 className="text-[15px] sm:text-base md:text-lg font-bold tracking-tight text-text leading-tight flex items-center gap-1.5 min-w-0">
+                <span className="truncate">Quantum Link</span>
                 {titleTapCount >= 3 && (
                   <motion.span
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0, opacity: 0 }}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold tabular-nums"
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold tabular-nums shrink-0"
                     style={{
                       backgroundColor: 'var(--md-sys-color-primary-container)',
                       color: 'var(--md-sys-color-on-primary-container)',
@@ -3095,7 +3097,13 @@ export default function App() {
                   </motion.span>
                 )}
               </h1>
-              <div className="text-[11px] text-muted flex items-center gap-1.5 whitespace-nowrap">
+              <div className="text-[10px] sm:text-[11px] text-muted flex items-center gap-1.5 leading-tight mt-0.5">
+                <span
+                  className={cn(
+                    "w-1.5 h-1.5 rounded-full shrink-0",
+                    status === "connected" ? "bg-success" : status === "handshaking" ? "bg-amber-500 animate-pulse" : "bg-[var(--md-sys-color-primary)]"
+                  )}
+                />
                 <span className="truncate font-medium">
                   {status === "connected"
                     ? (isSimulation ? "Demo Mesh Active" : `${connectedCount} ${connectedCount === 1 ? 'peer' : 'peers'} linked`)
@@ -3106,7 +3114,11 @@ export default function App() {
               </div>
             </motion.div>
           </div>
+        </div>
 
+        {/* Right Action Cluster - Stays on Row 1 in Portrait Mobile, Right in Desktop */}
+        <div className="flex gap-1 sm:gap-1.5 md:gap-2 items-center flex-shrink-0 order-2 md:order-3">
+          {/* Simulation / Demo Mode Toggle */}
           <button 
             id="simulation-toggle-btn"
             onClick={() => {
@@ -3114,106 +3126,37 @@ export default function App() {
               toggleSimulation();
             }}
             className={cn(
-              "px-3.5 py-2 rounded-full flex items-center gap-1.5 font-semibold text-xs flex-shrink-0 transition-all cursor-pointer active:scale-[0.97]",
+              "h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-full flex items-center justify-center gap-1.5 font-semibold text-[11px] sm:text-xs flex-shrink-0 transition-all cursor-pointer active:scale-[0.97]",
               isSimulation ? "m3-btn-filled shadow-xs" : "m3-btn-tonal"
             )}
             title={isSimulation ? "Demo Mode is ON (Click to turn off)" : "Try Demo Mode with simulated peers"}
             aria-label="Toggle simulation mode"
           >
-            <MaterialSymbol name="science" size={16} filled={isSimulation} />
-            <span className="hidden sm:inline whitespace-nowrap">{isSimulation ? "Demo: ON" : "Try Demo"}</span>
+            <MaterialSymbol name="science" size={17} filled={isSimulation} />
+            <span className="hidden xs:inline sm:inline whitespace-nowrap">{isSimulation ? "Demo: ON" : "Demo"}</span>
           </button>
-        </div>
 
-        {/* M3 Expressive Pill Navigation Bar with Material Symbols (Rounded) */}
-        <div className="w-full md:w-auto md:flex-1 flex justify-center min-w-0 order-last md:order-none pb-0.5 md:pb-0">
-          <nav
-            className="flex w-max justify-center gap-1 p-1.5 rounded-full z-[20] shrink-0 mx-auto overflow-x-auto scrollbar-hide border"
-            style={{
-              backgroundColor: 'var(--md-sys-color-surface-container)',
-              borderColor: 'var(--md-sys-color-outline-variant)',
-            }}
-          >
-            <button 
-              onClick={() => setActiveTab("p2p")}
-              className={cn(
-                "nav-tab px-4 py-2 text-xs font-semibold transition-all rounded-full whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-1.5 active:scale-[0.97]",
-                activeTab === "p2p" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
-              )}
-            >
-              <MaterialSymbol name="hub" size={18} filled={activeTab === "p2p"} />
-              <span>Connect</span>
-            </button>
-            <button 
-              onClick={() => { setActiveTab("chat"); setUnreadChatCount(0); }}
-              className={cn(
-                "nav-tab px-4 py-2 text-xs font-semibold transition-all rounded-full whitespace-nowrap shrink-0 relative cursor-pointer flex items-center gap-1.5 active:scale-[0.97]",
-                activeTab === "chat" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
-              )}
-            >
-              <MaterialSymbol name="forum" size={18} filled={activeTab === "chat"} />
-              <span>Chat & Calls</span>
-              {unreadChatCount > 0 && activeTab !== "chat" && (
-                <span className="ml-1 inline-flex items-center justify-center min-w-4 h-4 px-1 bg-red-600 text-white text-[10px] font-bold rounded-full tabular-nums">
-                  {unreadChatCount > 9 ? '9+' : unreadChatCount}
-                </span>
-              )}
-            </button>
-            <button 
-              onClick={() => { setActiveTab("qr"); addLog("Entering QR Studio", "info"); }}
-              className={cn(
-                "nav-tab px-4 py-2 text-xs font-semibold transition-all rounded-full whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-1.5 active:scale-[0.97]",
-                activeTab === "qr" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
-              )}
-            >
-              <MaterialSymbol name="qr_code_2" size={18} filled={activeTab === "qr"} />
-              <span>QR Studio</span>
-            </button>
-            <button 
-              onClick={() => setActiveTab("base64")}
-              className={cn(
-                "nav-tab px-4 py-2 text-xs font-semibold transition-all rounded-full whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-1.5 active:scale-[0.97]",
-                activeTab === "base64" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
-              )}
-            >
-              <MaterialSymbol name="data_object" size={18} filled={activeTab === "base64"} />
-              <span>Encoder</span>
-            </button>
-            <button 
-              onClick={() => setActiveTab("appearance")}
-              className={cn(
-                "nav-tab px-4 py-2 text-xs font-semibold transition-all rounded-full whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-1.5 active:scale-[0.97]",
-                activeTab === "appearance" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
-              )}
-            >
-              <MaterialSymbol name="palette" size={18} filled={activeTab === "appearance"} />
-              <span>Material You</span>
-            </button>
-          </nav>
-        </div>
-
-        {/* Right Action Cluster */}
-        <div className="flex gap-2 items-center flex-shrink-0 ml-auto md:ml-0">
           {/* Active Call Background Indicator (PiP mode indicator) */}
           {isCallActive && isCallMinimized && (
             <button
               onClick={() => setIsCallMinimized(false)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-success text-white hover:opacity-95 transition-all text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 shadow-xs active:scale-[0.97]"
+              className="flex items-center justify-center gap-1.5 h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-full bg-success text-white hover:opacity-95 transition-all text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 shadow-xs active:scale-[0.97]"
               title="Return to active call"
             >
               <MaterialSymbol name="call" size={16} filled />
-              <span className="hidden sm:inline">Return to Call</span>
+              <span className="hidden sm:inline">Call</span>
             </button>
           )}
 
-          {/* Profile Pill Button */}
+          {/* Profile Pill / Circle Button */}
           <button
             onClick={() => {
               triggerHaptic('light', materialTheme.hapticsEnabled);
               setShowProfileModal(true);
             }}
-            className="m3-surface-interactive flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full border transition-all cursor-pointer active:scale-[0.97]"
+            className="m3-surface-interactive w-9 h-9 sm:w-10 sm:h-10 xl:w-auto xl:pl-1.5 xl:pr-3 flex items-center justify-center gap-2 rounded-full border transition-all cursor-pointer shrink-0 active:scale-[0.97]"
             title="Edit Your Profile"
+            aria-label="Edit Your Profile"
           >
             <div className={cn(
               "w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold overflow-hidden relative shrink-0",
@@ -3236,7 +3179,7 @@ export default function App() {
               triggerHaptic('light', materialTheme.hapticsEnabled);
               setShowThemeModal(true);
             }}
-            className="m3-btn-tonal px-3 h-10 flex items-center justify-center gap-1.5 rounded-full cursor-pointer flex-shrink-0 text-xs font-semibold active:scale-[0.97]"
+            className="m3-btn-tonal w-9 h-9 sm:w-10 sm:h-10 lg:w-auto lg:px-3.5 flex items-center justify-center gap-1.5 rounded-full cursor-pointer flex-shrink-0 text-xs font-semibold active:scale-[0.97]"
             title="Material You Theme, Seed Color & App Icon Settings"
             aria-label="Material You Theme Settings"
           >
@@ -3251,11 +3194,11 @@ export default function App() {
               setInfoModalTab('guide');
               setShowInfoModal(true);
             }}
-            className="m3-surface-interactive w-10 h-10 flex items-center justify-center border rounded-full cursor-pointer flex-shrink-0 active:scale-[0.97]"
+            className="m3-surface-interactive w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center border rounded-full cursor-pointer flex-shrink-0 active:scale-[0.97]"
             title="How to Use & Help Guide"
             aria-label="Help and User Guide"
           >
-            <MaterialSymbol name="help" size={19} />
+            <MaterialSymbol name="help" size={18} />
           </button>
           
           {/* Light / Dark Mode Switch */}
@@ -3267,17 +3210,87 @@ export default function App() {
                 mode: prev.mode === 'dark' ? 'light' : 'dark',
               }));
             }}
-            className="m3-surface-interactive w-10 h-10 flex items-center justify-center border rounded-full cursor-pointer flex-shrink-0 active:scale-[0.97]"
+            className="m3-surface-interactive w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center border rounded-full cursor-pointer flex-shrink-0 active:scale-[0.97]"
             title="Switch Light / Dark Mode"
             aria-label="Switch Light or Dark Mode"
           >
-            <MaterialSymbol name={materialTheme.mode === 'dark' ? 'light_mode' : 'dark_mode'} size={19} />
+            <MaterialSymbol name={materialTheme.mode === 'dark' ? 'light_mode' : 'dark_mode'} size={18} />
           </button>
+        </div>
+
+        {/* M3 Expressive Pill Navigation Bar - Full-width 5-tab grid on Portrait Mobile (<md), Centered Pill Bar on Desktop (>=md) */}
+        <div className="w-full md:w-auto md:flex-1 flex justify-center min-w-0 order-3 md:order-2 overflow-x-auto scrollbar-hide">
+          <nav
+            className="grid grid-cols-5 md:flex w-full md:w-max items-center gap-1 p-1 md:p-1.5 rounded-2xl md:rounded-full z-[20] mx-auto border"
+            style={{
+              backgroundColor: 'var(--md-sys-color-surface-container)',
+              borderColor: 'var(--md-sys-color-outline-variant)',
+            }}
+          >
+            <button 
+              onClick={() => setActiveTab("p2p")}
+              className={cn(
+                "nav-tab px-1 sm:px-2.5 md:px-2.5 lg:px-4 py-1.5 md:py-2 text-[10px] sm:text-[11px] lg:text-xs font-semibold transition-all rounded-xl md:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
+                activeTab === "p2p" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
+              )}
+            >
+              <MaterialSymbol name="hub" size={17} filled={activeTab === "p2p"} />
+              <span className="truncate">Connect</span>
+            </button>
+            <button 
+              onClick={() => { setActiveTab("chat"); setUnreadChatCount(0); }}
+              className={cn(
+                "nav-tab px-1 sm:px-2.5 md:px-2.5 lg:px-4 py-1.5 md:py-2 text-[10px] sm:text-[11px] lg:text-xs font-semibold transition-all rounded-xl md:rounded-full whitespace-nowrap relative cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
+                activeTab === "chat" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
+              )}
+            >
+              <MaterialSymbol name="forum" size={17} filled={activeTab === "chat"} />
+              <span className="lg:hidden truncate">Chat</span>
+              <span className="hidden lg:inline">Chat & Calls</span>
+              {unreadChatCount > 0 && activeTab !== "chat" && (
+                <span className="absolute top-0.5 right-1 sm:static sm:ml-0.5 inline-flex items-center justify-center min-w-4 h-4 px-1 bg-red-600 text-white text-[9px] sm:text-[10px] font-bold rounded-full tabular-nums">
+                  {unreadChatCount > 9 ? '9+' : unreadChatCount}
+                </span>
+              )}
+            </button>
+            <button 
+              onClick={() => { setActiveTab("qr"); addLog("Entering QR Studio", "info"); }}
+              className={cn(
+                "nav-tab px-1 sm:px-2.5 md:px-2.5 lg:px-4 py-1.5 md:py-2 text-[10px] sm:text-[11px] lg:text-xs font-semibold transition-all rounded-xl md:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
+                activeTab === "qr" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
+              )}
+            >
+              <MaterialSymbol name="qr_code_2" size={17} filled={activeTab === "qr"} />
+              <span className="lg:hidden truncate">QR Code</span>
+              <span className="hidden lg:inline">QR Studio</span>
+            </button>
+            <button 
+              onClick={() => setActiveTab("base64")}
+              className={cn(
+                "nav-tab px-1 sm:px-2.5 md:px-2.5 lg:px-4 py-1.5 md:py-2 text-[10px] sm:text-[11px] lg:text-xs font-semibold transition-all rounded-xl md:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
+                activeTab === "base64" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
+              )}
+            >
+              <MaterialSymbol name="data_object" size={17} filled={activeTab === "base64"} />
+              <span className="truncate">Encoder</span>
+            </button>
+            <button 
+              onClick={() => setActiveTab("appearance")}
+              className={cn(
+                "nav-tab px-1 sm:px-2.5 md:px-2.5 lg:px-4 py-1.5 md:py-2 text-[10px] sm:text-[11px] lg:text-xs font-semibold transition-all rounded-xl md:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
+                activeTab === "appearance" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
+              )}
+            >
+              <MaterialSymbol name="palette" size={17} filled={activeTab === "appearance"} />
+              <span className="lg:hidden truncate">Theme</span>
+              <span className="hidden lg:inline">Material You</span>
+            </button>
+          </nav>
         </div>
       </header>
 
       {/* Edge-to-Edge Main Surface Canvas with Dynamic Paddings */}
-      <main className="z-10 flex-1 p-3 sm:p-5 md:p-6 overflow-hidden">
+      <main className="z-10 flex-1 min-h-0 p-2.5 sm:p-5 md:p-6 overflow-hidden">
         <AnimatePresence mode="wait">
           {activeTab === "appearance" ? (
             <motion.div
