@@ -63,20 +63,20 @@ export const NexusInfoModal: React.FC<NexusInfoModalProps> = ({
           animate={{ scale: 1, y: 0, opacity: 1 }}
           exit={{ scale: 0.96, y: 12, opacity: 0 }}
           transition={{ type: "spring", damping: 28, stiffness: 350 }}
-          className="relative w-full max-w-2xl max-h-[88vh] flex flex-col bg-white dark:bg-[#22242a] border border-gray-300 dark:border-[#343842] rounded-xl shadow-2xl overflow-hidden text-text"
+          className="relative w-full max-w-2xl max-h-[88vh] flex flex-col m3-card-xl shadow-2xl overflow-hidden text-text"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-[#343842] bg-gray-50 dark:bg-[#1e2026] flex-shrink-0">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--md-sys-color-outline-variant)] m3-surface-low flex-shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-accent/15 border border-accent/25 text-accent flex items-center justify-center shrink-0">
-                <Info className="w-4 h-4" />
+              <div className="w-10 h-10 rounded-2xl bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] flex items-center justify-center shrink-0">
+                <Info className="w-5 h-5" />
               </div>
               <div>
                 <h2 className="text-base sm:text-lg font-bold tracking-tight text-text flex items-center gap-2">
-                  How to Use Peer Connect
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                    Easy Guide
+                  How to Use Quantum Link
+                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[var(--md-sys-color-tertiary-container)] text-[var(--md-sys-color-on-tertiary-container)]">
+                    M3 Guide
                   </span>
                 </h2>
                 <p className="text-xs text-muted">
@@ -87,7 +87,7 @@ export const NexusInfoModal: React.FC<NexusInfoModalProps> = ({
 
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-muted hover:text-text hover:bg-gray-200/60 dark:hover:bg-[#2b2e37] transition-colors border border-gray-200 dark:border-[#343842] cursor-pointer"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-muted hover:text-text m3-surface-high transition-colors border border-[var(--md-sys-color-outline-variant)] cursor-pointer"
               aria-label="Close dialog"
             >
               <X className="w-4 h-4" />
@@ -95,13 +95,13 @@ export const NexusInfoModal: React.FC<NexusInfoModalProps> = ({
           </div>
 
           {/* Simple Segmented Navigation */}
-          <div className="flex items-center gap-1.5 px-5 py-2.5 border-b border-gray-200 dark:border-[#343842] bg-gray-100/70 dark:bg-[#18191d] flex-shrink-0">
+          <div className="flex items-center gap-1.5 px-6 py-3 border-b border-[var(--md-sys-color-outline-variant)] m3-surface-low flex-shrink-0">
             <button
               onClick={() => setActiveTab('guide')}
               className={cn(
-                "flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
+                "flex-1 py-2 px-3 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
                 activeTab === 'guide'
-                  ? "bg-accent text-white shadow-xs"
+                  ? "m3-btn-filled shadow-xs"
                   : "text-muted hover:text-text hover:bg-black/5 dark:hover:bg-white/5"
               )}
             >
@@ -112,9 +112,9 @@ export const NexusInfoModal: React.FC<NexusInfoModalProps> = ({
             <button
               onClick={() => setActiveTab('features')}
               className={cn(
-                "flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
+                "flex-1 py-2 px-3 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
                 activeTab === 'features'
-                  ? "bg-accent text-white shadow-xs"
+                  ? "m3-btn-filled shadow-xs"
                   : "text-muted hover:text-text hover:bg-black/5 dark:hover:bg-white/5"
               )}
             >
@@ -125,9 +125,9 @@ export const NexusInfoModal: React.FC<NexusInfoModalProps> = ({
             <button
               onClick={() => setActiveTab('privacy')}
               className={cn(
-                "flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
+                "flex-1 py-2 px-3 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
                 activeTab === 'privacy'
-                  ? "bg-emerald-600 text-white shadow-xs"
+                  ? "m3-btn-tertiary shadow-xs"
                   : "text-muted hover:text-text hover:bg-black/5 dark:hover:bg-white/5"
               )}
             >

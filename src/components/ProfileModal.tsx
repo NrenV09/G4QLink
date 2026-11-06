@@ -133,27 +133,27 @@ export function ProfileModal({ profile, onSave, onClose }: ProfileModalProps) {
         initial={{ scale: 0.95, opacity: 0, y: 12 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 12 }}
-        className="relative w-full max-w-md bg-white dark:bg-[#12151e] rounded-2xl shadow-2xl overflow-hidden border border-slate-200/80 dark:border-white/[0.08]"
+        className="relative w-full max-w-md m3-card-xl shadow-2xl overflow-hidden"
       >
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-[#343842] flex items-center justify-between bg-gray-50 dark:bg-[#1e2026]">
+        <div className="px-6 py-4 border-b border-[var(--md-sys-color-outline-variant)] flex items-center justify-between m3-surface-low">
           <div className="flex items-center gap-3">
-            <div className={cn("p-2 rounded-lg text-white shadow-2xs", editedProfile.avatarColor)}>
+            <div className={cn("p-2.5 rounded-2xl text-white shadow-2xs", editedProfile.avatarColor)}>
               <User className="w-4 h-4" />
             </div>
             <div>
               <h2 className="text-base font-bold text-text">Your Profile</h2>
-              <p className="text-xs text-muted">Customize how others see you</p>
+              <p className="text-xs text-muted">Customize how peers see you on Quantum Link</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="p-2 hover:bg-gray-200 dark:hover:bg-[#343842] rounded-lg text-muted hover:text-text transition-colors cursor-pointer"
+            className="p-2 m3-surface-high rounded-full text-muted hover:text-text transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto bg-white dark:bg-[#22242a]">
+        <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
           {/* Avatar & Photo Upload Section */}
           <div className="flex flex-col items-center gap-3">
             <input 
@@ -168,7 +168,7 @@ export function ProfileModal({ profile, onSave, onClose }: ProfileModalProps) {
               <div 
                 onClick={() => fileInputRef.current?.click()}
                 className={cn(
-                  "w-24 h-24 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-md border-4 border-white dark:border-[#2a2d35] transition-all overflow-hidden cursor-pointer relative select-none",
+                  "w-24 h-24 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-md border-4 border-[var(--md-sys-color-surface-container-high)] transition-all overflow-hidden cursor-pointer relative select-none",
                   editedProfile.avatarColor
                 )}
                 title="Click to choose a profile picture"
@@ -193,7 +193,7 @@ export function ProfileModal({ profile, onSave, onClose }: ProfileModalProps) {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute -bottom-1 -right-1 p-2 rounded-full bg-accent text-white shadow-md border-2 border-white dark:border-[#22242a] hover:bg-blue-700 transition-colors cursor-pointer"
+                className="absolute -bottom-1 -right-1 p-2 rounded-full m3-btn-filled shadow-md border-2 border-[var(--md-sys-color-surface-container)] transition-colors cursor-pointer"
                 title="Upload Profile Picture"
               >
                 <Camera className="w-3.5 h-3.5" />
@@ -205,9 +205,9 @@ export function ProfileModal({ profile, onSave, onClose }: ProfileModalProps) {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="px-3.5 py-1.5 rounded-lg bg-gray-100 dark:bg-[#2a2d35] hover:bg-gray-200 dark:hover:bg-[#343842] text-text text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border border-gray-300 dark:border-[#3c404d]"
+                className="px-4 py-1.5 rounded-full m3-btn-tonal text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
               >
-                <Upload className="w-3.5 h-3.5 text-accent" />
+                <Upload className="w-3.5 h-3.5" />
                 {editedProfile.avatarImage ? "Change Photo" : "Upload Photo"}
               </button>
               
@@ -215,7 +215,7 @@ export function ProfileModal({ profile, onSave, onClose }: ProfileModalProps) {
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border border-red-500/25"
+                  className="px-3.5 py-1.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border border-red-500/25"
                   title="Remove custom picture"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -236,8 +236,8 @@ export function ProfileModal({ profile, onSave, onClose }: ProfileModalProps) {
                     className={cn(
                       "w-8 h-8 rounded-full overflow-hidden border-2 transition-all hover:scale-105 cursor-pointer",
                       editedProfile.avatarImage === preset.url 
-                        ? "border-accent ring-2 ring-accent/30" 
-                        : "border-gray-300 dark:border-[#343842] opacity-80 hover:opacity-100"
+                        ? "border-[var(--md-sys-color-primary)] ring-2 ring-[var(--md-sys-color-primary)]/30" 
+                        : "border-[var(--md-sys-color-outline-variant)] opacity-80 hover:opacity-100"
                     )}
                     title={`Choose ${preset.name} avatar`}
                   >
@@ -256,7 +256,7 @@ export function ProfileModal({ profile, onSave, onClose }: ProfileModalProps) {
               </label>
               <button
                 onClick={() => setEditedProfile({...editedProfile, username: generateRandomName()})}
-                className="text-xs font-semibold text-accent hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-xs font-semibold text-[var(--md-sys-color-primary)] hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <RefreshCw className="w-3 h-3" />
                 Random Name
@@ -266,7 +266,7 @@ export function ProfileModal({ profile, onSave, onClose }: ProfileModalProps) {
               type="text"
               value={editedProfile.username}
               onChange={(e) => setEditedProfile({ ...editedProfile, username: e.target.value.substring(0, 20) })}
-              className="w-full bg-gray-50 dark:bg-[#18191c] border border-gray-300 dark:border-[#343842] rounded-lg px-3.5 py-2.5 text-sm text-text focus:border-accent outline-none transition-all"
+              className="w-full m3-surface-low border border-[var(--md-sys-color-outline-variant)] rounded-2xl px-4 py-2.5 text-sm text-text focus:border-[var(--md-sys-color-primary)] outline-none transition-all"
               placeholder="Enter your name..."
             />
           </div>
@@ -279,7 +279,7 @@ export function ProfileModal({ profile, onSave, onClose }: ProfileModalProps) {
             <textarea 
               value={editedProfile.bio}
               onChange={(e) => setEditedProfile({ ...editedProfile, bio: e.target.value.substring(0, 100) })}
-              className="w-full bg-gray-50 dark:bg-[#18191c] border border-gray-300 dark:border-[#343842] rounded-lg px-3.5 py-2.5 text-sm text-text focus:border-accent outline-none transition-all min-h-[72px] resize-none"
+              className="w-full m3-surface-low border border-[var(--md-sys-color-outline-variant)] rounded-2xl px-4 py-2.5 text-sm text-text focus:border-[var(--md-sys-color-primary)] outline-none transition-all min-h-[72px] resize-none"
               placeholder="Add a short status or note..."
             />
             <p className="text-[11px] text-right text-muted font-mono tabular-nums">{editedProfile.bio.length}/100</p>
@@ -303,9 +303,9 @@ export function ProfileModal({ profile, onSave, onClose }: ProfileModalProps) {
                     }
                   }}
                   className={cn(
-                    "h-8 rounded-lg transition-all relative overflow-hidden cursor-pointer",
+                    "h-8 rounded-full transition-all relative overflow-hidden cursor-pointer",
                     color,
-                    editedProfile.avatarColor === color ? "ring-2 ring-accent scale-105 shadow-xs border border-white/40" : "opacity-80 hover:opacity-100"
+                    editedProfile.avatarColor === color ? "ring-2 ring-[var(--md-sys-color-primary)] scale-105 shadow-xs border border-white/40" : "opacity-80 hover:opacity-100"
                   )}
                 >
                   {editedProfile.avatarColor === color && (
@@ -319,10 +319,10 @@ export function ProfileModal({ profile, onSave, onClose }: ProfileModalProps) {
           </div>
         </div>
 
-        <div className="px-6 py-4 bg-gray-50 dark:bg-[#1e2026] border-t border-gray-200 dark:border-[#343842] flex gap-2.5">
+        <div className="px-6 py-4 m3-surface-low border-t border-[var(--md-sys-color-outline-variant)] flex gap-2.5">
           <button 
             onClick={onClose}
-            className="flex-1 px-4 py-2.5 text-xs font-semibold text-text bg-white dark:bg-[#2a2d35] border border-gray-300 dark:border-[#3c404d] hover:bg-gray-100 dark:hover:bg-[#343842] rounded-lg transition-all cursor-pointer"
+            className="flex-1 px-4 py-2.5 text-xs font-semibold m3-btn-tonal rounded-full transition-all cursor-pointer"
           >
             Cancel
           </button>
@@ -330,10 +330,10 @@ export function ProfileModal({ profile, onSave, onClose }: ProfileModalProps) {
             onClick={handleSave}
             disabled={!isValid}
             className={cn(
-              "flex-[2] px-4 py-2.5 text-xs font-semibold text-white rounded-lg shadow-2xs transition-all cursor-pointer",
+              "flex-[2] px-4 py-2.5 text-xs font-semibold rounded-full shadow-2xs transition-all cursor-pointer",
               isValid 
-                ? "bg-accent hover:bg-blue-700" 
-                : "bg-gray-400 dark:bg-gray-700 opacity-50 cursor-not-allowed"
+                ? "m3-btn-filled" 
+                : "bg-gray-400 dark:bg-gray-700 opacity-50 cursor-not-allowed text-white"
             )}
           >
             Save Profile
