@@ -3055,32 +3055,34 @@ export default function App() {
 
       <NetworkBackground connectedCount={connectedCount} />
       
-      {/* Android 16 Material You (M3 Expressive) Top App Bar - Responsive for Portrait Mobile & Desktop */}
+      {/* Android 16 Material You (M3 Expressive) Top App Bar - Locked 2-Row Grid on Mobile Portrait, Single Row on Desktop */}
       <header
-        className="z-20 w-full h-auto md:h-18 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 md:py-0 border-b flex flex-wrap md:flex-nowrap items-center justify-between px-3 sm:px-4 md:px-6 flex-shrink-0 relative gap-x-2 sm:gap-x-3 gap-y-2 md:gap-y-0"
+        className="z-20 w-full h-auto lg:h-18 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 lg:py-0 border-b grid grid-cols-[minmax(0,1fr)_auto] lg:flex lg:items-center lg:justify-between px-3 sm:px-4 lg:px-6 flex-shrink-0 relative gap-x-2 gap-y-2 lg:gap-4"
         style={{
           backgroundColor: 'var(--md-sys-color-surface-container-low)',
           borderColor: 'var(--md-sys-color-outline-variant)',
         }}
       >
-        {/* Left Brand Cluster */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 md:flex-initial order-1">
+        {/* Row 1 Col 1 (Mobile) / Left (Desktop): Brand Cluster */}
+        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 lg:order-1">
           <div 
-            className="min-w-0 cursor-pointer select-none relative group flex items-center gap-2 sm:gap-3" 
+            className="min-w-0 cursor-pointer select-none relative group flex items-center gap-2 sm:gap-2.5" 
             onClick={handleTitleClick}
             title={titleTapCount > 0 ? `${10 - titleTapCount} taps left to unlock easter egg` : "Quantum Link"}
           >
-            <QuantumAppIcon
-              preset={materialTheme.appIconPreset}
-              shape={materialTheme.appIconShape}
-              size="sm"
-            />
+            <div className="shrink-0 scale-90 sm:scale-100 origin-left">
+              <QuantumAppIcon
+                preset={materialTheme.appIconPreset}
+                shape={materialTheme.appIconShape}
+                size="sm"
+              />
+            </div>
             <motion.div
               className="min-w-0"
               animate={titleTapCount > 0 ? { scale: [1, 0.96, 1] } : {}}
               transition={{ duration: 0.12 }}
             >
-              <h1 className="text-[15px] sm:text-base md:text-lg font-bold tracking-tight text-text leading-tight flex items-center gap-1.5 min-w-0">
+              <h1 className="text-sm sm:text-base lg:text-lg font-bold tracking-tight text-text leading-tight flex items-center gap-1.5 min-w-0">
                 <span className="truncate">Quantum Link</span>
                 {titleTapCount >= 3 && (
                   <motion.span
@@ -3106,7 +3108,7 @@ export default function App() {
                 />
                 <span className="truncate font-medium">
                   {status === "connected"
-                    ? (isSimulation ? "Demo Mesh Active" : `${connectedCount} ${connectedCount === 1 ? 'peer' : 'peers'} linked`)
+                    ? (isSimulation ? "Demo Active" : `${connectedCount} ${connectedCount === 1 ? 'peer' : 'peers'} linked`)
                     : status === "handshaking"
                       ? "Handshaking..."
                       : "P2P Ready"}
@@ -3116,8 +3118,8 @@ export default function App() {
           </div>
         </div>
 
-        {/* Right Action Cluster - Stays on Row 1 in Portrait Mobile, Right in Desktop */}
-        <div className="flex gap-1 sm:gap-1.5 md:gap-2 items-center flex-shrink-0 order-2 md:order-3">
+        {/* Row 1 Col 2 (Mobile) / Right (Desktop): Action Cluster - Strictly Non-Wrapping */}
+        <div className="flex gap-1 sm:gap-1.5 items-center justify-end flex-shrink-0 lg:order-3">
           {/* Simulation / Demo Mode Toggle */}
           <button 
             id="simulation-toggle-btn"
@@ -3126,21 +3128,21 @@ export default function App() {
               toggleSimulation();
             }}
             className={cn(
-              "h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-full flex items-center justify-center gap-1.5 font-semibold text-[11px] sm:text-xs flex-shrink-0 transition-all cursor-pointer active:scale-[0.97]",
+              "w-8.5 h-8.5 sm:w-auto sm:h-9 sm:px-3 rounded-full flex items-center justify-center gap-1.5 font-semibold text-xs flex-shrink-0 transition-all cursor-pointer active:scale-[0.97]",
               isSimulation ? "m3-btn-filled shadow-xs" : "m3-btn-tonal"
             )}
             title={isSimulation ? "Demo Mode is ON (Click to turn off)" : "Try Demo Mode with simulated peers"}
             aria-label="Toggle simulation mode"
           >
             <MaterialSymbol name="science" size={17} filled={isSimulation} />
-            <span className="hidden xs:inline sm:inline whitespace-nowrap">{isSimulation ? "Demo: ON" : "Demo"}</span>
+            <span className="hidden sm:inline whitespace-nowrap">{isSimulation ? "Demo: ON" : "Try Demo"}</span>
           </button>
 
           {/* Active Call Background Indicator (PiP mode indicator) */}
           {isCallActive && isCallMinimized && (
             <button
               onClick={() => setIsCallMinimized(false)}
-              className="flex items-center justify-center gap-1.5 h-9 sm:h-10 px-2.5 sm:px-3.5 rounded-full bg-success text-white hover:opacity-95 transition-all text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 shadow-xs active:scale-[0.97]"
+              className="w-8.5 h-8.5 sm:w-auto sm:h-9 sm:px-3 flex items-center justify-center gap-1.5 rounded-full bg-success text-white hover:opacity-95 transition-all text-xs font-semibold cursor-pointer whitespace-nowrap shrink-0 shadow-xs active:scale-[0.97]"
               title="Return to active call"
             >
               <MaterialSymbol name="call" size={16} filled />
@@ -3148,18 +3150,18 @@ export default function App() {
             </button>
           )}
 
-          {/* Profile Pill / Circle Button */}
+          {/* Profile Avatar Circle Button (Perfect circle on Mobile/Tablet, Pill on XL) */}
           <button
             onClick={() => {
               triggerHaptic('light', materialTheme.hapticsEnabled);
               setShowProfileModal(true);
             }}
-            className="m3-surface-interactive w-9 h-9 sm:w-10 sm:h-10 xl:w-auto xl:pl-1.5 xl:pr-3 flex items-center justify-center gap-2 rounded-full border transition-all cursor-pointer shrink-0 active:scale-[0.97]"
+            className="m3-surface-interactive w-8.5 h-8.5 sm:w-9 sm:h-9 xl:w-auto xl:h-9 xl:pl-1 xl:pr-3 p-0 flex items-center justify-center gap-2 rounded-full border transition-all cursor-pointer shrink-0 active:scale-[0.97]"
             title="Edit Your Profile"
             aria-label="Edit Your Profile"
           >
             <div className={cn(
-              "w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold overflow-hidden relative shrink-0",
+              "w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-white text-xs font-bold overflow-hidden relative shrink-0",
               profile.avatarColor
             )}>
               {profile.avatarImage ? (
@@ -3179,12 +3181,12 @@ export default function App() {
               triggerHaptic('light', materialTheme.hapticsEnabled);
               setShowThemeModal(true);
             }}
-            className="m3-btn-tonal w-9 h-9 sm:w-10 sm:h-10 lg:w-auto lg:px-3.5 flex items-center justify-center gap-1.5 rounded-full cursor-pointer flex-shrink-0 text-xs font-semibold active:scale-[0.97]"
+            className="m3-btn-tonal w-8.5 h-8.5 sm:w-9 sm:h-9 xl:w-auto xl:px-3 flex items-center justify-center gap-1.5 rounded-full cursor-pointer flex-shrink-0 text-xs font-semibold active:scale-[0.97]"
             title="Material You Theme, Seed Color & App Icon Settings"
             aria-label="Material You Theme Settings"
           >
-            <MaterialSymbol name="colors" size={18} />
-            <span className="hidden lg:inline whitespace-nowrap">Theme</span>
+            <MaterialSymbol name="colors" size={17} />
+            <span className="hidden xl:inline whitespace-nowrap">Theme</span>
           </button>
 
           {/* Help / Guide Button */}
@@ -3194,11 +3196,11 @@ export default function App() {
               setInfoModalTab('guide');
               setShowInfoModal(true);
             }}
-            className="m3-surface-interactive w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center border rounded-full cursor-pointer flex-shrink-0 active:scale-[0.97]"
+            className="m3-surface-interactive w-8.5 h-8.5 sm:w-9 sm:h-9 flex items-center justify-center border rounded-full cursor-pointer flex-shrink-0 active:scale-[0.97]"
             title="How to Use & Help Guide"
             aria-label="Help and User Guide"
           >
-            <MaterialSymbol name="help" size={18} />
+            <MaterialSymbol name="help" size={17} />
           </button>
           
           {/* Light / Dark Mode Switch */}
@@ -3210,18 +3212,18 @@ export default function App() {
                 mode: prev.mode === 'dark' ? 'light' : 'dark',
               }));
             }}
-            className="m3-surface-interactive w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center border rounded-full cursor-pointer flex-shrink-0 active:scale-[0.97]"
+            className="m3-surface-interactive w-8.5 h-8.5 sm:w-9 sm:h-9 flex items-center justify-center border rounded-full cursor-pointer flex-shrink-0 active:scale-[0.97]"
             title="Switch Light / Dark Mode"
             aria-label="Switch Light or Dark Mode"
           >
-            <MaterialSymbol name={materialTheme.mode === 'dark' ? 'light_mode' : 'dark_mode'} size={18} />
+            <MaterialSymbol name={materialTheme.mode === 'dark' ? 'light_mode' : 'dark_mode'} size={17} />
           </button>
         </div>
 
-        {/* M3 Expressive Pill Navigation Bar - Full-width 5-tab grid on Portrait Mobile (<md), Centered Pill Bar on Desktop (>=md) */}
-        <div className="w-full md:w-auto md:flex-1 flex justify-center min-w-0 order-3 md:order-2 overflow-x-auto scrollbar-hide">
+        {/* Row 2 (Mobile col-span-2) / Center (Desktop): Full-Width 5-Column Segmented Navigation Bar */}
+        <div className="col-span-2 w-full lg:w-auto lg:flex-1 flex justify-center min-w-0 lg:order-2">
           <nav
-            className="grid grid-cols-5 md:flex w-full md:w-max items-center gap-1 p-1 md:p-1.5 rounded-2xl md:rounded-full z-[20] mx-auto border"
+            className="grid grid-cols-5 lg:flex w-full lg:w-max items-center gap-1 p-1 lg:p-1.5 rounded-2xl lg:rounded-full z-[20] mx-auto border"
             style={{
               backgroundColor: 'var(--md-sys-color-surface-container)',
               borderColor: 'var(--md-sys-color-outline-variant)',
@@ -3230,7 +3232,7 @@ export default function App() {
             <button 
               onClick={() => setActiveTab("p2p")}
               className={cn(
-                "nav-tab px-1 sm:px-2.5 md:px-2.5 lg:px-4 py-1.5 md:py-2 text-[10px] sm:text-[11px] lg:text-xs font-semibold transition-all rounded-xl md:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
+                "nav-tab px-1 sm:px-2.5 lg:px-3.5 py-1.5 lg:py-2 text-[10px] sm:text-xs font-semibold transition-all rounded-xl lg:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
                 activeTab === "p2p" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
               )}
             >
@@ -3240,13 +3242,13 @@ export default function App() {
             <button 
               onClick={() => { setActiveTab("chat"); setUnreadChatCount(0); }}
               className={cn(
-                "nav-tab px-1 sm:px-2.5 md:px-2.5 lg:px-4 py-1.5 md:py-2 text-[10px] sm:text-[11px] lg:text-xs font-semibold transition-all rounded-xl md:rounded-full whitespace-nowrap relative cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
+                "nav-tab px-1 sm:px-2.5 lg:px-3.5 py-1.5 lg:py-2 text-[10px] sm:text-xs font-semibold transition-all rounded-xl lg:rounded-full whitespace-nowrap relative cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
                 activeTab === "chat" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
               )}
             >
               <MaterialSymbol name="forum" size={17} filled={activeTab === "chat"} />
-              <span className="lg:hidden truncate">Chat</span>
-              <span className="hidden lg:inline">Chat & Calls</span>
+              <span className="xl:hidden truncate">Chat</span>
+              <span className="hidden xl:inline">Chat & Calls</span>
               {unreadChatCount > 0 && activeTab !== "chat" && (
                 <span className="absolute top-0.5 right-1 sm:static sm:ml-0.5 inline-flex items-center justify-center min-w-4 h-4 px-1 bg-red-600 text-white text-[9px] sm:text-[10px] font-bold rounded-full tabular-nums">
                   {unreadChatCount > 9 ? '9+' : unreadChatCount}
@@ -3256,18 +3258,18 @@ export default function App() {
             <button 
               onClick={() => { setActiveTab("qr"); addLog("Entering QR Studio", "info"); }}
               className={cn(
-                "nav-tab px-1 sm:px-2.5 md:px-2.5 lg:px-4 py-1.5 md:py-2 text-[10px] sm:text-[11px] lg:text-xs font-semibold transition-all rounded-xl md:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
+                "nav-tab px-1 sm:px-2.5 lg:px-3.5 py-1.5 lg:py-2 text-[10px] sm:text-xs font-semibold transition-all rounded-xl lg:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
                 activeTab === "qr" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
               )}
             >
               <MaterialSymbol name="qr_code_2" size={17} filled={activeTab === "qr"} />
-              <span className="lg:hidden truncate">QR Code</span>
-              <span className="hidden lg:inline">QR Studio</span>
+              <span className="xl:hidden truncate">QR</span>
+              <span className="hidden xl:inline">QR Studio</span>
             </button>
             <button 
               onClick={() => setActiveTab("base64")}
               className={cn(
-                "nav-tab px-1 sm:px-2.5 md:px-2.5 lg:px-4 py-1.5 md:py-2 text-[10px] sm:text-[11px] lg:text-xs font-semibold transition-all rounded-xl md:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
+                "nav-tab px-1 sm:px-2.5 lg:px-3.5 py-1.5 lg:py-2 text-[10px] sm:text-xs font-semibold transition-all rounded-xl lg:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
                 activeTab === "base64" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
               )}
             >
@@ -3277,13 +3279,13 @@ export default function App() {
             <button 
               onClick={() => setActiveTab("appearance")}
               className={cn(
-                "nav-tab px-1 sm:px-2.5 md:px-2.5 lg:px-4 py-1.5 md:py-2 text-[10px] sm:text-[11px] lg:text-xs font-semibold transition-all rounded-xl md:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
+                "nav-tab px-1 sm:px-2.5 lg:px-3.5 py-1.5 lg:py-2 text-[10px] sm:text-xs font-semibold transition-all rounded-xl lg:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
                 activeTab === "appearance" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
               )}
             >
               <MaterialSymbol name="palette" size={17} filled={activeTab === "appearance"} />
-              <span className="lg:hidden truncate">Theme</span>
-              <span className="hidden lg:inline">Material You</span>
+              <span className="xl:hidden truncate">Theme</span>
+              <span className="hidden xl:inline">Material You</span>
             </button>
           </nav>
         </div>
@@ -4162,16 +4164,16 @@ export default function App() {
             >
               <div className="m-auto flex flex-col items-center gap-6 w-full max-w-4xl py-6 lg:py-0 px-3 sm:px-6">
                 {/* Expressive Hero Container (Corner Extra Large 28dp) */}
-                <div className="w-full m3-card-xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div className="w-full m3-card-xl p-5 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 sm:gap-6">
                   <div className="space-y-2.5 max-w-xl">
-                    <div className="flex items-center gap-2 text-xs font-medium text-[color:var(--md-sys-color-primary)]">
-                      <span>Direct WebRTC Mesh</span>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] sm:text-xs font-semibold text-[color:var(--md-sys-color-primary)]">
+                      <span className="whitespace-nowrap">Direct WebRTC Mesh</span>
                       <span aria-hidden="true">·</span>
-                      <span>DTLS Encrypted</span>
+                      <span className="whitespace-nowrap">DTLS Encrypted</span>
                       <span aria-hidden="true">·</span>
-                      <span>Zero Cloud Storage</span>
+                      <span className="whitespace-nowrap">Zero Cloud Storage</span>
                     </div>
-                    <h2 className="text-2xl sm:text-4xl font-bold text-text tracking-tight text-balance">
+                    <h2 className="text-xl sm:text-4xl font-bold text-text tracking-tight text-balance">
                       Instant device-to-device sharing with Quantum Link.
                     </h2>
                     <p className="text-muted text-sm leading-relaxed">
