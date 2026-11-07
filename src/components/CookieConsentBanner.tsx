@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Cookie, ShieldCheck, X, Check, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { MaterialSymbol } from '../lib/materialTheme';
 
 interface CookieConsentBannerProps {
   onOpenLegal: () => void;
@@ -13,7 +13,6 @@ export const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({ onOpen
     try {
       const consent = localStorage.getItem('nexus_cookie_consent');
       if (!consent) {
-        // Small delay to prevent layout pop
         const timer = setTimeout(() => setIsVisible(true), 1200);
         return () => clearTimeout(timer);
       }
@@ -54,59 +53,81 @@ export const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({ onOpen
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-[200]"
         >
-          <div className="p-4 sm:p-5 rounded-2xl bg-white/95 dark:bg-[#12151e]/95 border border-slate-200/80 dark:border-white/[0.1] shadow-2xl backdrop-blur-xl text-text space-y-3">
+          <div
+            className="m3-card-xl rounded-[28px] p-5 shadow-2xl backdrop-blur-xl text-text space-y-3.5 border"
+            style={{
+              backgroundColor: 'var(--md-sys-color-surface-container-high)',
+              borderColor: 'var(--md-sys-color-outline-variant)',
+            }}
+          >
             <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-accent/10 border border-accent/20 text-accent flex items-center justify-center shrink-0">
-                  <Cookie className="w-4 h-4" />
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border"
+                  style={{
+                    backgroundColor: 'var(--md-sys-color-primary-container)',
+                    color: 'var(--md-sys-color-on-primary-container)',
+                    borderColor: 'var(--md-sys-color-outline-variant)',
+                  }}
+                >
+                  <MaterialSymbol name="cookie" size={20} />
                 </div>
                 <div>
-                  <h4 className="text-xs sm:text-sm font-bold text-text flex items-center gap-1.5">
-                    Zero-Tracking & Storage Notice
-                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-success/15 text-success border border-success/25">
-                      No Trackers
+                  <h4 className="text-xs sm:text-sm font-bold text-text flex items-center gap-2 flex-wrap">
+                    <span>On-Device Storage Notice</span>
+                    <span
+                      className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full"
+                      style={{
+                        backgroundColor: 'var(--md-sys-color-tertiary-container)',
+                        color: 'var(--md-sys-color-on-tertiary-container)',
+                      }}
+                    >
+                      Zero Trackers
                     </span>
                   </h4>
                   <p className="text-[11px] text-muted">
-                    We do not use advertising or tracking cookies.
+                    Quantum Link never uses advertising or tracking cookies.
                   </p>
                 </div>
               </div>
 
               <button
                 onClick={() => setIsVisible(false)}
-                className="text-muted hover:text-text p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-muted hover:text-text m3-surface-interactive border transition-colors cursor-pointer shrink-0"
+                style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
                 title="Dismiss banner"
-                aria-label="Dismiss cookie notice"
+                aria-label="Dismiss storage notice"
               >
-                <X className="w-4 h-4" />
+                <MaterialSymbol name="close" size={16} />
               </button>
             </div>
 
             <p className="text-xs text-muted leading-relaxed">
-              Peer Connect stores essential connection parameters and offline sandbox file cache directly on your device disk. No personal data ever touches a remote server.
+              Quantum Link stores essential connection parameters, Material You theme preferences, and offline sandbox file cache directly on your device disk. Zero personal data ever touches a remote server.
             </p>
 
-            <div className="flex items-center justify-between gap-2 pt-1">
+            <div className="flex items-center justify-between gap-2 pt-1 flex-wrap">
               <button
                 onClick={onOpenLegal}
-                className="text-[11px] text-accent hover:underline flex items-center gap-1 cursor-pointer font-medium"
+                className="text-[11px] font-semibold text-[color:var(--md-sys-color-primary)] hover:underline flex items-center gap-1 cursor-pointer"
               >
-                <span>Review Full Legal & Privacy Hub</span>
+                <MaterialSymbol name="verified_user" size={14} />
+                <span>Legal & Regulatory Hub</span>
               </button>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 ml-auto">
                 <button
                   type="button"
                   onClick={handleEssentialOnly}
-                  className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] text-text text-xs font-semibold border border-slate-200/80 dark:border-white/[0.08] transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-full m3-surface-interactive border text-text text-xs font-semibold transition-all active:scale-95 cursor-pointer"
+                  style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
                 >
                   Essential Only
                 </button>
                 <button
                   type="button"
                   onClick={handleAcceptAll}
-                  className="px-3.5 py-1.5 rounded-xl bg-accent text-white hover:bg-accent/90 text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-full m3-btn-filled text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer"
                 >
                   Accept All
                 </button>

@@ -675,23 +675,31 @@ export function CallOverlay({
                   scale: { type: "spring", stiffness: 380, damping: 28 },
                   y: { type: "spring", stiffness: 380, damping: 28 }
                 }}
-                className="fixed bottom-5 right-5 z-[95] w-72 sm:w-80 md:w-88 rounded-2xl shadow-[0_24px_50px_rgba(0,0,0,0.7)] border border-white/[0.12] bg-[#121418]/95 backdrop-blur-2xl overflow-hidden select-none text-white font-sans ring-1 ring-white/5 transition-shadow duration-200 touch-none cursor-grab active:cursor-grabbing"
+                className="fixed bottom-5 right-5 z-[95] w-72 sm:w-80 md:w-88 m3-card-xl rounded-[28px] shadow-[0_24px_50px_rgba(0,0,0,0.55)] border backdrop-blur-2xl overflow-hidden select-none text-text font-sans transition-shadow duration-200 touch-none cursor-grab active:cursor-grabbing"
+                style={{
+                  backgroundColor: 'var(--md-sys-color-surface-container-high)',
+                  borderColor: 'var(--md-sys-color-outline-variant)',
+                }}
               >
                 {/* Mini Header: Drag bar + Status + Maximize button */}
                 <div 
-                  className="h-10 px-3 bg-[#181a20]/95 border-b border-white/[0.08] flex items-center justify-between flex-shrink-0 cursor-grab active:cursor-grabbing select-none"
-                  title="Drag to move PIP box"
+                  className="h-11 px-4 border-b flex items-center justify-between flex-shrink-0 cursor-grab active:cursor-grabbing select-none"
+                  style={{
+                    backgroundColor: 'var(--md-sys-color-surface-container)',
+                    borderColor: 'var(--md-sys-color-outline-variant)',
+                  }}
+                  title="Drag to move Quantum Link PiP window"
                 >
                   <div className="flex items-center gap-2 overflow-hidden pointer-events-none">
-                    <GripHorizontal className="w-3.5 h-3.5 text-white/40 flex-shrink-0" />
+                    <GripHorizontal className="w-3.5 h-3.5 text-muted flex-shrink-0" />
                     <span className="relative flex h-2 w-2 flex-shrink-0">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                     </span>
-                    <span className="text-xs font-semibold text-white/90 truncate">
+                    <span className="text-xs font-bold text-text truncate">
                       {pipPrimaryId === 'local' ? (isScreenSharing ? 'Your Screen' : 'You') : resolveParticipantName(pipPrimaryId)}
                     </span>
-                    <span className="text-[10px] text-white/40 font-mono hidden sm:inline">
+                    <span className="text-[10px] text-muted font-mono hidden sm:inline">
                       {currentTime.toLocaleTimeString([], { minute: '2-digit', second: '2-digit' })}
                     </span>
                   </div>
@@ -700,10 +708,10 @@ export function CallOverlay({
                     {/* Maximize Button */}
                     <button
                       onClick={toggleMinimize}
-                      className="p-1.5 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
-                      title="Maximize meeting to full screen"
+                      className="w-7 h-7 rounded-full m3-surface-interactive flex items-center justify-center text-muted hover:text-text transition-colors cursor-pointer"
+                      title="Maximize call to full screen"
                     >
-                      <Maximize2 className="w-4 h-4" />
+                      <Maximize2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -711,8 +719,9 @@ export function CallOverlay({
                 {/* Mini Video Feed (Aspect-preserved with object-contain) */}
                 <div 
                   onClick={toggleMinimize}
-                  className="w-full h-44 sm:h-48 bg-[#0b0c0f] relative overflow-hidden cursor-grab active:cursor-grabbing group flex items-center justify-center"
-                  title="Click to maximize meeting, drag to move"
+                  className="w-full h-44 sm:h-48 relative overflow-hidden cursor-grab active:cursor-grabbing group flex items-center justify-center"
+                  style={{ backgroundColor: 'var(--md-sys-color-surface-container-lowest, #0b0d13)' }}
+                  title="Click to maximize call, drag to move"
                 >
                 {pipPrimaryId === 'local' ? (
                   <LocalVideoTile 
@@ -744,16 +753,23 @@ export function CallOverlay({
                 )}
 
                 {/* Hover Overlay: Click to Maximize */}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[3px] z-20">
-                  <span className="text-xs font-semibold bg-white/20 border border-white/20 px-3 py-1.5 rounded-full text-white flex items-center gap-1.5 shadow-lg backdrop-blur-md">
+                <div className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[3px] z-20">
+                  <span className="text-xs font-semibold m3-btn-filled px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg">
                     <Maximize2 className="w-3.5 h-3.5" />
-                    Maximize Meeting
+                    Return to Call Stage
                   </span>
                 </div>
 
                 {/* Multiple participant badge if > 1 remote */}
                 {totalParticipants > 2 && (
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/70 border border-white/10 text-[10px] font-medium text-white/90 backdrop-blur-md z-10 shadow">
+                  <div
+                    className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full border text-[10px] font-semibold backdrop-blur-md z-10 shadow"
+                    style={{
+                      backgroundColor: 'var(--md-sys-color-secondary-container)',
+                      color: 'var(--md-sys-color-on-secondary-container)',
+                      borderColor: 'var(--md-sys-color-outline-variant)',
+                    }}
+                  >
                     +{totalParticipants - 1} peers
                   </div>
                 )}
@@ -762,15 +778,19 @@ export function CallOverlay({
               {/* Mini Control Strip */}
               <div 
                 onPointerDown={(e) => e.stopPropagation()}
-                className="h-12 px-3 bg-[#15171d]/95 border-t border-white/[0.08] flex items-center justify-between flex-shrink-0"
+                className="h-13 px-3.5 border-t flex items-center justify-between flex-shrink-0"
+                style={{
+                  backgroundColor: 'var(--md-sys-color-surface-container)',
+                  borderColor: 'var(--md-sys-color-outline-variant)',
+                }}
               >
                 <div className="flex items-center gap-2">
                   {/* Mic Toggle */}
                   <button 
                     onClick={toggleMic}
                     className={cn(
-                      "w-8 h-8 rounded-xl flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow",
-                      isMicMuted ? "bg-rose-600 text-white" : "bg-white/10 hover:bg-white/20 text-emerald-400"
+                      "w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-xs",
+                      isMicMuted ? "bg-rose-600 text-white" : "m3-btn-tonal"
                     )}
                     title={isMicMuted ? "Unmute mic" : "Mute mic"}
                   >
@@ -781,8 +801,8 @@ export function CallOverlay({
                   <button 
                     onClick={toggleVideo}
                     className={cn(
-                      "w-8 h-8 rounded-xl flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow",
-                      (isVideoOff && !isScreenSharing) ? "bg-rose-600 text-white" : "bg-white/10 hover:bg-white/20 text-white"
+                      "w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-xs",
+                      (isVideoOff && !isScreenSharing) ? "bg-rose-600 text-white" : "m3-btn-tonal"
                     )}
                     title={isVideoOff ? "Turn on camera" : "Turn off camera"}
                   >
@@ -794,8 +814,8 @@ export function CallOverlay({
                   {/* Maximize Button */}
                   <button
                     onClick={toggleMinimize}
-                    className="px-2.5 py-1 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 text-blue-300 text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer shadow"
-                    title="Maximize meeting to full screen"
+                    className="px-3.5 py-1.5 rounded-full m3-btn-filled text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95"
+                    title="Maximize call to full screen"
                   >
                     <Maximize2 className="w-3.5 h-3.5" />
                     <span>Expand</span>
@@ -804,7 +824,7 @@ export function CallOverlay({
                   {/* End Call */}
                   <button 
                     onClick={onEndCall}
-                    className="w-8 h-8 rounded-xl bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow shadow-rose-600/30"
+                    className="w-9 h-9 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-xs"
                     title="Leave call"
                   >
                     <PhoneOff className="w-3.5 h-3.5" />
@@ -815,7 +835,7 @@ export function CallOverlay({
           </>
           ) : (
             /* ------------------------------------------------------------- */
-            /* FULL-SCREEN MEETING MODE                                      */
+            /* FULL-SCREEN MATERIAL YOU (M3 EXPRESSIVE) MEETING MODE         */
             /* ------------------------------------------------------------- */
             <motion.div
               ref={meetingContainerRef}
@@ -826,69 +846,114 @@ export function CallOverlay({
               transition={{ duration: 0.18 }}
               onMouseMove={isTheaterMode ? resetTheaterControlsTimer : undefined}
               onTouchStart={isTheaterMode ? resetTheaterControlsTimer : undefined}
-              className="fixed inset-0 z-[110] bg-[#090a0d] w-full h-full max-h-screen overflow-hidden flex flex-col cursor-default select-none text-white font-sans"
+              className="fixed inset-0 z-[110] w-full h-full max-h-screen overflow-hidden flex flex-col cursor-default select-none text-text font-sans"
+              style={{ backgroundColor: 'var(--md-sys-color-surface)' }}
             >
-              <div className="w-full h-full flex flex-col overflow-hidden relative bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#181a22]/70 via-[#0d0f14] to-[#08080a]">
-                
-                {/* Top Bar: View Mode Switcher, Call Info & Quick Actions (Hidden in Theater Mode to maximize presentation space) */}
+              <div className="w-full h-full flex flex-col overflow-hidden relative">
+                {/* Ambient Material You Tonal Aura */}
+                <div
+                  className="pointer-events-none absolute -top-32 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-20"
+                  style={{ backgroundColor: 'var(--md-sys-color-primary-container)' }}
+                />
+                <div
+                  className="pointer-events-none absolute -bottom-32 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-20"
+                  style={{ backgroundColor: 'var(--md-sys-color-tertiary-container)' }}
+                />
+
+                {/* Top App Bar: Call Identity, Mode Switcher & Actions (Hidden in Theater Mode) */}
                 {!isTheaterMode && (
-                  <div className="h-14 px-3 sm:px-6 flex items-center justify-between border-b border-white/[0.08] bg-[#121419]/90 backdrop-blur-xl flex-shrink-0 z-20">
+                  <div
+                    className="min-h-16 px-3 sm:px-6 py-2 flex items-center justify-between border-b backdrop-blur-xl flex-shrink-0 z-20 gap-2"
+                    style={{
+                      backgroundColor: 'var(--md-sys-color-surface-container-low)',
+                      borderColor: 'var(--md-sys-color-outline-variant)',
+                    }}
+                  >
                     <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
-                      <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-mono text-emerald-300 shadow-sm">
+                      <div
+                        className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-xs font-semibold shadow-2xs"
+                        style={{
+                          backgroundColor: 'var(--md-sys-color-secondary-container)',
+                          color: 'var(--md-sys-color-on-secondary-container)',
+                          borderColor: 'var(--md-sys-color-outline-variant)',
+                        }}
+                      >
                         <span className="relative flex h-2 w-2 flex-shrink-0">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                         </span>
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 hidden xs:inline" />
-                        <span className="font-semibold tracking-wider text-[11px] sm:text-xs">PEER CONNECT</span>
-                        <span className="text-emerald-500/40">•</span>
-                        <span className="text-zinc-400 truncate hidden sm:inline">
-                          E2EE {type === 'video' ? 'Video' : 'Audio'}
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 hidden xs:inline" />
+                        <span className="font-bold tracking-tight text-[11px] sm:text-xs">Quantum Link</span>
+                        <span className="opacity-40">•</span>
+                        <span className="truncate text-[11px] sm:text-xs opacity-90">
+                          {type === 'video' ? 'HD Video Call' : 'Voice Call'}
                         </span>
                       </div>
 
                       {viewMode === 'spotlight' && (
-                        <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-medium animate-fadeIn">
+                        <div
+                          className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold animate-fadeIn"
+                          style={{
+                            backgroundColor: 'var(--md-sys-color-tertiary-container)',
+                            color: 'var(--md-sys-color-on-tertiary-container)',
+                            borderColor: 'var(--md-sys-color-outline-variant)',
+                          }}
+                        >
                           <Sparkles className="w-3.5 h-3.5" />
-                          <span className="truncate max-w-[160px]">Spotlight: {resolveParticipantName(effectiveSpotlightId || '')}</span>
+                          <span className="truncate max-w-[160px]">
+                            Spotlight: {resolveParticipantName(effectiveSpotlightId || '')}
+                          </span>
                         </div>
                       )}
 
-                      {/* Active Screen Presenter Indicator Banner */}
+                      {/* Active Screen Presenter Indicator Pill */}
                       {activeSharerId && (
-                        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/40 text-blue-300 text-xs font-semibold shadow-sm animate-fadeIn">
-                          <MonitorUp className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
-                          <span className="truncate max-w-[140px] sm:max-w-none">
+                        <div
+                          className="flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-semibold shadow-2xs animate-fadeIn"
+                          style={{
+                            backgroundColor: 'var(--md-sys-color-primary-container)',
+                            color: 'var(--md-sys-color-on-primary-container)',
+                            borderColor: 'var(--md-sys-color-outline-variant)',
+                          }}
+                        >
+                          <MonitorUp className="w-3.5 h-3.5 animate-pulse" />
+                          <span className="truncate max-w-[130px] sm:max-w-none">
                             {activeSharerId === 'local' ? 'Presenting Screen' : `${resolveParticipantName(activeSharerId)}'s Screen`}
                           </span>
                           <button
                             onClick={toggleTheaterMode}
-                            className="px-2 py-0.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
+                            className="px-2.5 py-0.5 rounded-full m3-btn-filled text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
                             title="View presentation in edge-to-edge Full Screen"
                           >
                             <Maximize2 className="w-3 h-3" />
-                            <span>Full Screen</span>
+                            <span className="hidden xs:inline">Theater</span>
                           </button>
                         </div>
                       )}
                     </div>
 
-                    {/* View Mode & Quick Actions Controls */}
+                    {/* Right: View Mode Segmented Pill & Quick Actions */}
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      {/* View Mode (Grid vs Spotlight) Segmented Switcher */}
-                      <div className="flex items-center p-0.5 rounded-xl bg-white/[0.04] border border-white/[0.08]">
+                      {/* View Mode (Grid vs Spotlight) Segmented M3 Pill */}
+                      <div
+                        className="flex items-center p-1 rounded-full border"
+                        style={{
+                          backgroundColor: 'var(--md-sys-color-surface-container-high)',
+                          borderColor: 'var(--md-sys-color-outline-variant)',
+                        }}
+                      >
                         <button
                           onClick={() => {
                             setViewMode('grid');
                             setSpotlightId(null);
                           }}
                           className={cn(
-                            "px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer",
+                            "px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
                             viewMode === 'grid'
-                              ? "bg-white/15 text-white shadow-sm font-semibold"
-                              : "text-zinc-400 hover:text-white"
+                              ? "m3-btn-filled shadow-2xs"
+                              : "text-muted hover:text-text"
                           )}
-                          title="Grid View: See all participants equally"
+                          title="Grid View: Equal stage tiles"
                         >
                           <LayoutGrid className="w-3.5 h-3.5" />
                           <span className="hidden sm:inline">Grid</span>
@@ -900,10 +965,10 @@ export function CallOverlay({
                             setSpotlightId(remoteEntries.length > 0 ? remoteEntries[0][0] : 'local');
                           }}
                           className={cn(
-                            "px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer",
+                            "px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer",
                             viewMode === 'spotlight'
-                              ? "bg-amber-500 text-zinc-950 shadow-sm font-bold"
-                              : "text-zinc-400 hover:text-white"
+                              ? "m3-btn-tertiary shadow-2xs"
+                              : "text-muted hover:text-text"
                           )}
                           title="Spotlight: Focus on active speaker or shared screen"
                         >
@@ -912,20 +977,21 @@ export function CallOverlay({
                         </button>
                       </div>
 
-                      {/* Minimize Button: Return to chat / file transfer while call stays on */}
+                      {/* Minimize to PiP Button */}
                       <button
                         onClick={toggleMinimize}
-                        className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer border bg-white/[0.05] text-zinc-300 border-white/[0.08] hover:bg-white/[0.1] hover:text-white"
-                        title="Minimize to Picture-in-Picture to use Secure Chat and File Transfer"
+                        className="px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border m3-surface-interactive text-text"
+                        style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
+                        title="Minimize to Picture-in-Picture to use Chat and File Transfer"
                       >
-                        <Minimize2 className="w-3.5 h-3.5 text-blue-400" />
-                        <span className="hidden md:inline">Minimize</span>
+                        <Minimize2 className="w-3.5 h-3.5 text-[color:var(--md-sys-color-primary)]" />
+                        <span className="hidden md:inline">PiP Mode</span>
                       </button>
 
-                      {/* Quick Leave in header */}
+                      {/* Leave Call Pill */}
                       <button
                         onClick={onEndCall}
-                        className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/30"
+                        className="px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer bg-rose-600 hover:bg-rose-500 text-white shadow-xs active:scale-95"
                         title="Leave call"
                       >
                         <PhoneOff className="w-3.5 h-3.5" />
@@ -946,21 +1012,28 @@ export function CallOverlay({
                   >
                     {/* Left: Presenter Badge & Rotation status */}
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-600/90 backdrop-blur-xl border border-blue-400/40 text-white text-xs font-semibold shadow-2xl">
-                        <MonitorUp className="w-3.5 h-3.5 text-blue-200 animate-pulse" />
+                      <div
+                        className="flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-semibold shadow-2xl backdrop-blur-xl"
+                        style={{
+                          backgroundColor: 'var(--md-sys-color-primary-container)',
+                          color: 'var(--md-sys-color-on-primary-container)',
+                          borderColor: 'var(--md-sys-color-outline-variant)',
+                        }}
+                      >
+                        <MonitorUp className="w-3.5 h-3.5 animate-pulse" />
                         <span>
                           {effectiveSpotlightId === 'local' ? 'Presenting Screen' : `${resolveParticipantName(effectiveSpotlightId || '')}'s Screen`}
                         </span>
-                        <span className="text-[10px] bg-black/30 px-1.5 py-0.5 rounded text-blue-200 uppercase font-mono">1080p</span>
+                        <span className="text-[10px] bg-black/20 px-2 py-0.5 rounded-full uppercase font-mono">1080p</span>
                       </div>
 
                       {tileRotations[effectiveSpotlightId || 'local'] ? (
                         <button
                           onClick={() => resetTileRotation(effectiveSpotlightId || 'local')}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-medium cursor-pointer shadow-md hover:bg-amber-500/30 transition-colors"
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-full m3-btn-tertiary text-xs font-semibold cursor-pointer shadow-md transition-all"
                           title="Reset rotation to 0°"
                         >
-                          <RotateCw className="w-3 h-3 text-amber-300" />
+                          <RotateCw className="w-3 h-3" />
                           <span>Rotated {tileRotations[effectiveSpotlightId || 'local']}° (Reset)</span>
                         </button>
                       ) : null}
@@ -970,28 +1043,30 @@ export function CallOverlay({
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => rotateTile(effectiveSpotlightId || 'local')}
-                        className="px-3 py-1.5 rounded-xl bg-black/70 hover:bg-black/90 backdrop-blur-xl text-white text-xs font-medium border border-white/10 flex items-center gap-1.5 shadow-xl transition-all cursor-pointer"
+                        className="px-3.5 py-1.5 rounded-full m3-surface-high border text-text text-xs font-semibold flex items-center gap-1.5 shadow-xl transition-all cursor-pointer"
+                        style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
                         title="Rotate presentation 90 degrees"
                       >
-                        <RotateCw className="w-3.5 h-3.5 text-zinc-300" />
+                        <RotateCw className="w-3.5 h-3.5" />
                         <span>Rotate 90°</span>
                       </button>
 
                       <button
                         onClick={() => toggleTileFit(effectiveSpotlightId || 'local')}
-                        className="px-3 py-1.5 rounded-xl bg-black/70 hover:bg-black/90 backdrop-blur-xl text-white text-xs font-medium border border-white/10 flex items-center gap-1.5 shadow-xl transition-all cursor-pointer"
+                        className="px-3.5 py-1.5 rounded-full m3-surface-high border text-text text-xs font-semibold flex items-center gap-1.5 shadow-xl transition-all cursor-pointer"
+                        style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
                         title={tileFitModes[effectiveSpotlightId || 'local'] === 'contain' ? "Zoom to fill screen" : "Fit whole presentation without cropping"}
                       >
-                        <Scan className="w-3.5 h-3.5 text-zinc-300" />
+                        <Scan className="w-3.5 h-3.5" />
                         <span>{tileFitModes[effectiveSpotlightId || 'local'] === 'contain' ? 'Fit (Full)' : 'Fill'}</span>
                       </button>
 
                       <button
                         onClick={toggleTheaterMode}
-                        className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs flex items-center gap-1.5 shadow-2xl transition-all cursor-pointer ring-2 ring-amber-300/40"
+                        className="px-4 py-1.5 rounded-full m3-btn-filled font-bold text-xs flex items-center gap-1.5 shadow-2xl transition-all cursor-pointer"
                         title="Exit Full Screen Presenter view (Esc)"
                       >
-                        <Minimize2 className="w-3.5 h-3.5 text-zinc-950" />
+                        <Minimize2 className="w-3.5 h-3.5" />
                         <span>Exit Full Screen</span>
                       </button>
                     </div>
@@ -1000,24 +1075,34 @@ export function CallOverlay({
 
                 {/* Main Meeting Stage Area */}
                 <div className={cn(
-                  "flex-1 min-h-0 w-full flex flex-col items-center justify-center overflow-hidden relative",
-                  isTheaterMode ? "p-0" : "p-2 sm:p-3 md:p-4"
+                  "flex-1 min-h-0 w-full flex flex-col items-center justify-center overflow-hidden relative z-10",
+                  isTheaterMode ? "p-0" : "p-2.5 sm:p-4 md:p-5"
                 )}>
                   
                   {/* 1. SPOTLIGHT MODE LAYOUT */}
                   {viewMode === 'spotlight' && (
                     <div className={cn(
                       "w-full h-full flex flex-col md:flex-row overflow-hidden min-h-0",
-                      isTheaterMode ? "gap-0" : "gap-2.5 sm:gap-3.5"
+                      isTheaterMode ? "gap-0" : "gap-3 sm:gap-4"
                     )}>
                       
-                      {/* Spotlight Main Stage (Hero Area) */}
-                      <div className={cn(
-                        "flex-1 min-h-0 h-full flex items-center justify-center relative bg-[#0e1014] overflow-hidden transition-all duration-300",
-                        isTheaterMode 
-                          ? "w-full max-w-full rounded-none border-0 shadow-none ring-0 bg-black" 
-                          : "rounded-2xl sm:rounded-3xl border border-white/[0.1] shadow-2xl ring-1 ring-white/5"
-                      )}>
+                      {/* Spotlight Main Stage (28dp Corner Extra Large Container) */}
+                      <div
+                        className={cn(
+                          "flex-1 min-h-0 h-full flex items-center justify-center relative overflow-hidden transition-all duration-300",
+                          isTheaterMode 
+                            ? "w-full max-w-full rounded-none border-0 shadow-none bg-black" 
+                            : "m3-card-xl rounded-[28px] border shadow-2xl"
+                        )}
+                        style={
+                          isTheaterMode
+                            ? undefined
+                            : {
+                                backgroundColor: 'var(--md-sys-color-surface-container)',
+                                borderColor: 'var(--md-sys-color-outline-variant)',
+                              }
+                        }
+                      >
                         {effectiveSpotlightId === 'local' ? (
                           <LocalVideoTile 
                             stream={localStream}
@@ -1061,14 +1146,18 @@ export function CallOverlay({
                         )}
                       </div>
 
-                      {/* Filmstrip (Thumbnails of other participants) - hidden in full screen theater mode to maximize presentation space */}
+                      {/* Filmstrip (Thumbnails of other participants) */}
                       {!isTheaterMode && (
-                        <div className="h-24 sm:h-28 md:h-full md:w-56 lg:w-64 flex flex-row md:flex-col gap-2 sm:gap-2.5 overflow-x-auto md:overflow-y-auto p-1 flex-shrink-0 min-h-0 scrollbar-thin">
+                        <div className="h-24 sm:h-28 md:h-full md:w-60 lg:w-68 flex flex-row md:flex-col gap-2.5 sm:gap-3 overflow-x-auto md:overflow-y-auto p-1 flex-shrink-0 min-h-0 scrollbar-thin">
                         {/* Local Thumbnail in filmstrip if not spotlighted */}
                         {effectiveSpotlightId !== 'local' && (
                           <div 
                             onClick={() => handleSpotlight('local')}
-                            className="relative min-w-[125px] sm:min-w-[145px] md:min-w-0 md:w-full h-full md:h-34 rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer group border border-white/10 hover:border-amber-400/60 transition-all shadow-lg bg-[#15171d] flex-shrink-0"
+                            className="relative min-w-[130px] sm:min-w-[150px] md:min-w-0 md:w-full h-full md:h-36 m3-card rounded-2xl overflow-hidden cursor-pointer group border transition-all shadow-md flex-shrink-0"
+                            style={{
+                              backgroundColor: 'var(--md-sys-color-surface-container)',
+                              borderColor: 'var(--md-sys-color-outline-variant)',
+                            }}
                             title="Click to spotlight your video"
                           >
                             <LocalVideoTile 
@@ -1086,7 +1175,7 @@ export function CallOverlay({
                             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
                               <button 
                                 onClick={(e) => { e.stopPropagation(); handleSpotlight('local'); }}
-                                className="p-1.5 rounded-lg bg-black/70 hover:bg-amber-500 text-white text-xs shadow-md cursor-pointer transition-colors"
+                                className="p-1.5 rounded-full m3-btn-filled text-xs shadow-md cursor-pointer transition-all"
                                 title="Spotlight You"
                               >
                                 <Pin className="w-3.5 h-3.5" />
@@ -1104,7 +1193,11 @@ export function CallOverlay({
                             <div 
                               key={id}
                               onClick={() => handleSpotlight(id)}
-                              className="relative min-w-[125px] sm:min-w-[145px] md:min-w-0 md:w-full h-full md:h-34 rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer group border border-white/10 hover:border-amber-400/60 transition-all shadow-lg bg-[#15171d] flex-shrink-0"
+                              className="relative min-w-[130px] sm:min-w-[150px] md:min-w-0 md:w-full h-full md:h-36 m3-card rounded-2xl overflow-hidden cursor-pointer group border transition-all shadow-md flex-shrink-0"
+                              style={{
+                                backgroundColor: 'var(--md-sys-color-surface-container)',
+                                borderColor: 'var(--md-sys-color-outline-variant)',
+                              }}
                               title={`Click to spotlight ${resolvedName}`}
                             >
                               <RemoteVideoTile 
@@ -1122,7 +1215,7 @@ export function CallOverlay({
                               <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); handleSpotlight(id); }}
-                                  className="p-1.5 rounded-lg bg-black/70 hover:bg-amber-500 text-white text-xs shadow-md cursor-pointer transition-colors"
+                                  className="p-1.5 rounded-full m3-btn-filled text-xs shadow-md cursor-pointer transition-all"
                                   title={`Spotlight ${resolvedName}`}
                                 >
                                   <Pin className="w-3.5 h-3.5" />
@@ -1138,15 +1231,21 @@ export function CallOverlay({
 
                   {/* 2. BALANCED GRID MODE LAYOUT */}
                   {viewMode === 'grid' && (
-                    <div className={cn("w-full h-full max-w-7xl flex-1 min-h-0 grid gap-2.5 sm:gap-3.5 md:gap-4 place-content-center p-1 sm:p-2", gridCols)}>
+                    <div className={cn("w-full h-full max-w-7xl flex-1 min-h-0 grid gap-3 sm:gap-4 place-content-center p-1 sm:p-2", gridCols)}>
                       
                       {/* Local Participant Tile */}
-                      <div className={cn(
-                        "relative group bg-[#13151b] rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl w-full h-full min-h-0 flex items-center justify-center border transition-all duration-300",
-                        isLocalSpeaking 
-                          ? "border-emerald-500/80 ring-2 ring-emerald-500/40 shadow-[0_0_24px_rgba(16,185,129,0.25)]" 
-                          : "border-white/[0.08] hover:border-white/20"
-                      )}>
+                      <div
+                        className={cn(
+                          "relative group m3-card-xl rounded-[28px] overflow-hidden shadow-xl w-full h-full min-h-0 flex items-center justify-center border transition-all duration-300",
+                          isLocalSpeaking && "ring-2 ring-[var(--md-sys-color-primary)] shadow-2xl"
+                        )}
+                        style={{
+                          backgroundColor: 'var(--md-sys-color-surface-container)',
+                          borderColor: isLocalSpeaking
+                            ? 'var(--md-sys-color-primary)'
+                            : 'var(--md-sys-color-outline-variant)',
+                        }}
+                      >
                         <LocalVideoTile 
                           stream={localStream}
                           screenTrack={screenTrack}
@@ -1171,7 +1270,11 @@ export function CallOverlay({
                         return (
                           <div 
                             key={id}
-                            className="relative group bg-[#13151b] rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl w-full h-full min-h-0 flex items-center justify-center border transition-all duration-300 border-white/[0.08] hover:border-white/20"
+                            className="relative group m3-card-xl rounded-[28px] overflow-hidden shadow-xl w-full h-full min-h-0 flex items-center justify-center border transition-all duration-300"
+                            style={{
+                              backgroundColor: 'var(--md-sys-color-surface-container)',
+                              borderColor: 'var(--md-sys-color-outline-variant)',
+                            }}
                           >
                             <RemoteVideoTile 
                               id={id}
@@ -1194,18 +1297,34 @@ export function CallOverlay({
 
                       {/* Waiting state when alone in call */}
                       {remoteEntries.length === 0 && (
-                        <div className="relative group bg-[#121419]/80 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl w-full h-full min-h-0 flex flex-col items-center justify-center p-4 sm:p-6 text-center border border-white/[0.08] border-dashed">
-                          <div className="relative flex items-center justify-center mb-3">
-                            <span className="animate-ping absolute inline-flex h-16 w-16 rounded-full bg-emerald-500/20" />
-                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 relative z-10 shadow-inner">
+                        <div
+                          className="relative group m3-card-xl rounded-[28px] overflow-hidden shadow-xl w-full h-full min-h-0 flex flex-col items-center justify-center p-6 text-center border border-dashed"
+                          style={{
+                            backgroundColor: 'var(--md-sys-color-surface-container-low)',
+                            borderColor: 'var(--md-sys-color-outline-variant)',
+                          }}
+                        >
+                          <div className="relative flex items-center justify-center mb-4">
+                            <span
+                              className="animate-ping absolute inline-flex h-16 w-16 rounded-full opacity-35"
+                              style={{ backgroundColor: 'var(--md-sys-color-primary)' }}
+                            />
+                            <div
+                              className="w-14 h-14 rounded-2xl border flex items-center justify-center relative z-10 shadow-sm"
+                              style={{
+                                backgroundColor: 'var(--md-sys-color-primary-container)',
+                                color: 'var(--md-sys-color-on-primary-container)',
+                                borderColor: 'var(--md-sys-color-outline-variant)',
+                              }}
+                            >
                               <Users className="w-6 h-6 sm:w-7 sm:h-7" />
                             </div>
                           </div>
-                          <h4 className="text-xs sm:text-sm font-semibold text-zinc-200 mb-1">
-                            Waiting for peer to connect...
+                          <h4 className="text-sm font-bold text-text mb-1">
+                            Waiting for peer to join...
                           </h4>
-                          <p className="text-[11px] sm:text-xs text-zinc-400 max-w-xs">
-                            The encrypted Quantum Link channel is standing by for the remote peer.
+                          <p className="text-xs text-muted max-w-xs leading-relaxed">
+                            Your encrypted Quantum Link {type === 'video' ? 'video' : 'voice'} stage is active and ready.
                           </p>
                         </div>
                       )}
@@ -1223,13 +1342,19 @@ export function CallOverlay({
                       showTheaterControls ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
                     )}
                   >
-                    <div className="flex items-center gap-2 sm:gap-3 px-3.5 py-2 rounded-2xl bg-[#121419]/90 backdrop-blur-2xl border border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.7)]">
+                    <div
+                      className="flex items-center gap-2 sm:gap-3 px-4 py-2.5 rounded-full backdrop-blur-2xl border shadow-[0_10px_40px_rgba(0,0,0,0.65)]"
+                      style={{
+                        backgroundColor: 'var(--md-sys-color-surface-container-high)',
+                        borderColor: 'var(--md-sys-color-outline-variant)',
+                      }}
+                    >
                       {/* Mic Toggle */}
                       <button 
                         onClick={toggleMic}
                         className={cn(
-                          "w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer",
-                          isMicMuted ? "bg-rose-600 text-white" : "bg-white/10 text-emerald-400 hover:bg-white/20"
+                          "w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer",
+                          isMicMuted ? "bg-rose-600 text-white" : "m3-btn-tonal"
                         )}
                         title={isMicMuted ? "Unmute microphone" : "Mute microphone"}
                       >
@@ -1240,8 +1365,8 @@ export function CallOverlay({
                       <button 
                         onClick={toggleVideo}
                         className={cn(
-                          "w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer",
-                          isVideoOff ? "bg-rose-600 text-white" : "bg-white/10 text-zinc-200 hover:bg-white/20"
+                          "w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer",
+                          isVideoOff ? "bg-rose-600 text-white" : "m3-btn-tonal"
                         )}
                         title={isVideoOff ? "Turn on camera" : "Turn off camera"}
                       >
@@ -1252,31 +1377,29 @@ export function CallOverlay({
                       <button 
                         onClick={toggleScreenShare}
                         className={cn(
-                          "h-9 px-3 rounded-xl flex items-center gap-1.5 text-xs font-semibold cursor-pointer transition-all",
-                          isScreenSharing 
-                            ? "bg-blue-600 text-white shadow-md shadow-blue-600/30" 
-                            : "bg-white/10 text-zinc-200 hover:bg-white/20"
+                          "h-10 px-4 rounded-full flex items-center gap-1.5 text-xs font-semibold cursor-pointer transition-all",
+                          isScreenSharing ? "m3-btn-filled shadow-md" : "m3-btn-tonal"
                         )}
                         title={isScreenSharing ? "Stop sharing screen" : "Share screen"}
                       >
-                        <MonitorUp className="w-3.5 h-3.5 text-blue-300" />
+                        <MonitorUp className="w-3.5 h-3.5" />
                         <span>{isScreenSharing ? "Stop Sharing" : "Share Screen"}</span>
                       </button>
 
                       {/* Exit Full Screen */}
                       <button
                         onClick={toggleTheaterMode}
-                        className="h-9 px-3 rounded-xl flex items-center gap-1.5 text-xs font-bold bg-amber-500 hover:bg-amber-400 text-zinc-950 cursor-pointer shadow-md transition-all active:scale-95"
+                        className="h-10 px-4 rounded-full flex items-center gap-1.5 text-xs font-bold m3-btn-tertiary cursor-pointer shadow-md transition-all active:scale-95"
                         title="Exit Full Screen (Esc)"
                       >
                         <Minimize2 className="w-3.5 h-3.5" />
-                        <span>Exit Full Screen</span>
+                        <span>Exit Theater</span>
                       </button>
 
                       {/* Leave Call */}
                       <button 
                         onClick={onEndCall}
-                        className="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-600 hover:bg-rose-500 text-white cursor-pointer shadow-md active:scale-95 transition-all"
+                        className="w-10 h-10 rounded-full flex items-center justify-center bg-rose-600 hover:bg-rose-500 text-white cursor-pointer shadow-md active:scale-95 transition-all"
                         title="Leave call"
                       >
                         <PhoneOff className="w-4 h-4" />
@@ -1285,31 +1408,43 @@ export function CallOverlay({
                   </div>
                 )}
 
-                {/* Bottom Control Bar (Modern Elevated Island Dock) - Hidden in Theater Mode */}
+                {/* Bottom Control Bar (Android 16 Material You Expressive Call Dock) */}
                 {!isTheaterMode && (
-                  <div className="h-16 sm:h-20 bg-[#121419]/95 backdrop-blur-2xl border-t border-white/[0.08] flex items-center justify-between px-3 sm:px-6 md:px-8 flex-shrink-0 z-30 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
-                    {/* Left side: Time & Status */}
-                    <div className="hidden md:flex items-center text-xs font-medium text-zinc-300 w-1/4">
-                      <span className="font-mono text-sm tracking-wide text-zinc-200">
+                  <div
+                    className="min-h-20 py-2.5 border-t flex items-center justify-between px-3 sm:px-6 md:px-8 flex-shrink-0 z-30 backdrop-blur-2xl"
+                    style={{
+                      backgroundColor: 'var(--md-sys-color-surface-container-low)',
+                      borderColor: 'var(--md-sys-color-outline-variant)',
+                    }}
+                  >
+                    {/* Left side: Time & E2EE Status */}
+                    <div className="hidden md:flex items-center text-xs font-medium text-muted w-1/4">
+                      <span className="font-mono text-sm font-semibold tracking-wide text-text">
                         {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                       </span>
-                      <span className="mx-3 text-white/20">|</span>
-                      <span className="truncate text-zinc-400 text-xs flex items-center gap-1.5">
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                        E2EE Direct P2P
+                      <span className="mx-3 opacity-30">•</span>
+                      <span className="truncate text-muted text-xs flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                        <span>DTLS-SRTP Mesh</span>
                       </span>
                     </div>
 
-                    {/* Center: Controls */}
-                    <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-3.5 w-full md:w-auto">
+                    {/* Center: Expressive Pill / Squircle Call Controls Island */}
+                    <div
+                      className="flex items-center justify-center gap-2 sm:gap-2.5 md:gap-3 px-3 sm:px-4 py-2 rounded-full border shadow-lg mx-auto"
+                      style={{
+                        backgroundColor: 'var(--md-sys-color-surface-container-high)',
+                        borderColor: 'var(--md-sys-color-outline-variant)',
+                      }}
+                    >
                       {/* Mic Toggle */}
                       <button 
                         onClick={toggleMic}
                         className={cn(
-                          "w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-md",
+                          "w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-xs",
                           isMicMuted 
-                            ? "bg-rose-600 text-white hover:bg-rose-500 shadow-rose-600/30 border border-rose-400/40" 
-                            : "bg-white/[0.08] text-emerald-400 hover:bg-white/[0.14] border border-white/[0.08] hover:border-emerald-500/40"
+                            ? "bg-rose-600 text-white hover:bg-rose-500" 
+                            : "m3-btn-tonal"
                         )}
                         title={isMicMuted ? "Turn on microphone" : "Turn off microphone"}
                       >
@@ -1320,10 +1455,10 @@ export function CallOverlay({
                       <button 
                         onClick={toggleVideo}
                         className={cn(
-                          "w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-md",
+                          "w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-xs",
                           isVideoOff
-                            ? "bg-rose-600 text-white hover:bg-rose-500 shadow-rose-600/30 border border-rose-400/40" 
-                            : "bg-white/[0.08] text-zinc-200 hover:bg-white/[0.14] border border-white/[0.08]"
+                            ? "bg-rose-600 text-white hover:bg-rose-500" 
+                            : "m3-btn-tonal"
                         )}
                         title={isVideoOff ? "Turn on camera" : "Turn off camera"}
                       >
@@ -1332,60 +1467,57 @@ export function CallOverlay({
 
                       {/* Screen Share / Mirror Screen Actions */}
                       {isScreenSharing ? (
-                        /* Local user is actively presenting */
                         <div className="flex items-center gap-1.5 sm:gap-2">
                           <button 
                             onClick={toggleScreenShare}
-                            className="h-10 sm:h-11 md:h-12 px-3 sm:px-4 rounded-2xl flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/40 ring-2 ring-blue-400/50 border border-blue-300/40 font-semibold cursor-pointer active:scale-95 text-xs sm:text-sm"
+                            className="h-11 sm:h-12 px-4 rounded-full flex items-center justify-center gap-2 m3-btn-filled font-semibold cursor-pointer active:scale-95 text-xs sm:text-sm shadow-sm"
                             title="You are actively mirroring your screen. Click to stop presenting."
                           >
-                            <MonitorUp className="w-4 h-4 sm:w-5 sm:h-5 text-white animate-pulse" />
+                            <MonitorUp className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
                             <span>Stop Sharing</span>
                           </button>
                           <button 
                             onClick={toggleTheaterMode}
-                            className="h-10 sm:h-11 md:h-12 px-3 sm:px-4 rounded-2xl flex items-center justify-center gap-2 bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-400/40 font-semibold cursor-pointer active:scale-95 shadow-md text-xs sm:text-sm transition-all"
+                            className="h-11 sm:h-12 px-3.5 sm:px-4 rounded-full flex items-center justify-center gap-2 m3-btn-tertiary font-semibold cursor-pointer active:scale-95 shadow-xs text-xs sm:text-sm transition-all"
                             title="View your screen presentation in edge-to-edge Full Screen"
                           >
-                            <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400" />
-                            <span className="hidden sm:inline">Full Screen</span>
+                            <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                            <span className="hidden sm:inline">Theater</span>
                           </button>
                         </div>
                       ) : remoteScreenSharerId ? (
-                        /* Remote peer is actively presenting screen */
                         <div className="flex items-center gap-1.5 sm:gap-2">
                           <button 
                             onClick={toggleTheaterMode}
-                            className="h-10 sm:h-11 md:h-12 px-3.5 sm:px-5 rounded-2xl flex items-center justify-center gap-2 bg-gradient-to-r from-sky-400 via-sky-500 to-blue-600 hover:from-sky-300 hover:to-blue-500 text-zinc-950 font-bold shadow-lg shadow-sky-500/35 ring-2 ring-sky-300/80 border border-sky-200 cursor-pointer active:scale-95 transition-all text-xs sm:text-sm"
+                            className="h-11 sm:h-12 px-4 sm:px-5 rounded-full flex items-center justify-center gap-2 m3-btn-filled font-bold shadow-md cursor-pointer active:scale-95 transition-all text-xs sm:text-sm"
                             title={`View ${resolveParticipantName(remoteScreenSharerId)}'s presentation in Full Screen`}
                           >
-                            <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-950" />
+                            <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5" />
                             <span>Full Screen Presenter</span>
                           </button>
                           <button 
                             onClick={toggleScreenShare}
-                            className="h-10 sm:h-11 md:h-12 px-3 sm:px-3.5 rounded-2xl flex items-center justify-center gap-2 bg-white/[0.08] text-zinc-200 hover:bg-white/[0.14] border border-white/[0.08] hover:border-blue-400/40 cursor-pointer active:scale-95 transition-all text-xs sm:text-sm font-medium"
+                            className="h-11 sm:h-12 px-3.5 sm:px-4 rounded-full flex items-center justify-center gap-2 m3-btn-tonal cursor-pointer active:scale-95 transition-all text-xs sm:text-sm font-semibold"
                             title="Share your own screen"
                           >
-                            <MonitorUp className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
-                            <span className="hidden md:inline">Share My Screen</span>
+                            <MonitorUp className="w-4 h-4 sm:w-5 sm:h-5" />
+                            <span className="hidden md:inline">Share Screen</span>
                           </button>
                         </div>
                       ) : (
-                        /* No active screen share */
                         <div className="flex items-center gap-1.5 sm:gap-2">
                           <button 
                             onClick={toggleScreenShare}
-                            className="h-10 sm:h-11 md:h-12 px-3 sm:px-4 rounded-2xl flex items-center justify-center gap-2 bg-white/[0.08] text-zinc-200 hover:bg-white/[0.14] border border-white/[0.08] hover:border-blue-400/40 cursor-pointer active:scale-95 transition-all text-xs sm:text-sm font-medium"
+                            className="h-11 sm:h-12 px-3.5 sm:px-4 rounded-full flex items-center justify-center gap-2 m3-btn-tonal cursor-pointer active:scale-95 transition-all text-xs sm:text-sm font-semibold"
                             title="Mirror / Share Screen (Full 1080p Presentation)"
                           >
-                            <MonitorUp className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+                            <MonitorUp className="w-4 h-4 sm:w-5 sm:h-5" />
                             <span className="hidden sm:inline">Mirror Screen</span>
                           </button>
                           {viewMode === 'spotlight' && (
                             <button 
                               onClick={toggleTheaterMode}
-                              className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center bg-white/[0.08] text-sky-400 hover:bg-white/[0.14] border border-white/[0.08] hover:border-sky-400/40 cursor-pointer active:scale-95 transition-all shadow-md"
+                              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center m3-btn-tonal cursor-pointer active:scale-95 transition-all shadow-xs"
                               title="Full Screen Spotlight View"
                             >
                               <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -1406,41 +1538,47 @@ export function CallOverlay({
                           }
                         }}
                         className={cn(
-                          "w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-md",
+                          "w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-xs",
                           viewMode === 'spotlight'
-                            ? "bg-amber-500 text-zinc-950 font-bold shadow-amber-500/30 border border-amber-300"
-                            : "bg-white/[0.08] text-zinc-200 hover:bg-white/[0.14] border border-white/[0.08] hover:border-amber-400/40"
+                            ? "m3-btn-tertiary font-bold"
+                            : "m3-btn-tonal"
                         )}
                         title={viewMode === 'spotlight' ? "Exit Spotlight mode" : "Spotlight mode"}
                       >
-                        {viewMode === 'spotlight' ? <PinOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />}
+                        {viewMode === 'spotlight' ? <PinOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />}
                       </button>
 
                       {/* Minimize to PiP Toggle */}
                       <button
                         onClick={toggleMinimize}
-                        className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-md bg-white/[0.08] text-zinc-200 hover:bg-white/[0.14] border border-white/[0.08]"
+                        className="w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all active:scale-95 cursor-pointer shadow-xs m3-btn-tonal"
                         title="Minimize to Picture-in-Picture (use chat & file transfer)"
                       >
-                        <Minimize2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+                        <Minimize2 className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
 
-                      {/* End Call Button */}
+                      {/* End Call Pill Button */}
                       <button 
                         onClick={onEndCall} 
-                        className="h-10 sm:h-11 md:h-12 px-4 sm:px-6 rounded-2xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-medium flex items-center justify-center gap-2 shadow-lg shadow-rose-600/30 transition-all active:scale-95 cursor-pointer ml-1 sm:ml-2 border border-rose-400/30"
+                        className="h-11 sm:h-12 px-5 sm:px-6 rounded-full bg-rose-600 hover:bg-rose-500 text-white font-semibold flex items-center justify-center gap-2 shadow-md shadow-rose-600/25 transition-all active:scale-95 cursor-pointer ml-1"
                         title="Leave call"
                       >
                         <PhoneOff className="w-4 h-4 sm:w-5 sm:h-5" />
-                        <span className="text-xs sm:text-sm font-semibold tracking-wide hidden sm:inline">Leave</span>
+                        <span className="text-xs sm:text-sm font-bold tracking-wide hidden sm:inline">End Call</span>
                       </button>
                     </div>
 
-                    {/* Right side: Participant info */}
-                    <div className="hidden md:flex items-center justify-end gap-3 w-1/4 text-zinc-300">
-                      <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/[0.05] border border-white/[0.08] text-xs font-medium text-zinc-300">
-                        <Users className="w-3.5 h-3.5 text-zinc-400" />
-                        <span>{totalParticipants} participant{totalParticipants > 1 ? 's' : ''}</span>
+                    {/* Right side: Participant count pill */}
+                    <div className="hidden md:flex items-center justify-end gap-3 w-1/4">
+                      <div
+                        className="flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-semibold text-text"
+                        style={{
+                          backgroundColor: 'var(--md-sys-color-surface-container-high)',
+                          borderColor: 'var(--md-sys-color-outline-variant)',
+                        }}
+                      >
+                        <Users className="w-3.5 h-3.5 text-[color:var(--md-sys-color-primary)]" />
+                        <span>{totalParticipants} node{totalParticipants > 1 ? 's' : ''}</span>
                       </div>
                     </div>
                   </div>
@@ -1534,9 +1672,6 @@ function LocalVideoTile({
     (isScreenSharing && stream && stream.getVideoTracks().some(t => t.readyState === 'live'))
   );
 
-  // Media stream to display in this video element:
-  // When screen sharing is on, display screenTrack!
-  // Otherwise, if camera is enabled, display stream.
   const displayStream = useMemo(() => {
     if (hasActiveScreenTrack && screenTrack) {
       return new MediaStream([screenTrack]);
@@ -1576,11 +1711,12 @@ function LocalVideoTile({
       onDoubleClick={() => onToggleTheater ? onToggleTheater() : onToggleFit?.()}
       title={isScreenSharing ? "Double-click to toggle Full Screen presentation" : undefined}
       className={cn(
-        "w-full h-full flex items-center justify-center relative overflow-hidden bg-[#0d0e12]",
-        isLocalSpeaking && !isThumbnail && "ring-2 ring-emerald-400/80 shadow-[0_0_24px_rgba(52,211,153,0.3)]"
+        "w-full h-full flex items-center justify-center relative overflow-hidden",
+        isLocalSpeaking && !isThumbnail && "ring-2 ring-[var(--md-sys-color-primary)]"
       )}
+      style={{ backgroundColor: 'var(--md-sys-color-surface-container)' }}
     >
-      {/* Video Element: uses object-contain so landscape screen shares are NEVER cropped */}
+      {/* Video Element */}
       <video 
         ref={videoRef}
         autoPlay 
@@ -1599,28 +1735,53 @@ function LocalVideoTile({
       />
 
       {/* Subtle Vignette Gradient for badge & control legibility */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/40 pointer-events-none" />
+      {showVideo && (
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/35 pointer-events-none" />
+      )}
 
-      {/* Avatar Fallback for audio or camera off */}
+      {/* Material You Expressive Avatar Stage for Voice Call or Camera Off */}
       {!showVideo && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-[#181a22] to-[#0f1116]">
-          <div className={cn(
-            "rounded-full border flex items-center justify-center text-blue-200 font-bold uppercase shadow-2xl transition-all overflow-hidden",
-            avatarColor || "bg-blue-600/20",
-            isThumbnail ? "w-12 h-12 text-sm" : "w-22 h-22 sm:w-26 sm:h-26 text-2xl sm:text-3xl",
-            isLocalSpeaking 
-              ? "border-emerald-400 ring-4 ring-emerald-500/30 scale-105 shadow-[0_0_25px_rgba(16,185,129,0.35)]" 
-              : "border-blue-500/30 shadow-inner"
-          )}>
-            {avatarImage ? (
-              <img src={avatarImage} alt="You" className="w-full h-full object-cover" />
-            ) : (
-              "You"
+        <div
+          className="absolute inset-0 flex flex-col items-center justify-center p-4"
+          style={{ backgroundColor: 'var(--md-sys-color-surface-container)' }}
+        >
+          <div className="relative flex items-center justify-center">
+            {isLocalSpeaking && (
+              <span
+                className="animate-ping absolute -inset-3 rounded-[32px] opacity-35"
+                style={{ backgroundColor: 'var(--md-sys-color-primary)' }}
+              />
             )}
+            <div
+              className={cn(
+                "rounded-[28px] border flex items-center justify-center font-bold uppercase shadow-xl transition-all overflow-hidden relative z-10",
+                avatarColor || "m3-btn-tonal",
+                isThumbnail ? "w-12 h-12 rounded-2xl text-sm" : "w-24 h-24 sm:w-28 sm:h-28 text-2xl sm:text-3xl",
+                isLocalSpeaking && "scale-105 ring-4 ring-[var(--md-sys-color-primary)]/40"
+              )}
+              style={{
+                borderColor: isLocalSpeaking
+                  ? 'var(--md-sys-color-primary)'
+                  : 'var(--md-sys-color-outline-variant)',
+              }}
+            >
+              {avatarImage ? (
+                <img src={avatarImage} alt="You" className="w-full h-full object-cover" />
+              ) : (
+                "You"
+              )}
+            </div>
           </div>
           {!isThumbnail && isVideoOff && !hasActiveScreenTrack && (
-            <span className="text-xs text-zinc-400 mt-3 font-medium bg-black/40 px-3 py-1 rounded-full border border-white/5">
-              Camera is turned off
+            <span
+              className="text-xs font-semibold mt-4 px-3.5 py-1 rounded-full border"
+              style={{
+                backgroundColor: 'var(--md-sys-color-surface-container-high)',
+                color: 'var(--md-sys-color-on-surface-variant)',
+                borderColor: 'var(--md-sys-color-outline-variant)',
+              }}
+            >
+              Voice Only • Camera Off
             </span>
           )}
         </div>
@@ -1632,33 +1793,29 @@ function LocalVideoTile({
           "absolute top-3 right-3 flex items-center gap-1.5 z-20 transition-opacity",
           isScreenSharing ? "opacity-95 hover:opacity-100" : "opacity-0 group-hover:opacity-100"
         )}>
-          {/* Full Screen Presenter / Theater Button */}
           {onToggleTheater && (
             <button
               onClick={(e) => { e.stopPropagation(); onToggleTheater(); }}
               className={cn(
-                "px-2.5 py-1.5 rounded-xl text-xs font-semibold backdrop-blur-xl border flex items-center gap-1.5 shadow-md cursor-pointer transition-all",
-                isTheaterMode 
-                  ? "bg-amber-500 hover:bg-amber-400 text-zinc-950 border-amber-300 shadow-amber-500/30" 
-                  : "bg-sky-600/90 hover:bg-sky-500 text-white border-sky-400/40 shadow-sky-600/30"
+                "px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-xl border flex items-center gap-1.5 shadow-md cursor-pointer transition-all",
+                isTheaterMode ? "m3-btn-tertiary" : "m3-btn-filled"
               )}
-              title={isTheaterMode ? "Exit Full Screen Presenter view" : "Full Screen Presenter view (Maximize presentation)"}
+              style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
+              title={isTheaterMode ? "Exit Full Screen Presenter view" : "Full Screen Presenter view"}
             >
               {isTheaterMode ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
               <span className="text-[11px] hidden sm:inline">{isTheaterMode ? 'Exit Full Screen' : 'Full Screen'}</span>
             </button>
           )}
 
-          {/* Rotate 90 degrees button */}
           {onRotate && (
             <button
               onClick={(e) => { e.stopPropagation(); onRotate(); }}
               className={cn(
-                "px-2.5 py-1.5 rounded-xl text-xs font-medium backdrop-blur-xl border flex items-center gap-1.5 shadow-md cursor-pointer transition-all",
-                rotation > 0
-                  ? "bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold border-amber-300 shadow-amber-500/30"
-                  : "bg-black/60 hover:bg-black/85 text-white/90 border-white/10"
+                "px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-xl border flex items-center gap-1.5 shadow-md cursor-pointer transition-all",
+                rotation > 0 ? "m3-btn-tertiary" : "m3-surface-high text-text"
               )}
+              style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
               title={`Rotate 90° (Currently ${rotation}°)`}
             >
               <RotateCw className="w-3.5 h-3.5" />
@@ -1666,38 +1823,37 @@ function LocalVideoTile({
             </button>
           )}
 
-          {/* Flip / Mirror Camera button */}
           {!hasActiveScreenTrack && !isScreenSharing && showVideo && (
             <button
               onClick={(e) => { 
                 e.stopPropagation(); 
                 setManualMirror(prev => (prev === null ? false : !prev)); 
               }}
-              className="px-2.5 py-1.5 rounded-xl bg-black/60 hover:bg-black/85 text-xs font-medium text-white/90 backdrop-blur-xl border border-white/10 flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+              className="px-3 py-1.5 rounded-full m3-surface-high text-xs font-semibold text-text backdrop-blur-xl border flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+              style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
               title="Mirror / Flip camera view"
             >
-              <FlipHorizontal className="w-3.5 h-3.5 text-zinc-300" />
+              <FlipHorizontal className="w-3.5 h-3.5" />
               <span className="text-[11px]">Flip</span>
             </button>
           )}
 
-          {/* Fit / Fill toggle button */}
           {onToggleFit && (
             <button
               onClick={(e) => { e.stopPropagation(); onToggleFit(); }}
-              className="px-2.5 py-1.5 rounded-xl bg-black/60 hover:bg-black/85 text-xs font-medium text-white/90 backdrop-blur-xl border border-white/10 flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+              className="px-3 py-1.5 rounded-full m3-surface-high text-xs font-semibold text-text backdrop-blur-xl border flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+              style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
               title={fitMode === 'contain' ? "Switch to Fill (zoom to edge)" : "Switch to Fit (show entire screen without cropping)"}
             >
-              {fitMode === 'contain' ? <Maximize2 className="w-3.5 h-3.5 text-zinc-300" /> : <Minimize2 className="w-3.5 h-3.5 text-zinc-300" />}
-              <span className="text-[11px]">{fitMode === 'contain' ? 'Fit (Full)' : 'Fill'}</span>
+              {fitMode === 'contain' ? <Maximize2 className="w-3.5 h-3.5" /> : <Minimize2 className="w-3.5 h-3.5" />}
+              <span className="text-[11px]">{fitMode === 'contain' ? 'Fit' : 'Fill'}</span>
             </button>
           )}
 
-          {/* Spotlight / Unspotlight button */}
           {isSpotlightStage && onUnspotlight ? (
             <button
               onClick={(e) => { e.stopPropagation(); onUnspotlight(); }}
-              className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-xs font-bold text-zinc-950 backdrop-blur-xl flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+              className="px-3 py-1.5 rounded-full m3-btn-tertiary text-xs font-bold backdrop-blur-xl flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
               title="Exit Spotlight Mode"
             >
               <PinOff className="w-3.5 h-3.5" />
@@ -1706,7 +1862,8 @@ function LocalVideoTile({
           ) : onSpotlight ? (
             <button
               onClick={(e) => { e.stopPropagation(); onSpotlight(); }}
-              className="p-2 rounded-xl bg-black/60 hover:bg-amber-500 hover:text-zinc-950 text-white backdrop-blur-xl border border-white/10 shadow-md cursor-pointer transition-all"
+              className="p-2 rounded-full m3-surface-high text-text hover:m3-btn-filled backdrop-blur-xl border shadow-md cursor-pointer transition-all"
+              style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
               title="Spotlight your video"
             >
               <Pin className="w-3.5 h-3.5" />
@@ -1717,39 +1874,51 @@ function LocalVideoTile({
 
       {/* Spotlight Badge on Stage */}
       {isSpotlightStage && (
-        <div className="absolute top-3 left-3 flex items-center gap-2 bg-amber-500 text-zinc-950 px-3 py-1.5 rounded-xl text-xs font-bold shadow-lg z-20 backdrop-blur-md">
+        <div className="absolute top-3 left-3 flex items-center gap-2 m3-btn-tertiary px-3.5 py-1.5 rounded-full text-xs font-bold shadow-lg z-20 backdrop-blur-md">
           <Sparkles className="w-3.5 h-3.5" />
           <span>SPOTLIGHT • YOU</span>
-          {hasActiveScreenTrack && <span className="bg-black/20 px-1.5 py-0.5 rounded-md text-[10px]">SCREEN</span>}
+          {hasActiveScreenTrack && <span className="bg-black/20 px-2 py-0.5 rounded-full text-[10px]">SCREEN</span>}
         </div>
       )}
 
-      {/* Bottom Name & Audio Status Overlay */}
-      <div className={cn(
-        "absolute bottom-2.5 left-2.5 flex items-center gap-2 bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl text-xs font-medium text-white shadow-lg z-10",
-        isThumbnail ? "px-2 py-0.5 text-[10px]" : "px-3 py-1.5"
-      )}>
+      {/* Bottom Name & Audio Status Pill */}
+      <div
+        className={cn(
+          "absolute bottom-3 left-3 flex items-center gap-2 backdrop-blur-xl border rounded-full text-xs font-semibold text-text shadow-lg z-10",
+          isThumbnail ? "px-2.5 py-0.5 text-[10px]" : "px-3.5 py-1.5"
+        )}
+        style={{
+          backgroundColor: 'var(--md-sys-color-surface-container-high)',
+          borderColor: 'var(--md-sys-color-outline-variant)',
+        }}
+      >
         {avatarImage && (
           <div className="w-4 h-4 rounded-full overflow-hidden border border-white/30 flex-shrink-0">
             <img src={avatarImage} alt="You" className="w-full h-full object-cover" />
           </div>
         )}
         {isMicMuted ? (
-          <MicOff className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
+          <MicOff className="w-3.5 h-3.5 text-rose-500 flex-shrink-0" />
         ) : isLocalSpeaking ? (
           <div className="flex items-center gap-0.5 h-3">
-            <span className="w-1 h-3 bg-emerald-400 rounded-full animate-pulse" />
-            <span className="w-1 h-4 bg-emerald-400 rounded-full animate-pulse delay-75" />
-            <span className="w-1 h-2 bg-emerald-400 rounded-full animate-pulse delay-150" />
+            <span className="w-1 h-3 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="w-1 h-4 bg-emerald-500 rounded-full animate-pulse delay-75" />
+            <span className="w-1 h-2 bg-emerald-500 rounded-full animate-pulse delay-150" />
           </div>
         ) : (
-          <Mic className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+          <Mic className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
         )}
         <span className="truncate max-w-[120px]">
           You {hasActiveScreenTrack ? '(Screen)' : ''}
         </span>
         {aspectLandscape && hasActiveScreenTrack && !isThumbnail && (
-          <span className="text-[10px] text-amber-300 bg-amber-400/20 px-1.5 py-0.5 rounded-md font-mono border border-amber-400/30">
+          <span
+            className="text-[10px] px-2 py-0.5 rounded-full font-mono"
+            style={{
+              backgroundColor: 'var(--md-sys-color-tertiary-container)',
+              color: 'var(--md-sys-color-on-tertiary-container)',
+            }}
+          >
             Landscape
           </span>
         )}
@@ -1875,26 +2044,27 @@ function RemoteVideoTile({
       onDoubleClick={() => onToggleTheater ? onToggleTheater() : onToggleFit?.()}
       title={isScreenSharing ? "Double-click to toggle Full Screen presentation" : undefined}
       className={cn(
-        "w-full h-full flex items-center justify-center relative overflow-hidden bg-[#0d0e12]",
-        isRemoteSpeaking && !isThumbnail && "ring-2 ring-emerald-400/80 shadow-[0_0_24px_rgba(52,211,153,0.3)]"
+        "w-full h-full flex items-center justify-center relative overflow-hidden",
+        isRemoteSpeaking && !isThumbnail && "ring-2 ring-[var(--md-sys-color-primary)]"
       )}
+      style={{ backgroundColor: 'var(--md-sys-color-surface-container)' }}
     >
       {/* Screen Sharing Badge */}
       {isScreenSharing && !isThumbnail && (
         <div 
           onClick={onToggleTheater}
-          className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-600/90 hover:bg-blue-500 backdrop-blur-md text-white text-[11px] font-semibold border border-blue-400/40 shadow-lg cursor-pointer transition-colors"
+          className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-3.5 py-1 rounded-full m3-btn-filled text-[11px] font-semibold shadow-lg cursor-pointer transition-all"
           title="Click to toggle Full Screen presentation"
         >
           <Monitor className="w-3.5 h-3.5" />
           <span>{name}'s Screen</span>
-          <span className="text-[10px] bg-black/30 px-1.5 py-0.5 rounded-md text-blue-200">
+          <span className="text-[10px] bg-black/20 px-2 py-0.5 rounded-full">
             {isTheaterMode ? "Exit Full" : "Full Screen"}
           </span>
         </div>
       )}
 
-      {/* Video Element: uses object-contain by default so landscape iPad screen shares never crop */}
+      {/* Video Element */}
       <video 
         ref={videoRef} 
         autoPlay 
@@ -1913,28 +2083,53 @@ function RemoteVideoTile({
       />
 
       {/* Subtle Vignette Gradient for badge & control legibility */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/40 pointer-events-none" />
+      {showVideo && (
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/35 pointer-events-none" />
+      )}
 
-      {/* Avatar Fallback for audio calls or when camera is off */}
+      {/* Material You Expressive Avatar Stage for Voice Call or Camera Off */}
       {!showVideo && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-[#181a22] to-[#0f1116]">
-          <div className={cn(
-            "rounded-full border flex items-center justify-center text-emerald-200 font-bold uppercase shadow-2xl transition-all overflow-hidden",
-            avatarColor || "bg-emerald-600/20",
-            isThumbnail ? "w-12 h-12 text-sm" : "w-22 h-22 sm:w-26 sm:h-26 text-2xl sm:text-3xl",
-            isRemoteSpeaking 
-              ? "border-emerald-400 ring-4 ring-emerald-500/30 scale-105 shadow-[0_0_25px_rgba(16,185,129,0.35)]" 
-              : "border-emerald-500/30 shadow-inner"
-          )}>
-            {avatarImage ? (
-              <img src={avatarImage} alt={name} className="w-full h-full object-cover" />
-            ) : (
-              initials
+        <div
+          className="absolute inset-0 flex flex-col items-center justify-center p-4"
+          style={{ backgroundColor: 'var(--md-sys-color-surface-container)' }}
+        >
+          <div className="relative flex items-center justify-center">
+            {isRemoteSpeaking && (
+              <span
+                className="animate-ping absolute -inset-3 rounded-[32px] opacity-35"
+                style={{ backgroundColor: 'var(--md-sys-color-tertiary)' }}
+              />
             )}
+            <div
+              className={cn(
+                "rounded-[28px] border flex items-center justify-center font-bold uppercase shadow-xl transition-all overflow-hidden relative z-10",
+                avatarColor || "m3-btn-tertiary",
+                isThumbnail ? "w-12 h-12 rounded-2xl text-sm" : "w-24 h-24 sm:w-28 sm:h-28 text-2xl sm:text-3xl",
+                isRemoteSpeaking && "scale-105 ring-4 ring-[var(--md-sys-color-tertiary)]/40"
+              )}
+              style={{
+                borderColor: isRemoteSpeaking
+                  ? 'var(--md-sys-color-tertiary)'
+                  : 'var(--md-sys-color-outline-variant)',
+              }}
+            >
+              {avatarImage ? (
+                <img src={avatarImage} alt={name} className="w-full h-full object-cover" />
+              ) : (
+                initials
+              )}
+            </div>
           </div>
           {!isThumbnail && isRemoteVideoOff && (
-            <p className="text-xs text-zinc-400 mt-3 font-medium bg-black/40 px-3 py-1 rounded-full border border-white/5">
-              Camera turned off
+            <p
+              className="text-xs font-semibold mt-4 px-3.5 py-1 rounded-full border"
+              style={{
+                backgroundColor: 'var(--md-sys-color-surface-container-high)',
+                color: 'var(--md-sys-color-on-surface-variant)',
+                borderColor: 'var(--md-sys-color-outline-variant)',
+              }}
+            >
+              Voice Only • Camera Off
             </p>
           )}
         </div>
@@ -1946,33 +2141,29 @@ function RemoteVideoTile({
           "absolute top-3 right-3 flex items-center gap-1.5 z-20 transition-opacity",
           isScreenSharing ? "opacity-95 hover:opacity-100" : "opacity-0 group-hover:opacity-100"
         )}>
-          {/* Full Screen Presenter / Theater Button */}
           {onToggleTheater && (
             <button
               onClick={(e) => { e.stopPropagation(); onToggleTheater(); }}
               className={cn(
-                "px-2.5 py-1.5 rounded-xl text-xs font-semibold backdrop-blur-xl border flex items-center gap-1.5 shadow-md cursor-pointer transition-all",
-                isTheaterMode 
-                  ? "bg-amber-500 hover:bg-amber-400 text-zinc-950 border-amber-300 shadow-amber-500/30" 
-                  : "bg-sky-600/90 hover:bg-sky-500 text-white border-sky-400/40 shadow-sky-600/30"
+                "px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-xl border flex items-center gap-1.5 shadow-md cursor-pointer transition-all",
+                isTheaterMode ? "m3-btn-tertiary" : "m3-btn-filled"
               )}
-              title={isTheaterMode ? "Exit Full Screen Presenter view" : "Full Screen Presenter view (Maximize presentation)"}
+              style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
+              title={isTheaterMode ? "Exit Full Screen Presenter view" : "Full Screen Presenter view"}
             >
               {isTheaterMode ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
               <span className="text-[11px] hidden sm:inline">{isTheaterMode ? 'Exit Full Screen' : 'Full Screen'}</span>
             </button>
           )}
 
-          {/* Rotate 90 degrees button */}
           {onRotate && (
             <button
               onClick={(e) => { e.stopPropagation(); onRotate(); }}
               className={cn(
-                "px-2.5 py-1.5 rounded-xl text-xs font-medium backdrop-blur-xl border flex items-center gap-1.5 shadow-md cursor-pointer transition-all",
-                rotation > 0
-                  ? "bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold border-amber-300 shadow-amber-500/30"
-                  : "bg-black/60 hover:bg-black/85 text-white/90 border-white/10"
+                "px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-xl border flex items-center gap-1.5 shadow-md cursor-pointer transition-all",
+                rotation > 0 ? "m3-btn-tertiary" : "m3-surface-high text-text"
               )}
+              style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
               title={`Rotate 90° (Currently ${rotation}°)`}
             >
               <RotateCw className="w-3.5 h-3.5" />
@@ -1980,23 +2171,22 @@ function RemoteVideoTile({
             </button>
           )}
 
-          {/* Fit / Fill toggle */}
           {onToggleFit && (
             <button
               onClick={(e) => { e.stopPropagation(); onToggleFit(); }}
-              className="px-2.5 py-1.5 rounded-xl bg-black/60 hover:bg-black/85 text-xs font-medium text-white/90 backdrop-blur-xl border border-white/10 flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+              className="px-3 py-1.5 rounded-full m3-surface-high text-xs font-semibold text-text backdrop-blur-xl border flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+              style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
               title={fitMode === 'contain' ? "Switch to Fill (zoom to edge)" : "Switch to Fit (show entire screen without cropping)"}
             >
-              {fitMode === 'contain' ? <Maximize2 className="w-3.5 h-3.5 text-zinc-300" /> : <Minimize2 className="w-3.5 h-3.5 text-zinc-300" />}
-              <span className="text-[11px]">{fitMode === 'contain' ? 'Fit (Full)' : 'Fill'}</span>
+              {fitMode === 'contain' ? <Maximize2 className="w-3.5 h-3.5" /> : <Minimize2 className="w-3.5 h-3.5" />}
+              <span className="text-[11px]">{fitMode === 'contain' ? 'Fit' : 'Fill'}</span>
             </button>
           )}
 
-          {/* Spotlight / Unspotlight button */}
           {isSpotlightStage && onUnspotlight ? (
             <button
               onClick={(e) => { e.stopPropagation(); onUnspotlight(); }}
-              className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-xs font-bold text-zinc-950 backdrop-blur-xl flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+              className="px-3 py-1.5 rounded-full m3-btn-tertiary text-xs font-bold backdrop-blur-xl flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
               title="Exit Spotlight Mode"
             >
               <PinOff className="w-3.5 h-3.5" />
@@ -2005,7 +2195,8 @@ function RemoteVideoTile({
           ) : onSpotlight ? (
             <button
               onClick={(e) => { e.stopPropagation(); onSpotlight(); }}
-              className="p-2 rounded-xl bg-black/60 hover:bg-amber-500 hover:text-zinc-950 text-white backdrop-blur-xl border border-white/10 shadow-md cursor-pointer transition-all"
+              className="p-2 rounded-full m3-surface-high text-text hover:m3-btn-filled backdrop-blur-xl border shadow-md cursor-pointer transition-all"
+              style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
               title={`Spotlight ${name}`}
             >
               <Pin className="w-3.5 h-3.5" />
@@ -2016,37 +2207,49 @@ function RemoteVideoTile({
 
       {/* Spotlight Badge on Stage */}
       {isSpotlightStage && (
-        <div className="absolute top-3 left-3 flex items-center gap-2 bg-amber-500 text-zinc-950 px-3 py-1.5 rounded-xl text-xs font-bold shadow-lg z-20 backdrop-blur-md">
+        <div className="absolute top-3 left-3 flex items-center gap-2 m3-btn-tertiary px-3.5 py-1.5 rounded-full text-xs font-bold shadow-lg z-20 backdrop-blur-md">
           <Sparkles className="w-3.5 h-3.5" />
           <span>SPOTLIGHT: {name.toUpperCase()}</span>
-          {isLandscape && <span className="bg-black/20 px-1.5 py-0.5 rounded-md text-[10px]">LANDSCAPE</span>}
+          {isLandscape && <span className="bg-black/20 px-2 py-0.5 rounded-full text-[10px]">LANDSCAPE</span>}
         </div>
       )}
 
       {/* Participant Name Badge */}
-      <div className={cn(
-        "absolute bottom-2.5 left-2.5 flex items-center gap-2 bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl text-xs font-medium text-white shadow-lg z-10",
-        isThumbnail ? "px-2 py-0.5 text-[10px]" : "px-3 py-1.5"
-      )}>
+      <div
+        className={cn(
+          "absolute bottom-3 left-3 flex items-center gap-2 backdrop-blur-xl border rounded-full text-xs font-semibold text-text shadow-lg z-10",
+          isThumbnail ? "px-2.5 py-0.5 text-[10px]" : "px-3.5 py-1.5"
+        )}
+        style={{
+          backgroundColor: 'var(--md-sys-color-surface-container-high)',
+          borderColor: 'var(--md-sys-color-outline-variant)',
+        }}
+      >
         {avatarImage && (
           <div className="w-4 h-4 rounded-full overflow-hidden border border-white/30 flex-shrink-0">
             <img src={avatarImage} alt={name} className="w-full h-full object-cover" />
           </div>
         )}
         {isRemoteAudioMuted ? (
-          <MicOff className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
+          <MicOff className="w-3.5 h-3.5 text-rose-500 flex-shrink-0" />
         ) : isRemoteSpeaking ? (
           <div className="flex items-center gap-0.5 h-3">
-            <span className="w-1 h-3 bg-emerald-400 rounded-full animate-pulse" />
-            <span className="w-1 h-4 bg-emerald-400 rounded-full animate-pulse delay-75" />
-            <span className="w-1 h-2 bg-emerald-400 rounded-full animate-pulse delay-150" />
+            <span className="w-1 h-3 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="w-1 h-4 bg-emerald-500 rounded-full animate-pulse delay-75" />
+            <span className="w-1 h-2 bg-emerald-500 rounded-full animate-pulse delay-150" />
           </div>
         ) : (
-          <Volume2 className="w-3.5 h-3.5 text-zinc-300 flex-shrink-0" />
+          <Volume2 className="w-3.5 h-3.5 text-muted flex-shrink-0" />
         )}
         <span className="truncate max-w-[120px]">{name}</span>
         {isLandscape && !isThumbnail && (
-          <span className="text-[10px] text-amber-300 bg-amber-400/20 px-1.5 py-0.5 rounded-md font-mono border border-amber-400/30">
+          <span
+            className="text-[10px] px-2 py-0.5 rounded-full font-mono"
+            style={{
+              backgroundColor: 'var(--md-sys-color-tertiary-container)',
+              color: 'var(--md-sys-color-on-tertiary-container)',
+            }}
+          >
             Landscape
           </span>
         )}

@@ -453,133 +453,208 @@ export function NexusFailoverHUD({
   const currentHostPeer = peers.find(p => p.peerId === currentHostId) || peers.find(p => p.role === 'host') || peers[0];
 
   return (
-    <div className="w-full h-full flex flex-col gap-3 sm:gap-4 lg:gap-5 overflow-y-auto p-3 sm:p-5 lg:p-6 pb-24 lg:pb-8 scrollbar-hide text-text">
-      
+    <div
+      className="w-full h-full flex flex-col gap-3.5 sm:gap-4 lg:gap-5 overflow-y-auto p-3.5 sm:p-5 lg:p-6 pb-24 lg:pb-8 scrollbar-hide text-text"
+      style={{ backgroundColor: 'var(--md-sys-color-surface)' }}
+    >
       {/* Simulation Mode Toggle Banner */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 px-3.5 sm:px-4 py-2.5 rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 backdrop-blur-md shadow-sm flex-shrink-0">
+      <div
+        className="m3-card flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 px-4 py-3 rounded-2xl border shadow-2xs flex-shrink-0"
+        style={{
+          backgroundColor: 'var(--md-sys-color-surface-container-low)',
+          borderColor: 'var(--md-sys-color-outline-variant)',
+        }}
+      >
         <div className="flex items-center gap-2.5 min-w-0">
           <div className={cn(
             "w-2.5 h-2.5 rounded-full flex-shrink-0",
-            isSimActive ? "bg-accent animate-ping" : isConnectedToRealPeers ? "bg-emerald-500" : "bg-amber-500"
+            isSimActive ? "bg-[var(--md-sys-color-primary)] animate-ping" : isConnectedToRealPeers ? "bg-emerald-500" : "bg-amber-500"
           )} />
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-text truncate">
-              {isSimActive ? "Simulation Mode Active" : isConnectedToRealPeers ? "Live Mesh Connected" : "Live Standalone Mode"}
+            <span className="text-xs font-bold tracking-tight text-text truncate">
+              {isSimActive ? "Quantum Link Mesh Simulation Active" : isConnectedToRealPeers ? "Quantum Link Mesh Connected" : "Quantum Link Standalone Node"}
             </span>
-            <span className={cn(
-              "text-[9px] px-2 py-0.5 rounded-full font-mono font-bold uppercase flex-shrink-0",
-              isSimActive ? "bg-accent/20 text-accent border border-accent/30" : isConnectedToRealPeers ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20" : "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20"
-            )}>
-              {isSimActive ? "Sandboxed" : isConnectedToRealPeers ? "Production" : "0 Peers"}
+            <span
+              className="text-[10px] px-2.5 py-0.5 rounded-full font-mono font-semibold uppercase flex-shrink-0"
+              style={{
+                backgroundColor: isSimActive
+                  ? 'var(--md-sys-color-primary-container)'
+                  : isConnectedToRealPeers
+                    ? 'var(--md-sys-color-tertiary-container)'
+                    : 'var(--md-sys-color-secondary-container)',
+                color: isSimActive
+                  ? 'var(--md-sys-color-on-primary-container)'
+                  : isConnectedToRealPeers
+                    ? 'var(--md-sys-color-on-tertiary-container)'
+                    : 'var(--md-sys-color-on-secondary-container)',
+              }}
+            >
+              {isSimActive ? "Sandboxed" : isConnectedToRealPeers ? "Live Mesh" : "0 Peers"}
             </span>
           </div>
           <span className="text-[11px] text-muted hidden md:inline font-mono truncate">
             {isSimActive 
-              ? "• Simulation triggers and failure scenarios enabled" 
+              ? "• Failure injection & election triggers enabled" 
               : isConnectedToRealPeers
-                ? `• Connected to ${realConnectedCount} real peers via WebRTC`
-                : "• Real WebRTC watchdog active (no fake names)"}
+                ? `• Connected to ${realConnectedCount} real peer${realConnectedCount === 1 ? '' : 's'} via WebRTC`
+                : "• Deterministic WebRTC watchdog standing by"}
           </span>
         </div>
 
         <button
           onClick={handleToggleSim}
           className={cn(
-            "px-3.5 py-1.5 text-xs font-mono font-semibold rounded-xl border transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm flex-shrink-0",
-            isSimActive
-              ? "bg-accent text-white border-accent hover:opacity-90"
-              : "bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-text border-black/10 dark:border-white/10"
+            "px-4 py-1.5 text-xs font-semibold rounded-full transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs flex-shrink-0 active:scale-95",
+            isSimActive ? "m3-btn-filled" : "m3-btn-tonal"
           )}
         >
           <FlaskConical className="w-3.5 h-3.5" />
-          <span>{isSimActive ? "Exit Simulation" : "Enable Simulation Mode"}</span>
+          <span>{isSimActive ? "Exit Simulation" : "Simulation Sandbox"}</span>
         </button>
       </div>
 
       {/* Top Telemetry Strip (Responsive 2x2 grid in portrait, 4 cols in landscape) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 flex-shrink-0">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5 flex-shrink-0">
         
         {/* Card 1: Current Host Node */}
-        <div className="p-2.5 sm:p-3.5 lg:p-4 rounded-xl sm:rounded-2xl flex items-center gap-2.5 sm:gap-3 bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 shadow-sm relative overflow-hidden backdrop-blur-md">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-lg sm:rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent flex-shrink-0">
-            <Crown className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+        <div
+          className="m3-card p-3 sm:p-4 rounded-2xl flex items-center gap-3 border shadow-2xs relative overflow-hidden"
+          style={{
+            backgroundColor: 'var(--md-sys-color-surface-container)',
+            borderColor: 'var(--md-sys-color-outline-variant)',
+          }}
+        >
+          <div
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl border flex items-center justify-center flex-shrink-0"
+            style={{
+              backgroundColor: 'var(--md-sys-color-primary-container)',
+              color: 'var(--md-sys-color-on-primary-container)',
+              borderColor: 'var(--md-sys-color-outline-variant)',
+            }}
+          >
+            <Crown className="w-5 h-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-[9px] sm:text-[10px] lg:text-[11px] font-mono text-muted uppercase tracking-wider flex items-center gap-1">
-              <span className="truncate">Leader</span>
-              <span className="text-[8px] sm:text-[9px] px-1 py-0.2 rounded bg-accent/10 text-accent font-bold">T{term}</span>
+            <div className="text-[10px] font-mono text-muted uppercase tracking-wider flex items-center gap-1.5">
+              <span className="truncate">Mesh Leader</span>
+              <span
+                className="text-[9px] px-1.5 py-0.2 rounded-full font-bold"
+                style={{
+                  backgroundColor: 'var(--md-sys-color-secondary-container)',
+                  color: 'var(--md-sys-color-on-secondary-container)',
+                }}
+              >
+                T{term}
+              </span>
             </div>
-            <div className="text-xs sm:text-sm font-semibold truncate text-text mt-0.5">
+            <div className="text-xs sm:text-sm font-bold truncate text-text mt-0.5">
               {isStandalone 
                 ? (role === 'host' ? `${localUsername || 'You'} (Host)` : 'Standalone') 
                 : (currentHostPeer?.username || 'Electing...')}
             </div>
-            <div className="text-[8px] sm:text-[10px] font-mono text-muted truncate">
+            <div className="text-[9px] sm:text-[10px] font-mono text-muted truncate">
               {isStandalone ? 'Local Node' : `ID: ${currentHostId.substring(0, 10)}`}
             </div>
           </div>
         </div>
 
         {/* Card 2: Quorum Status */}
-        <div className="p-2.5 sm:p-3.5 lg:p-4 rounded-xl sm:rounded-2xl flex items-center gap-2.5 sm:gap-3 bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 shadow-sm backdrop-blur-md">
-          <div className={cn(
-            "w-8 h-8 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 border",
-            quorumMet ? "bg-success/10 border-success/20 text-success" : "bg-red-500/10 border-red-500/20 text-red-500"
-          )}>
-            <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+        <div
+          className="m3-card p-3 sm:p-4 rounded-2xl flex items-center gap-3 border shadow-2xs"
+          style={{
+            backgroundColor: 'var(--md-sys-color-surface-container)',
+            borderColor: 'var(--md-sys-color-outline-variant)',
+          }}
+        >
+          <div
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center flex-shrink-0 border"
+            style={{
+              backgroundColor: quorumMet
+                ? 'var(--md-sys-color-tertiary-container)'
+                : 'rgba(239, 68, 68, 0.14)',
+              color: quorumMet
+                ? 'var(--md-sys-color-on-tertiary-container)'
+                : '#ef4444',
+              borderColor: 'var(--md-sys-color-outline-variant)',
+            }}
+          >
+            <ShieldCheck className="w-5 h-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-[9px] sm:text-[10px] lg:text-[11px] font-mono text-muted uppercase tracking-wider truncate">
+            <div className="text-[10px] font-mono text-muted uppercase tracking-wider truncate">
               Quorum (&gt;50%)
             </div>
-            <div className={cn("text-xs sm:text-sm font-semibold mt-0.5 truncate", quorumMet ? "text-success" : "text-red-500")}>
+            <div className={cn("text-xs sm:text-sm font-bold mt-0.5 truncate", quorumMet ? "text-emerald-500" : "text-rose-500")}>
               {isStandalone ? "Standalone" : quorumMet ? "Consensus Valid" : "Guarded"}
             </div>
-            <div className="text-[8px] sm:text-[10px] font-mono text-muted truncate">
+            <div className="text-[9px] sm:text-[10px] font-mono text-muted truncate">
               {isStandalone ? "0 peers connected" : `${activeAcks}/${totalActivePeers} nodes acked`}
             </div>
           </div>
         </div>
 
         {/* Card 3: Local Node Role */}
-        <div className="p-2.5 sm:p-3.5 lg:p-4 rounded-xl sm:rounded-2xl flex items-center gap-2.5 sm:gap-3 bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 shadow-sm backdrop-blur-md">
-          <div className={cn(
-            "w-8 h-8 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 border",
-            localRole === 'host' ? "bg-accent/10 border-accent/30 text-accent" : localRole === 'peer' ? "bg-blue-500/10 border-blue-500/20 text-blue-500" : "bg-amber-500/10 border-amber-500/20 text-amber-500 animate-pulse"
-          )}>
-            <Server className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+        <div
+          className="m3-card p-3 sm:p-4 rounded-2xl flex items-center gap-3 border shadow-2xs"
+          style={{
+            backgroundColor: 'var(--md-sys-color-surface-container)',
+            borderColor: 'var(--md-sys-color-outline-variant)',
+          }}
+        >
+          <div
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center flex-shrink-0 border"
+            style={{
+              backgroundColor: 'var(--md-sys-color-secondary-container)',
+              color: 'var(--md-sys-color-on-secondary-container)',
+              borderColor: 'var(--md-sys-color-outline-variant)',
+            }}
+          >
+            <Server className="w-5 h-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-[9px] sm:text-[10px] lg:text-[11px] font-mono text-muted uppercase tracking-wider truncate">
+            <div className="text-[10px] font-mono text-muted uppercase tracking-wider truncate">
               Local Role
             </div>
-            <div className="text-xs sm:text-sm font-bold uppercase tracking-tight mt-0.5 truncate">
+            <div className="text-xs sm:text-sm font-bold uppercase tracking-tight mt-0.5 truncate text-text">
               {isStandalone ? (role === 'host' ? 'HOST' : role === 'join' ? 'PEER' : 'STANDALONE') : localRole}
             </div>
-            <div className="text-[8px] sm:text-[10px] font-mono text-muted truncate">
+            <div className="text-[9px] sm:text-[10px] font-mono text-muted truncate">
               {role === 'host' ? "Authoritative state" : role === 'join' ? "Tunnel client" : "Awaiting connect"}
             </div>
           </div>
         </div>
 
         {/* Card 4: Heartbeat Pulse */}
-        <div className="p-2.5 sm:p-3.5 lg:p-4 rounded-xl sm:rounded-2xl flex items-center gap-2.5 sm:gap-3 bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 shadow-sm backdrop-blur-md">
-          <div className={cn(
-            "w-8 h-8 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-lg sm:rounded-xl border flex items-center justify-center flex-shrink-0 transition-transform duration-200",
-            heartbeatBeat ? "scale-110 bg-rose-500/20 border-rose-500 text-rose-500" : "bg-rose-500/10 border-rose-500/20 text-rose-400"
-          )}>
-            <Activity className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+        <div
+          className="m3-card p-3 sm:p-4 rounded-2xl flex items-center gap-3 border shadow-2xs"
+          style={{
+            backgroundColor: 'var(--md-sys-color-surface-container)',
+            borderColor: 'var(--md-sys-color-outline-variant)',
+          }}
+        >
+          <div
+            className={cn(
+              "w-10 h-10 sm:w-11 sm:h-11 rounded-2xl border flex items-center justify-center flex-shrink-0 transition-transform duration-200",
+              heartbeatBeat && "scale-108"
+            )}
+            style={{
+              backgroundColor: 'var(--md-sys-color-primary-container)',
+              color: 'var(--md-sys-color-on-primary-container)',
+              borderColor: 'var(--md-sys-color-outline-variant)',
+            }}
+          >
+            <Activity className="w-5 h-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-[9px] sm:text-[10px] lg:text-[11px] font-mono text-muted uppercase tracking-wider flex items-center gap-1">
+            <div className="text-[10px] font-mono text-muted uppercase tracking-wider flex items-center gap-1.5">
               <span className="truncate">Heartbeat</span>
-              <span className={cn("w-1.5 h-1.5 rounded-full flex-shrink-0", heartbeatBeat ? "bg-rose-500" : "bg-muted/40")} />
+              <span className={cn("w-2 h-2 rounded-full flex-shrink-0", heartbeatBeat ? "bg-emerald-500" : "bg-muted/40")} />
             </div>
-            <div className="text-xs sm:text-sm font-semibold mt-0.5 truncate">
+            <div className="text-xs sm:text-sm font-bold mt-0.5 truncate text-text">
               Every 2.0s
             </div>
-            <div className="text-[8px] sm:text-[10px] font-mono text-muted truncate">
-              Threshold: 5.0s
+            <div className="text-[9px] sm:text-[10px] font-mono text-muted truncate">
+              Watchdog: 5.0s
             </div>
           </div>
         </div>
@@ -587,39 +662,59 @@ export function NexusFailoverHUD({
       </div>
 
       {/* Main Content Grid: Synchronized Peer Table & Simulator/Locked Engine */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-5 flex-1 min-h-0">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 flex-1 min-h-0">
         
         {/* Left Column: Synchronized Peer Table */}
-        <div className="lg:col-span-8 flex flex-col bg-white dark:bg-white/5 rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-black/10 dark:border-white/10 shadow-sm backdrop-blur-md">
-          
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 sm:pb-4 border-b border-black/10 dark:border-white/10">
+        <div
+          className="lg:col-span-8 flex flex-col m3-card-xl rounded-[28px] p-4 sm:p-5 border shadow-xs"
+          style={{
+            backgroundColor: 'var(--md-sys-color-surface-container)',
+            borderColor: 'var(--md-sys-color-outline-variant)',
+          }}
+        >
+          <div
+            className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3.5 sm:pb-4 border-b"
+            style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
+          >
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-sm sm:text-base font-bold tracking-tight text-text flex items-center gap-2">
-                  <Users className="w-4 h-4 sm:w-5 sm:h-5 text-accent flex-shrink-0" />
-                  <span>Synchronized Nexus Peer Registry</span>
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5 text-[color:var(--md-sys-color-primary)] flex-shrink-0" />
+                  <span>Synchronized Quantum Link Registry</span>
                 </h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-accent/15 text-accent border border-accent/20 flex-shrink-0">
+                <span
+                  className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold flex-shrink-0"
+                  style={{
+                    backgroundColor: 'var(--md-sys-color-primary-container)',
+                    color: 'var(--md-sys-color-on-primary-container)',
+                  }}
+                >
                   {peers.length} {peers.length === 1 ? 'Node' : 'Nodes'}
                 </span>
               </div>
-              <p className="text-[11px] sm:text-xs text-muted mt-0.5 font-mono">
+              <p className="text-[11px] sm:text-xs text-muted mt-0.5">
                 {isSimActive 
                   ? "Sandboxed simulation registry. Earliest joiner is designated failover heir." 
                   : isConnectedToRealPeers
-                    ? "Live active WebRTC cluster with authoritative sequence sorting."
-                    : "Standalone node. Connect peers to establish failover redundancy."}
+                    ? "Live active WebRTC mesh with deterministic join-order succession."
+                    : "Standalone node. Connect peers to establish automatic failover redundancy."}
               </p>
             </div>
             
-            <div className="flex items-center gap-2 text-[11px] sm:text-xs font-mono bg-black/5 dark:bg-white/5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl border border-black/10 dark:border-white/10 self-start sm:self-auto flex-shrink-0">
-              <Clock className="w-3.5 h-3.5 text-accent flex-shrink-0" />
-              <span>Next in Line: <strong className="text-accent">{isStandalone ? 'None (0 peers)' : (nextInLine?.username || 'None')}</strong></span>
+            <div
+              className="flex items-center gap-2 text-[11px] sm:text-xs font-mono px-3 py-1.5 rounded-full border self-start sm:self-auto flex-shrink-0"
+              style={{
+                backgroundColor: 'var(--md-sys-color-surface-container-high)',
+                borderColor: 'var(--md-sys-color-outline-variant)',
+              }}
+            >
+              <Clock className="w-3.5 h-3.5 text-[color:var(--md-sys-color-primary)] flex-shrink-0" />
+              <span>Heir: <strong className="text-[color:var(--md-sys-color-primary)]">{isStandalone ? 'None (0 peers)' : (nextInLine?.username || 'None')}</strong></span>
             </div>
           </div>
 
-          {/* Mobile Portrait Peer Cards View (Optimal for portrait phones & narrow screens) */}
-          <div className="block sm:hidden space-y-2.5 mt-3">
+          {/* Mobile Portrait Peer Cards View */}
+          <div className="block sm:hidden space-y-2.5 mt-3.5">
             {peers.map((peer) => {
               const isHost = peer.role === 'host';
               const isLocal = peer.peerId === (localPeerId || 'local_node') || peer.peerId === 'local_user_03';
@@ -630,26 +725,39 @@ export function NexusFailoverHUD({
                 <div 
                   key={`mobile-${peer.peerId}`}
                   className={cn(
-                    "p-3 rounded-2xl border transition-all flex flex-col gap-2.5 shadow-sm",
-                    isDead 
-                      ? "opacity-50 bg-red-500/5 border-red-500/20" 
-                      : isHost 
-                        ? "bg-accent/10 border-accent/30" 
-                        : isNext 
-                          ? "bg-blue-500/10 border-blue-500/30" 
-                          : "bg-white dark:bg-white/5 border-black/10 dark:border-white/10"
+                    "m3-card p-3.5 rounded-2xl border transition-all flex flex-col gap-2.5",
+                    isDead && "opacity-55"
                   )}
+                  style={{
+                    backgroundColor: isHost
+                      ? 'var(--md-sys-color-primary-container)'
+                      : isNext
+                        ? 'var(--md-sys-color-secondary-container)'
+                        : 'var(--md-sys-color-surface-container-low)',
+                    color: isHost
+                      ? 'var(--md-sys-color-on-primary-container)'
+                      : isNext
+                        ? 'var(--md-sys-color-on-secondary-container)'
+                        : 'var(--md-sys-color-on-surface)',
+                    borderColor: 'var(--md-sys-color-outline-variant)',
+                  }}
                 >
-                  {/* Card Header: Seq #, Avatar, Name, Status */}
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className={cn(
-                        "px-1.5 py-0.5 rounded text-[10px] font-mono font-bold flex-shrink-0",
-                        isHost ? "bg-accent text-white" : "bg-black/5 dark:bg-white/10 text-text"
-                      )}>
+                      <span
+                        className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold flex-shrink-0"
+                        style={{
+                          backgroundColor: isHost
+                            ? 'var(--md-sys-color-primary)'
+                            : 'var(--md-sys-color-surface-container-high)',
+                          color: isHost
+                            ? 'var(--md-sys-color-on-primary)'
+                            : 'var(--md-sys-color-on-surface)',
+                        }}
+                      >
                         #{peer.joinOrder}
                       </span>
-                      <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold shadow-sm flex-shrink-0 overflow-hidden", peer.avatarColor)}>
+                      <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-xs flex-shrink-0 overflow-hidden", peer.avatarColor || "m3-btn-filled")}>
                         {peer.avatarImage ? (
                            <img src={peer.avatarImage} alt={peer.username} className="w-full h-full object-cover" />
                         ) : (
@@ -657,78 +765,74 @@ export function NexusFailoverHUD({
                         )}
                       </div>
                       <div className="min-w-0">
-                        <div className="font-semibold text-text truncate flex items-center gap-1.5 text-xs">
+                        <div className="font-bold truncate flex items-center gap-1.5 text-xs">
                           <span className="truncate">{peer.username}</span>
                           {isLocal && (
-                            <span className="text-[8px] bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold px-1.5 py-0.2 rounded flex-shrink-0">
+                            <span className="text-[9px] bg-emerald-500/20 text-emerald-500 font-bold px-1.5 py-0.2 rounded-full flex-shrink-0">
                               YOU
                             </span>
                           )}
                         </div>
-                        <div className="text-[9px] font-mono text-muted truncate">
+                        <div className="text-[9px] font-mono opacity-75 truncate">
                           ID: {peer.peerId.substring(0, 10)}
                         </div>
                       </div>
                     </div>
 
                     <span className={cn(
-                      "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold flex-shrink-0",
+                      "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold flex-shrink-0",
                       isDead 
-                        ? "bg-red-500/20 text-red-500 border border-red-500/30" 
+                        ? "bg-rose-500/20 text-rose-500" 
                         : isStandalone
-                          ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20"
-                          : "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                          ? "bg-amber-500/20 text-amber-500"
+                          : "bg-emerald-500/20 text-emerald-500"
                     )}>
                       <span className={cn(
                         "w-1.5 h-1.5 rounded-full",
-                        isDead ? "bg-red-500" : isStandalone ? "bg-amber-500" : "bg-emerald-500 animate-pulse"
+                        isDead ? "bg-rose-500" : isStandalone ? "bg-amber-500" : "bg-emerald-500 animate-pulse"
                       )} />
                       {isDead ? "DEAD" : isStandalone ? "STANDALONE" : "ONLINE"}
                     </span>
                   </div>
 
-                  {/* Card Details Grid: Role, Failover Priority, Latency, Endpoint */}
-                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-black/10 dark:border-white/10 text-[10px] font-mono">
+                  <div
+                    className="grid grid-cols-2 gap-2 pt-2 border-t text-[10px] font-mono"
+                    style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
+                  >
                     <div className="flex items-center gap-1.5">
-                      <span className="text-muted">Role:</span>
+                      <span className="opacity-70">Role:</span>
                       {isHost ? (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-accent/20 text-accent">
-                          <Crown className="w-2.5 h-2.5" /> HOST
+                        <span className="inline-flex items-center gap-1 font-bold">
+                          <Crown className="w-3 h-3" /> HOST
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-black/5 dark:bg-white/10 text-muted">
-                          PEER
-                        </span>
+                        <span className="font-medium">PEER</span>
                       )}
                     </div>
 
                     <div className="flex items-center gap-1.5 justify-end">
-                      <span className="text-muted">Rank:</span>
+                      <span className="opacity-70">Rank:</span>
                       {isDead ? (
-                        <span className="text-muted/60">—</span>
+                        <span>—</span>
                       ) : isHost ? (
-                        <span className="text-accent font-semibold">{isStandalone ? "Standalone" : "Active Leader"}</span>
+                        <span className="font-semibold">{isStandalone ? "Standalone" : "Leader"}</span>
                       ) : isNext ? (
-                        <span className="text-blue-500 font-bold flex items-center gap-0.5">
-                          <Zap className="w-2.5 h-2.5" /> 1st Heir
+                        <span className="font-bold flex items-center gap-0.5">
+                          <Zap className="w-3 h-3" /> 1st Heir
                         </span>
                       ) : (
-                        <span className="text-muted">Rank #{peer.joinOrder}</span>
+                        <span>Rank #{peer.joinOrder}</span>
                       )}
                     </div>
 
                     <div className="flex items-center gap-1.5 col-span-2 justify-between">
-                      <span className="text-muted truncate max-w-[200px]">{peer.endpoint}</span>
-                      <span className={cn(
-                        "font-bold flex-shrink-0",
-                        peer.latencyMs < 15 ? "text-emerald-500" : peer.latencyMs < 30 ? "text-blue-500" : "text-amber-500"
-                      )}>
+                      <span className="opacity-75 truncate max-w-[200px]">{peer.endpoint}</span>
+                      <span className="font-bold flex-shrink-0">
                         {isDead ? "TIMEOUT" : `${peer.latencyMs}ms`}
                       </span>
                     </div>
                   </div>
 
-                  {/* Host Transfer Action for Mobile */}
                   {role === 'host' && !isHost && !isDead && (
                     <button
                       onClick={() => {
@@ -738,7 +842,7 @@ export function NexusFailoverHUD({
                           handleSimulateGracefulHandoff();
                         }
                       }}
-                      className="w-full mt-1 py-1.5 px-3 rounded-xl bg-accent text-white hover:bg-accent/90 font-medium text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-[0.98]"
+                      className="w-full mt-1 py-2 px-3 rounded-full m3-btn-filled font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-[0.98]"
                     >
                       <Crown className="w-3.5 h-3.5" />
                       <span>Transfer Host Authority to {peer.username}</span>
@@ -749,24 +853,27 @@ export function NexusFailoverHUD({
             })}
           </div>
 
-          {/* Desktop/Tablet Peer Table (Hidden on small portrait mobile screens, shown on tablet/desktop) */}
-          <div className="hidden sm:block w-full overflow-x-auto mt-2 sm:mt-3 scrollbar-hide">
+          {/* Desktop/Tablet Peer Table */}
+          <div className="hidden sm:block w-full overflow-x-auto mt-3 scrollbar-hide">
             <table className="w-full text-left border-collapse text-xs whitespace-nowrap sm:whitespace-normal">
               <thead>
-                <tr className="border-b border-black/10 dark:border-white/10 text-muted font-mono uppercase text-[9px] sm:text-[10px] tracking-wider">
-                  <th className="py-2 px-2 sm:px-3 text-center sm:text-left">Seq #</th>
-                  <th className="py-2 px-2 sm:px-3">Node Identity</th>
-                  <th className="py-2 px-2 sm:px-3 hidden md:table-cell">Endpoint</th>
-                  <th className="py-2 px-2 sm:px-3 hidden sm:table-cell">Latency</th>
-                  <th className="py-2 px-2 sm:px-3">Role</th>
-                  <th className="py-2 px-2 sm:px-3 hidden sm:table-cell">Failover Rank</th>
-                  <th className="py-2 px-2 sm:px-3 text-center">Status</th>
+                <tr
+                  className="border-b text-muted font-mono uppercase text-[10px] tracking-wider"
+                  style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
+                >
+                  <th className="py-2.5 px-3 text-center sm:text-left">Seq #</th>
+                  <th className="py-2.5 px-3">Node Identity</th>
+                  <th className="py-2.5 px-3 hidden md:table-cell">Endpoint</th>
+                  <th className="py-2.5 px-3 hidden sm:table-cell">Latency</th>
+                  <th className="py-2.5 px-3">Role</th>
+                  <th className="py-2.5 px-3 hidden sm:table-cell">Failover Rank</th>
+                  <th className="py-2.5 px-3 text-center">Status</th>
                   {role === 'host' && (
-                    <th className="py-2 px-2 sm:px-3 text-right">Host Control</th>
+                    <th className="py-2.5 px-3 text-right">Host Control</th>
                   )}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-black/5 dark:divide-white/5">
+              <tbody className="divide-y divide-[var(--md-sys-color-outline-variant)]">
                 {peers.map((peer) => {
                   const isHost = peer.role === 'host';
                   const isLocal = peer.peerId === (localPeerId || 'local_node') || peer.peerId === 'local_user_03';
@@ -778,23 +885,28 @@ export function NexusFailoverHUD({
                       key={peer.peerId}
                       className={cn(
                         "transition-colors",
-                        isDead ? "opacity-40 bg-red-500/5" : isHost ? "bg-accent/5 font-medium" : isNext ? "bg-blue-500/5" : "hover:bg-black/5 dark:hover:bg-white/5"
+                        isDead ? "opacity-45" : "hover:bg-black/5 dark:hover:bg-white/5"
                       )}
                     >
-                      {/* Seq # */}
-                      <td className="py-2.5 sm:py-3 px-2 sm:px-3 font-mono font-bold text-center sm:text-left">
-                        <span className={cn(
-                          "px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs",
-                          isHost ? "bg-accent text-white" : "bg-slate-100 dark:bg-white/10 text-text font-semibold"
-                        )}>
+                      <td className="py-3 px-3 font-mono font-bold text-center sm:text-left">
+                        <span
+                          className="px-2 py-0.5 rounded-full text-[10px] sm:text-xs"
+                          style={{
+                            backgroundColor: isHost
+                              ? 'var(--md-sys-color-primary)'
+                              : 'var(--md-sys-color-surface-container-high)',
+                            color: isHost
+                              ? 'var(--md-sys-color-on-primary)'
+                              : 'var(--md-sys-color-on-surface)',
+                          }}
+                        >
                           #{peer.joinOrder}
                         </span>
                       </td>
 
-                      {/* Identity */}
-                      <td className="py-2.5 sm:py-3 px-2 sm:px-3">
-                        <div className="flex items-center gap-2 sm:gap-2.5">
-                          <div className={cn("w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center text-white text-[10px] sm:text-xs font-bold shadow-sm flex-shrink-0 overflow-hidden", peer.avatarColor)}>
+                      <td className="py-3 px-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-xs flex-shrink-0 overflow-hidden", peer.avatarColor || "m3-btn-filled")}>
                             {peer.avatarImage ? (
                               <img src={peer.avatarImage} alt={peer.username} className="w-full h-full object-cover" />
                             ) : (
@@ -802,57 +914,74 @@ export function NexusFailoverHUD({
                             )}
                           </div>
                           <div className="min-w-0">
-                            <div className="font-semibold text-text truncate flex items-center gap-1.5 text-xs sm:text-sm">
+                            <div className="font-bold text-text truncate flex items-center gap-1.5 text-xs sm:text-sm">
                               <span className="truncate">{peer.username}</span>
-                              {isLocal && <span className="text-[8px] sm:text-[9px] bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold px-1.5 py-0.2 rounded flex-shrink-0">YOU</span>}
+                              {isLocal && (
+                                <span
+                                  className="text-[9px] font-bold px-2 py-0.2 rounded-full flex-shrink-0"
+                                  style={{
+                                    backgroundColor: 'var(--md-sys-color-tertiary-container)',
+                                    color: 'var(--md-sys-color-on-tertiary-container)',
+                                  }}
+                                >
+                                  YOU
+                                </span>
+                              )}
                             </div>
-                            <div className="text-[9px] sm:text-[10px] font-mono text-muted truncate">
+                            <div className="text-[10px] font-mono text-muted truncate">
                               {peer.peerId.substring(0, 10)}
-                              <span className="sm:hidden ml-1.5 text-muted/80">• {peer.latencyMs}ms</span>
                             </div>
                           </div>
                         </div>
                       </td>
 
-                      {/* Endpoint (Hidden on portrait mobile/tablet to avoid overflow) */}
-                      <td className="py-2.5 sm:py-3 px-2 sm:px-3 font-mono text-muted text-[10px] sm:text-[11px] hidden md:table-cell">
+                      <td className="py-3 px-3 font-mono text-muted text-[11px] hidden md:table-cell">
                         {peer.endpoint}
                       </td>
 
-                      {/* Latency (Hidden on extra small mobile) */}
-                      <td className="py-2.5 sm:py-3 px-2 sm:px-3 font-mono hidden sm:table-cell">
+                      <td className="py-3 px-3 font-mono hidden sm:table-cell">
                         {isDead ? (
-                          <span className="text-red-400">TIMEOUT</span>
+                          <span className="text-rose-500 font-semibold">TIMEOUT</span>
                         ) : (
-                          <span className={cn(
-                            peer.latencyMs < 15 ? "text-emerald-500" : peer.latencyMs < 30 ? "text-blue-500" : "text-amber-500"
-                          )}>
+                          <span className="text-emerald-500 font-semibold">
                             {peer.latencyMs}ms
                           </span>
                         )}
                       </td>
 
-                      {/* Role */}
-                      <td className="py-2.5 sm:py-3 px-2 sm:px-3">
+                      <td className="py-3 px-3">
                         {isHost ? (
-                          <span className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-accent/20 text-accent border border-accent/30">
-                            <Crown className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> HOST
+                          <span
+                            className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+                            style={{
+                              backgroundColor: 'var(--md-sys-color-primary-container)',
+                              color: 'var(--md-sys-color-on-primary-container)',
+                            }}
+                          >
+                            <Crown className="w-3 h-3" /> HOST
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-medium bg-slate-100 dark:bg-white/10 text-muted">
+                          <span
+                            className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold"
+                            style={{
+                              backgroundColor: 'var(--md-sys-color-surface-container-high)',
+                              color: 'var(--md-sys-color-on-surface-variant)',
+                            }}
+                          >
                             PEER
                           </span>
                         )}
                       </td>
 
-                      {/* Failover Priority */}
-                      <td className="py-2.5 sm:py-3 px-2 sm:px-3 font-mono text-[10px] sm:text-[11px] hidden sm:table-cell">
+                      <td className="py-3 px-3 font-mono text-[11px] hidden sm:table-cell">
                         {isDead ? (
                           <span className="text-muted/60">—</span>
                         ) : isHost ? (
-                          <span className="text-accent font-semibold">{isStandalone ? "Standalone Host" : "Active Leader"}</span>
+                          <span className="text-[color:var(--md-sys-color-primary)] font-bold">
+                            {isStandalone ? "Standalone Host" : "Active Leader"}
+                          </span>
                         ) : isNext ? (
-                          <span className="text-blue-500 font-bold flex items-center gap-1">
+                          <span className="text-[color:var(--md-sys-color-tertiary)] font-bold flex items-center gap-1">
                             <Zap className="w-3 h-3" /> 1st In Line
                           </span>
                         ) : (
@@ -860,27 +989,25 @@ export function NexusFailoverHUD({
                         )}
                       </td>
 
-                      {/* Status */}
-                      <td className="py-2.5 sm:py-3 px-2 sm:px-3 text-center">
+                      <td className="py-3 px-3 text-center">
                         <span className={cn(
-                          "inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold",
+                          "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold",
                           isDead 
-                            ? "bg-red-500/20 text-red-500 border border-red-500/30" 
+                            ? "bg-rose-500/15 text-rose-500" 
                             : isStandalone
-                              ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20"
-                              : "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                              ? "bg-amber-500/15 text-amber-500"
+                              : "bg-emerald-500/15 text-emerald-500"
                         )}>
                           <span className={cn(
                             "w-1.5 h-1.5 rounded-full",
-                            isDead ? "bg-red-500" : isStandalone ? "bg-amber-500" : "bg-emerald-500 animate-pulse"
+                            isDead ? "bg-rose-500" : isStandalone ? "bg-amber-500" : "bg-emerald-500 animate-pulse"
                           )} />
                           {isDead ? "DEAD" : isStandalone ? "STANDALONE" : "ONLINE"}
                         </span>
                       </td>
 
-                      {/* Host Control Actions */}
                       {role === 'host' && (
-                        <td className="py-2.5 sm:py-3 px-2 sm:px-3 text-right">
+                        <td className="py-3 px-3 text-right">
                           {!isHost && !isDead && (
                             <button
                               onClick={() => {
@@ -890,7 +1017,7 @@ export function NexusFailoverHUD({
                                   handleSimulateGracefulHandoff();
                                 }
                               }}
-                              className="px-2.5 py-1 rounded-xl bg-accent text-white hover:bg-accent/90 font-medium text-[10px] transition-all inline-flex items-center gap-1 cursor-pointer shadow-sm active:scale-95"
+                              className="px-3 py-1 rounded-full m3-btn-filled font-semibold text-[10px] transition-all inline-flex items-center gap-1 cursor-pointer shadow-2xs active:scale-95"
                               title={`Transfer Host control to ${peer.username} and become 1st heir`}
                             >
                               <Crown className="w-3 h-3" />
@@ -909,24 +1036,36 @@ export function NexusFailoverHUD({
             </table>
           </div>
 
-          {/* Standalone Empty-State Notification (When not connected to anyone) */}
+          {/* Standalone Empty-State Notification */}
           {isStandalone && (
-            <div className="mt-3 p-3 sm:p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-black/10 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+            <div
+              className="mt-3.5 p-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left"
+              style={{
+                backgroundColor: 'var(--md-sys-color-surface-container-low)',
+                borderColor: 'var(--md-sys-color-outline-variant)',
+              }}
+            >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 shrink-0">
-                  <WifiOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                <div
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
+                  style={{
+                    backgroundColor: 'var(--md-sys-color-secondary-container)',
+                    color: 'var(--md-sys-color-on-secondary-container)',
+                  }}
+                >
+                  <WifiOff className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-text">No Remote Peers Connected</div>
+                  <div className="text-xs font-bold text-text">No Remote Peers Linked</div>
                   <div className="text-[11px] text-muted max-w-md leading-relaxed">
-                    This node is running standalone. When peers connect via QR code or connection string, they will be registered here with deterministic failover order.
+                    This node is running standalone. When peers connect via QR code or connection token, they are registered here with deterministic failover succession.
                   </div>
                 </div>
               </div>
               {onNavigateToConnect && (
                 <button
                   onClick={onNavigateToConnect}
-                  className="px-3.5 py-1.5 text-xs font-semibold rounded-xl bg-accent text-white hover:bg-accent/90 shrink-0 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold rounded-full m3-btn-filled shrink-0 shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
                 >
                   <Radio className="w-3.5 h-3.5" />
                   <span>Connect Peers</span>
@@ -936,11 +1075,14 @@ export function NexusFailoverHUD({
           )}
 
           {/* Failover Telemetry Log Feed */}
-          <div className="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-black/10 dark:border-white/10 flex flex-col">
+          <div
+            className="mt-4 pt-3.5 border-t flex flex-col"
+            style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
+          >
             <div className="text-[10px] sm:text-[11px] font-mono text-muted uppercase tracking-wider mb-2 flex items-center justify-between">
               <span className="flex items-center gap-1.5">
-                <Radio className="w-3.5 h-3.5 text-accent animate-pulse" />
-                Deterministic Election Protocol Telemetry
+                <Radio className="w-3.5 h-3.5 text-[color:var(--md-sys-color-primary)] animate-pulse" />
+                <span>Deterministic Election Protocol Telemetry</span>
               </span>
               <button 
                 onClick={() => setLogs([])}
@@ -952,14 +1094,18 @@ export function NexusFailoverHUD({
 
             <div 
               ref={logContainerRef}
-              className="h-28 sm:h-32 overflow-y-auto pr-1 space-y-1.5 font-mono text-[10px] sm:text-[11px] bg-slate-100/70 dark:bg-black/20 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-black/10 dark:border-white/10 scrollbar-hide"
+              className="h-28 sm:h-32 overflow-y-auto pr-1 space-y-1.5 font-mono text-[10px] sm:text-[11px] p-3 rounded-2xl border scrollbar-hide"
+              style={{
+                backgroundColor: 'var(--md-sys-color-surface-container-low)',
+                borderColor: 'var(--md-sys-color-outline-variant)',
+              }}
             >
               {logs.map(l => (
                 <div key={l.id} className="flex items-start gap-2">
                   <span className="text-muted/60 text-[9px] sm:text-[10px] mt-0.5 shrink-0">[{l.time}]</span>
                   <span className={cn(
                     "flex-1 leading-relaxed",
-                    l.type === 'err' ? "text-red-500 font-semibold" : l.type === 'ok' ? "text-emerald-500 font-semibold" : l.type === 'warn' ? "text-amber-500" : "text-text/80"
+                    l.type === 'err' ? "text-rose-500 font-semibold" : l.type === 'ok' ? "text-emerald-500 font-semibold" : l.type === 'warn' ? "text-amber-500" : "text-text/85"
                   )}>
                     {l.text}
                   </span>
@@ -974,19 +1120,26 @@ export function NexusFailoverHUD({
         </div>
 
         {/* Right Column: Failover Simulation & Testing Suite */}
-        <div className="lg:col-span-4 flex flex-col gap-3 sm:gap-4">
+        <div className="lg:col-span-4 flex flex-col gap-4">
           
-          <div className="bg-white dark:bg-white/5 p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-black/10 dark:border-white/10 shadow-sm flex flex-col gap-3 backdrop-blur-md">
+          <div
+            className="m3-card-xl p-4 sm:p-5 rounded-[28px] border shadow-xs flex flex-col gap-3"
+            style={{
+              backgroundColor: 'var(--md-sys-color-surface-container)',
+              borderColor: 'var(--md-sys-color-outline-variant)',
+            }}
+          >
             <div className="flex items-center justify-between">
               <h4 className="text-xs sm:text-sm font-bold text-text flex items-center gap-2">
-                <Zap className="w-4 h-4 text-accent" />
-                Failover Simulator
+                <Zap className="w-4 h-4 text-[color:var(--md-sys-color-primary)]" />
+                <span>Failover Simulator</span>
               </h4>
               {isSimActive && (
                 <button 
                   onClick={handleResetTopology}
-                  className="text-xs text-muted hover:text-text flex items-center gap-1 font-mono transition-colors cursor-pointer"
-                  title="Reset network to healthy state"
+                  className="px-2.5 py-1 rounded-full m3-surface-interactive border text-xs text-muted hover:text-text flex items-center gap-1 font-mono transition-colors cursor-pointer"
+                  style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
+                  title="Reset mesh to healthy state"
                 >
                   <RefreshCw className="w-3 h-3" /> Reset
                 </button>
@@ -995,14 +1148,21 @@ export function NexusFailoverHUD({
 
             {isSimActive ? (
               <>
-                <div className="flex items-center justify-between gap-2 p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-accent/10 border border-accent/20">
+                <div
+                  className="flex items-center justify-between gap-2 px-3 py-2 rounded-2xl border"
+                  style={{
+                    backgroundColor: 'var(--md-sys-color-primary-container)',
+                    color: 'var(--md-sys-color-on-primary-container)',
+                    borderColor: 'var(--md-sys-color-outline-variant)',
+                  }}
+                >
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="w-2 h-2 rounded-full bg-accent animate-ping flex-shrink-0" />
-                    <span className="text-[11px] font-mono font-semibold text-accent truncate">Simulation Sandbox Active</span>
+                    <span className="w-2 h-2 rounded-full bg-current animate-ping flex-shrink-0" />
+                    <span className="text-[11px] font-mono font-bold truncate">Simulation Sandbox Active</span>
                   </div>
                   <button 
                     onClick={handleToggleSim}
-                    className="text-[10px] font-mono text-muted hover:text-text cursor-pointer underline flex-shrink-0"
+                    className="text-[10px] font-mono font-bold cursor-pointer underline flex-shrink-0"
                   >
                     Exit
                   </button>
@@ -1012,16 +1172,14 @@ export function NexusFailoverHUD({
                   Test host crash detection, deterministic leader election, simultaneous disconnect fallbacks, and quorum enforcement.
                 </p>
 
-                {/* Simulation Action Buttons (ONLY available in Simulation Mode) */}
                 <div className="flex flex-col gap-2 mt-1">
-                  
                   {/* Button 1: Abrupt Host Drop */}
                   <button
                     onClick={handleSimulateAbruptHostDrop}
                     disabled={isElecting}
-                    className="w-full text-left p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-text transition-all group cursor-pointer disabled:opacity-50"
+                    className="w-full text-left p-3 rounded-2xl bg-rose-500/10 hover:bg-rose-500/15 border border-rose-500/25 text-text transition-all group cursor-pointer disabled:opacity-50"
                   >
-                    <div className="flex items-center justify-between text-xs font-bold text-red-500 mb-1">
+                    <div className="flex items-center justify-between text-xs font-bold text-rose-500 mb-1">
                       <span>1. Abrupt Host Drop</span>
                       <AlertTriangle className="w-4 h-4 group-hover:scale-110 transition-transform flex-shrink-0" />
                     </div>
@@ -1034,9 +1192,13 @@ export function NexusFailoverHUD({
                   <button
                     onClick={handleSimulateGracefulHandoff}
                     disabled={isElecting}
-                    className="w-full text-left p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-accent/10 hover:bg-accent/20 border border-accent/20 text-text transition-all group cursor-pointer disabled:opacity-50"
+                    className="w-full text-left p-3 rounded-2xl m3-surface-interactive border text-text transition-all group cursor-pointer disabled:opacity-50"
+                    style={{
+                      backgroundColor: 'var(--md-sys-color-surface-container-low)',
+                      borderColor: 'var(--md-sys-color-outline-variant)',
+                    }}
                   >
-                    <div className="flex items-center justify-between text-xs font-bold text-accent mb-1">
+                    <div className="flex items-center justify-between text-xs font-bold text-[color:var(--md-sys-color-primary)] mb-1">
                       <span>2. Graceful HOST_HANDOFF</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform flex-shrink-0" />
                     </div>
@@ -1049,7 +1211,7 @@ export function NexusFailoverHUD({
                   <button
                     onClick={handleSimulateSimultaneousDrop}
                     disabled={isElecting}
-                    className="w-full text-left p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-text transition-all group cursor-pointer disabled:opacity-50"
+                    className="w-full text-left p-3 rounded-2xl bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/25 text-text transition-all group cursor-pointer disabled:opacity-50"
                   >
                     <div className="flex items-center justify-between text-xs font-bold text-amber-500 mb-1">
                       <span>3. Host + 1st Joiner Drop</span>
@@ -1064,9 +1226,13 @@ export function NexusFailoverHUD({
                   <button
                     onClick={handleSimulatePartition}
                     disabled={isElecting}
-                    className="w-full text-left p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-text transition-all group cursor-pointer disabled:opacity-50"
+                    className="w-full text-left p-3 rounded-2xl m3-surface-interactive border text-text transition-all group cursor-pointer disabled:opacity-50"
+                    style={{
+                      backgroundColor: 'var(--md-sys-color-surface-container-low)',
+                      borderColor: 'var(--md-sys-color-outline-variant)',
+                    }}
                   >
-                    <div className="flex items-center justify-between text-xs font-bold text-purple-500 mb-1">
+                    <div className="flex items-center justify-between text-xs font-bold text-[color:var(--md-sys-color-tertiary)] mb-1">
                       <span>4. Network Partition</span>
                       <ShieldCheck className="w-4 h-4 group-hover:scale-110 transition-transform flex-shrink-0" />
                     </div>
@@ -1074,23 +1240,31 @@ export function NexusFailoverHUD({
                       Split network test. Demonstrates how minority partitions pause commits without quorum (&gt; 50%).
                     </div>
                   </button>
-
                 </div>
               </>
             ) : role === 'host' ? (
               /* Live Host Authority Controls */
               <div className="flex flex-col gap-3 py-1">
-                <div className="flex items-center justify-between pb-2 border-b border-black/10 dark:border-white/10">
+                <div
+                  className="flex items-center justify-between pb-2.5 border-b"
+                  style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
+                >
                   <div className="flex items-center gap-2">
-                    <Crown className="w-4 h-4 text-accent" />
+                    <Crown className="w-4 h-4 text-[color:var(--md-sys-color-primary)]" />
                     <span className="text-xs font-bold text-text uppercase tracking-wider">Host Authority Controls</span>
                   </div>
-                  <span className="text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-accent/15 text-accent border border-accent/20">
+                  <span
+                    className="text-[9px] px-2.5 py-0.5 rounded-full font-mono font-bold"
+                    style={{
+                      backgroundColor: 'var(--md-sys-color-primary-container)',
+                      color: 'var(--md-sys-color-on-primary-container)',
+                    }}
+                  >
                     Host Exclusive
                   </span>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   <button
                     onClick={() => {
                       if (onGracefulHostDrop) {
@@ -1099,16 +1273,20 @@ export function NexusFailoverHUD({
                         handleSimulateGracefulHandoff();
                       }
                     }}
-                    className="w-full text-left p-3 rounded-2xl bg-slate-50 dark:bg-white/5 hover:bg-accent/10 border border-black/10 dark:border-white/10 hover:border-accent/30 transition-all group cursor-pointer shadow-sm active:scale-[0.99]"
+                    className="w-full text-left p-3.5 rounded-2xl m3-surface-interactive border transition-all group cursor-pointer shadow-2xs active:scale-[0.99]"
+                    style={{
+                      backgroundColor: 'var(--md-sys-color-surface-container-low)',
+                      borderColor: 'var(--md-sys-color-outline-variant)',
+                    }}
                   >
-                    <div className="flex items-center justify-between text-xs font-bold text-accent mb-1">
+                    <div className="flex items-center justify-between text-xs font-bold text-[color:var(--md-sys-color-primary)] mb-1">
                       <span className="flex items-center gap-1.5">
-                        <Crown className="w-3.5 h-3.5 text-accent" /> Graceful Host Drop
+                        <Crown className="w-3.5 h-3.5" /> Graceful Host Drop
                       </span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform flex-shrink-0" />
                     </div>
                     <div className="text-[10px] sm:text-[11px] text-muted leading-snug">
-                      Step down as Host and immediately transfer host access to the 1st joiner (heir).
+                      Step down as Host and immediately transfer host authority to the 1st joiner (heir).
                     </div>
                   </button>
 
@@ -1120,9 +1298,13 @@ export function NexusFailoverHUD({
                         handleSimulatePartition();
                       }
                     }}
-                    className="w-full text-left p-3 rounded-2xl bg-slate-50 dark:bg-white/5 hover:bg-purple-500/10 border border-black/10 dark:border-white/10 hover:border-purple-500/30 transition-all group cursor-pointer shadow-sm active:scale-[0.99]"
+                    className="w-full text-left p-3.5 rounded-2xl m3-surface-interactive border transition-all group cursor-pointer shadow-2xs active:scale-[0.99]"
+                    style={{
+                      backgroundColor: 'var(--md-sys-color-surface-container-low)',
+                      borderColor: 'var(--md-sys-color-outline-variant)',
+                    }}
                   >
-                    <div className="flex items-center justify-between text-xs font-bold text-purple-500 mb-1">
+                    <div className="flex items-center justify-between text-xs font-bold text-[color:var(--md-sys-color-tertiary)] mb-1">
                       <span className="flex items-center gap-1.5">
                         <WifiOff className="w-3.5 h-3.5" /> Network Split Test
                       </span>
@@ -1134,11 +1316,14 @@ export function NexusFailoverHUD({
                   </button>
                 </div>
 
-                <div className="pt-2 border-t border-black/10 dark:border-white/10 flex items-center justify-between">
+                <div
+                  className="pt-2.5 border-t flex items-center justify-between"
+                  style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
+                >
                   <span className="text-[10px] text-muted font-mono">Sandbox Scenarios</span>
                   <button
                     onClick={handleToggleSim}
-                    className="px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-accent hover:text-white text-[10px] font-semibold text-text transition-all flex items-center gap-1.5 cursor-pointer border border-black/10 dark:border-white/20"
+                    className="px-3.5 py-1.5 rounded-full m3-btn-tonal text-[11px] font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
                   >
                     <FlaskConical className="w-3 h-3" />
                     <span>Enter Simulation</span>
@@ -1147,9 +1332,15 @@ export function NexusFailoverHUD({
               </div>
             ) : (
               /* Locked State in Live Mode for Joiners */
-              <div className="flex flex-col items-center text-center py-4 sm:py-6 px-2 sm:px-3 gap-3">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-slate-100 dark:bg-white/5 border border-black/10 dark:border-white/10 flex items-center justify-center text-muted">
-                  <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-muted" />
+              <div className="flex flex-col items-center text-center py-5 px-3 gap-3">
+                <div
+                  className="w-12 h-12 rounded-2xl border flex items-center justify-center text-muted"
+                  style={{
+                    backgroundColor: 'var(--md-sys-color-surface-container-low)',
+                    borderColor: 'var(--md-sys-color-outline-variant)',
+                  }}
+                >
+                  <Lock className="w-5 h-5" />
                 </div>
                 
                 <div>
@@ -1157,13 +1348,13 @@ export function NexusFailoverHUD({
                     Simulation Triggers Locked
                   </h5>
                   <p className="text-[11px] sm:text-xs text-muted leading-relaxed max-w-xs">
-                    Simulation actions (crash injection, handoff triggers, and partition tests) are available only in <strong>Simulation Mode</strong> to prevent accidental disruption to live P2P tunnels.
+                    Failure injection and partition tests are available in <strong>Simulation Mode</strong> to protect live Quantum Link tunnels.
                   </p>
                 </div>
 
                 <button
                   onClick={handleToggleSim}
-                  className="mt-1 px-4 py-2 rounded-xl bg-accent text-white hover:bg-accent/90 text-xs font-semibold shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+                  className="mt-1 px-4 py-2 rounded-full m3-btn-filled text-xs font-semibold shadow-xs transition-all flex items-center gap-2 cursor-pointer active:scale-95"
                 >
                   <FlaskConical className="w-4 h-4" />
                   <span>Enable Simulation Mode</span>
@@ -1173,16 +1364,22 @@ export function NexusFailoverHUD({
           </div>
 
           {/* Protocol Invariants Card */}
-          <div className="bg-white dark:bg-white/5 p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl border border-black/10 dark:border-white/10 shadow-sm flex flex-col gap-2 text-xs backdrop-blur-md">
-            <h5 className="font-bold text-text flex items-center gap-1.5 text-xs">
+          <div
+            className="m3-card p-4 rounded-2xl border shadow-2xs flex flex-col gap-2 text-xs"
+            style={{
+              backgroundColor: 'var(--md-sys-color-surface-container)',
+              borderColor: 'var(--md-sys-color-outline-variant)',
+            }}
+          >
+            <h5 className="font-bold text-text flex items-center gap-2 text-xs">
               <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-              <span>Nexus Protocol Invariants</span>
+              <span>Quantum Link Mesh Invariants</span>
             </h5>
-            <ul className="text-muted space-y-1.5 text-[10px] sm:text-[11px] pl-1 font-mono">
-              <li>• <strong>Determinism:</strong> Identical sorting on all peers ensures 0 conflict.</li>
-              <li>• <strong>No Split-Brain:</strong> Requires majority ACK (&gt; 50% surviving).</li>
-              <li>• <strong>Cryptographic Claims:</strong> Signed tokens prevent spoofing.</li>
-              <li>• <strong>Seamless Re-routing:</strong> In-memory session buffers preserved.</li>
+            <ul className="text-muted space-y-1.5 text-[11px] pl-1">
+              <li>• <strong className="text-text">Determinism:</strong> Identical sequence sorting across all nodes guarantees zero election conflict.</li>
+              <li>• <strong className="text-text">No Split-Brain:</strong> Requires majority ACK (&gt; 50% surviving nodes).</li>
+              <li>• <strong className="text-text">Signed Handoff:</strong> Cryptographic succession tokens prevent spoofing.</li>
+              <li>• <strong className="text-text">Seamless Re-routing:</strong> In-memory WebRTC session buffers preserved.</li>
             </ul>
           </div>
 

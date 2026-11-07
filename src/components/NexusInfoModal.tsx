@@ -1,28 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Info, 
-  X, 
-  Wifi, 
-  QrCode, 
-  Send, 
-  HardDrive, 
-  ShieldCheck, 
-  Radio, 
-  Video, 
-  MessageSquare, 
-  Sparkles, 
-  CheckCircle2, 
-  Layers, 
-  ArrowRight, 
-  ChevronDown, 
-  ChevronUp, 
-  Lock, 
-  EyeOff, 
-  Cpu
-} from 'lucide-react';
 import { cn } from '../lib/utils';
 import { LegalComplianceView } from './LegalComplianceView';
+import { MaterialSymbol } from '../lib/materialTheme';
 
 interface NexusInfoModalProps {
   isOpen: boolean;
@@ -35,7 +15,6 @@ export const NexusInfoModal: React.FC<NexusInfoModalProps> = ({
   onClose, 
   initialTab = 'guide' 
 }) => {
-  // Normalize initial tab into 3 simple sections
   const getNormalizedTab = (tab: string): 'guide' | 'features' | 'privacy' => {
     if (tab === 'legal') return 'privacy';
     if (tab === 'dictionary' || tab === 'offline') return 'features';
@@ -63,329 +42,403 @@ export const NexusInfoModal: React.FC<NexusInfoModalProps> = ({
           animate={{ scale: 1, y: 0, opacity: 1 }}
           exit={{ scale: 0.96, y: 12, opacity: 0 }}
           transition={{ type: "spring", damping: 28, stiffness: 350 }}
-          className="relative w-full max-w-2xl max-h-[88vh] flex flex-col m3-card-xl shadow-2xl overflow-hidden text-text"
+          className="relative w-full max-w-4xl max-h-[90vh] flex flex-col m3-card-xl rounded-[28px] shadow-2xl overflow-hidden text-text border"
+          style={{
+            backgroundColor: 'var(--md-sys-color-surface)',
+            borderColor: 'var(--md-sys-color-outline-variant)',
+          }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--md-sys-color-outline-variant)] m3-surface-low flex-shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] flex items-center justify-center shrink-0">
-                <Info className="w-5 h-5" />
+          <div
+            className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0"
+            style={{
+              backgroundColor: 'var(--md-sys-color-surface-container-low)',
+              borderColor: 'var(--md-sys-color-outline-variant)',
+            }}
+          >
+            <div className="flex items-center gap-3.5">
+              <div
+                className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border"
+                style={{
+                  backgroundColor: 'var(--md-sys-color-primary-container)',
+                  color: 'var(--md-sys-color-on-primary-container)',
+                  borderColor: 'var(--md-sys-color-outline-variant)',
+                }}
+              >
+                <MaterialSymbol name="explore" size={22} filled />
               </div>
               <div>
-                <h2 className="text-base sm:text-lg font-bold tracking-tight text-text flex items-center gap-2">
-                  How to Use Quantum Link
-                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[var(--md-sys-color-tertiary-container)] text-[var(--md-sys-color-on-tertiary-container)]">
-                    M3 Guide
+                <h2 className="text-base sm:text-lg font-bold tracking-tight text-text flex items-center gap-2 flex-wrap">
+                  <span>Quantum Link Guide & Legal Hub</span>
+                  <span
+                    className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: 'var(--md-sys-color-tertiary-container)',
+                      color: 'var(--md-sys-color-on-tertiary-container)',
+                    }}
+                  >
+                    Material You
                   </span>
                 </h2>
                 <p className="text-xs text-muted">
-                  Share files, chat, and make voice or video calls directly between devices
+                  Direct WebRTC mesh guide, capabilities, and regulatory compliance
                 </p>
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="w-9 h-9 rounded-full flex items-center justify-center text-muted hover:text-text m3-surface-high transition-colors border border-[var(--md-sys-color-outline-variant)] cursor-pointer"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-muted hover:text-text m3-surface-interactive transition-colors border cursor-pointer"
+              style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
               aria-label="Close dialog"
             >
-              <X className="w-4 h-4" />
+              <MaterialSymbol name="close" size={18} />
             </button>
           </div>
 
-          {/* Simple Segmented Navigation */}
-          <div className="flex items-center gap-1.5 px-6 py-3 border-b border-[var(--md-sys-color-outline-variant)] m3-surface-low flex-shrink-0">
+          {/* Segmented Pill Navigation */}
+          <div
+            className="grid grid-cols-3 gap-1.5 px-6 py-3 border-b flex-shrink-0"
+            style={{
+              backgroundColor: 'var(--md-sys-color-surface-container-low)',
+              borderColor: 'var(--md-sys-color-outline-variant)',
+            }}
+          >
             <button
               onClick={() => setActiveTab('guide')}
               className={cn(
-                "flex-1 py-2 px-3 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
+                "py-2.5 px-3 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
                 activeTab === 'guide'
                   ? "m3-btn-filled shadow-xs"
-                  : "text-muted hover:text-text hover:bg-black/5 dark:hover:bg-white/5"
+                  : "m3-surface-interactive text-muted hover:text-text"
               )}
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>How to Connect</span>
+              <MaterialSymbol name="bolt" size={16} filled={activeTab === 'guide'} />
+              <span className="truncate">How to Connect</span>
             </button>
 
             <button
               onClick={() => setActiveTab('features')}
               className={cn(
-                "flex-1 py-2 px-3 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
+                "py-2.5 px-3 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
                 activeTab === 'features'
                   ? "m3-btn-filled shadow-xs"
-                  : "text-muted hover:text-text hover:bg-black/5 dark:hover:bg-white/5"
+                  : "m3-surface-interactive text-muted hover:text-text"
               )}
             >
-              <Layers className="w-3.5 h-3.5" />
-              <span>What You Can Do</span>
+              <MaterialSymbol name="widgets" size={16} filled={activeTab === 'features'} />
+              <span className="truncate">Capabilities</span>
             </button>
 
             <button
               onClick={() => setActiveTab('privacy')}
               className={cn(
-                "flex-1 py-2 px-3 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
+                "py-2.5 px-3 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer",
                 activeTab === 'privacy'
                   ? "m3-btn-tertiary shadow-xs"
-                  : "text-muted hover:text-text hover:bg-black/5 dark:hover:bg-white/5"
+                  : "m3-surface-interactive text-muted hover:text-text"
               )}
             >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Privacy & Legal</span>
+              <MaterialSymbol name="policy" size={16} filled={activeTab === 'privacy'} />
+              <span className="truncate">Legal & Regulatory</span>
             </button>
           </div>
 
           {/* Body Content */}
           <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
-            
             {/* TAB 1: HOW IT WORKS */}
             {activeTab === 'guide' && (
               <div className="space-y-4">
-                {/* 3 Step Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {/* Step 1 */}
-                  <div className="p-3.5 rounded-lg bg-gray-50 dark:bg-[#18191d] border border-gray-200 dark:border-[#343842] flex flex-col justify-between">
-                    <div>
-                      <div className="w-7 h-7 rounded-md bg-accent text-white flex items-center justify-center text-xs font-bold mb-2.5 shadow-xs">
-                        1
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                  {[
+                    {
+                      step: '01',
+                      icon: 'wifi_tethering',
+                      title: 'Create a Mesh Room',
+                      desc: 'On Device 1, tap Create a Mesh Room to generate an encrypted Offer QR code or token.',
+                      tone: 'primary',
+                    },
+                    {
+                      step: '02',
+                      icon: 'qr_code_scanner',
+                      title: 'Join & Reply',
+                      desc: 'On Device 2, tap Join a Mesh Room, scan or paste the Offer, and present your Answer QR.',
+                      tone: 'secondary',
+                    },
+                    {
+                      step: '03',
+                      icon: 'verified',
+                      title: 'Instant P2P Tunnel',
+                      desc: 'Device 1 scans the Answer QR. Both devices establish a direct DTLS-SRTP encrypted link.',
+                      tone: 'tertiary',
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.step}
+                      className="m3-card p-4 sm:p-5 rounded-2xl border flex flex-col justify-between"
+                      style={{
+                        backgroundColor: 'var(--md-sys-color-surface-container)',
+                        borderColor: 'var(--md-sys-color-outline-variant)',
+                      }}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <div
+                            className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                            style={{
+                              backgroundColor:
+                                item.tone === 'primary'
+                                  ? 'var(--md-sys-color-primary-container)'
+                                  : item.tone === 'secondary'
+                                    ? 'var(--md-sys-color-secondary-container)'
+                                    : 'var(--md-sys-color-tertiary-container)',
+                              color:
+                                item.tone === 'primary'
+                                  ? 'var(--md-sys-color-on-primary-container)'
+                                  : item.tone === 'secondary'
+                                    ? 'var(--md-sys-color-on-secondary-container)'
+                                    : 'var(--md-sys-color-on-tertiary-container)',
+                            }}
+                          >
+                            <MaterialSymbol name={item.icon} size={20} filled />
+                          </div>
+                          <span className="text-xs font-mono font-semibold text-muted">
+                            {item.step}
+                          </span>
+                        </div>
+                        <h4 className="text-sm font-bold text-text mb-1.5">{item.title}</h4>
+                        <p className="text-xs text-muted leading-relaxed">{item.desc}</p>
                       </div>
-                      <h4 className="text-xs font-bold text-text mb-1 flex items-center gap-1.5">
-                        <Wifi className="w-3.5 h-3.5 text-accent" />
-                        Create a Room
-                      </h4>
-                      <p className="text-[11px] text-muted leading-relaxed">
-                        On Device 1, click <strong>Create a Room</strong> to show an invite QR code or invite code.
-                      </p>
                     </div>
-                  </div>
-
-                  {/* Step 2 */}
-                  <div className="p-3.5 rounded-lg bg-gray-50 dark:bg-[#18191d] border border-gray-200 dark:border-[#343842] flex flex-col justify-between">
-                    <div>
-                      <div className="w-7 h-7 rounded-md bg-accent text-white flex items-center justify-center text-xs font-bold mb-2.5 shadow-xs">
-                        2
-                      </div>
-                      <h4 className="text-xs font-bold text-text mb-1 flex items-center gap-1.5">
-                        <QrCode className="w-3.5 h-3.5 text-accent" />
-                        Join a Room
-                      </h4>
-                      <p className="text-[11px] text-muted leading-relaxed">
-                        On Device 2, click <strong>Join a Room</strong>, scan the invite QR code, and show your reply code.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Step 3 */}
-                  <div className="p-3.5 rounded-lg bg-gray-50 dark:bg-[#18191d] border border-gray-200 dark:border-[#343842] flex flex-col justify-between">
-                    <div>
-                      <div className="w-7 h-7 rounded-md bg-emerald-600 text-white flex items-center justify-center text-xs font-bold mb-2.5 shadow-xs">
-                        3
-                      </div>
-                      <h4 className="text-xs font-bold text-text mb-1 flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                        Start Sharing!
-                      </h4>
-                      <p className="text-[11px] text-muted leading-relaxed">
-                        Device 1 scans the reply code. Both devices are now connected for file sharing, chat, and calls!
-                      </p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
 
-                {/* Direct Disk Stream Feature */}
-                <div className="p-4 rounded-lg bg-blue-50 dark:bg-accent/10 border border-blue-200 dark:border-accent/25 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-md bg-accent/15 text-accent flex items-center justify-center shrink-0 mt-0.5">
-                    <HardDrive className="w-4 h-4" />
+                {/* Direct Disk Stream Highlight */}
+                <div
+                  className="m3-card p-4 sm:p-5 rounded-2xl border flex items-start gap-3.5"
+                  style={{
+                    backgroundColor: 'var(--md-sys-color-surface-container-low)',
+                    borderColor: 'var(--md-sys-color-outline-variant)',
+                  }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
+                    style={{
+                      backgroundColor: 'var(--md-sys-color-primary-container)',
+                      color: 'var(--md-sys-color-on-primary-container)',
+                    }}
+                  >
+                    <MaterialSymbol name="hard_drive" size={20} />
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs font-bold text-text">Send Files of Any Size</div>
-                    <p className="text-[11px] text-muted leading-relaxed">
-                      Enable <strong>Direct Save</strong> to save incoming files straight to your computer or phone storage, allowing you to send large videos, photos, and folders smoothly.
+                    <div className="text-xs sm:text-sm font-bold text-text">
+                      Multi-Gigabyte Direct Disk Streaming
+                    </div>
+                    <p className="text-xs text-muted leading-relaxed">
+                      Enable <strong>Direct Save</strong> to stream incoming payloads straight to disk via the File System Access API or OPFS, bypassing browser RAM limits.
                     </p>
                   </div>
                 </div>
 
-                {/* Offline Wi-Fi Highlight */}
-                <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-md bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                    <Radio className="w-4 h-4" />
+                {/* Local Wi-Fi Mesh Highlight */}
+                <div
+                  className="m3-card p-4 sm:p-5 rounded-2xl border flex items-start gap-3.5"
+                  style={{
+                    backgroundColor: 'var(--md-sys-color-surface-container-low)',
+                    borderColor: 'var(--md-sys-color-outline-variant)',
+                  }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0"
+                    style={{
+                      backgroundColor: 'var(--md-sys-color-tertiary-container)',
+                      color: 'var(--md-sys-color-on-tertiary-container)',
+                    }}
+                  >
+                    <MaterialSymbol name="router" size={20} />
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs font-bold text-text">Works Over Local Wi-Fi Without Internet</div>
-                    <p className="text-[11px] text-muted leading-relaxed">
-                      If both devices are on the same Wi-Fi network or mobile hotspot, files transfer directly over your local network at high speed.
+                    <div className="text-xs sm:text-sm font-bold text-text">
+                      Works Over Local LAN & Hotspot Without Internet
+                    </div>
+                    <p className="text-xs text-muted leading-relaxed">
+                      When devices share a Wi-Fi router or mobile hotspot, WebRTC ICE host candidates route packets directly over the local radio link at maximum hardware speed.
                     </p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* TAB 2: FEATURES */}
+            {/* TAB 2: CAPABILITIES */}
             {activeTab === 'features' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-surface border border-zinc-200/80 dark:border-border/70 space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs font-bold text-text">
-                    <div className="w-7 h-7 rounded-lg bg-accent/15 text-accent flex items-center justify-center shrink-0">
-                      <Send className="w-3.5 h-3.5" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {[
+                  {
+                    icon: 'upload_file',
+                    title: '64KB Chunked File Streaming',
+                    desc: 'High-throughput WebRTC DataChannel streaming with backpressure control and SHA-verified integrity.',
+                  },
+                  {
+                    icon: 'videocam',
+                    title: 'Expressive Voice & Video Calls',
+                    desc: 'Full HD camera, voice, and 1080p screen mirroring with Spotlight, Theater mode, and draggable Picture-in-Picture.',
+                  },
+                  {
+                    icon: 'hub',
+                    title: 'Quantum Link Mesh & Failover',
+                    desc: 'Interactive multi-node mesh topology with deterministic host election, heartbeat watchdogs, and quorum protection.',
+                  },
+                  {
+                    icon: 'chat',
+                    title: 'E2EE Chat & Voice Notes',
+                    desc: 'Instant peer-to-peer messaging with replies, reactions, inline file attachments, and waveform voice notes.',
+                  },
+                  {
+                    icon: 'palette',
+                    title: 'Android 16 Material You Studio',
+                    desc: 'Dynamic HCT tonal palettes extracted from your wallpaper or custom seed hex, plus adaptive app icon presets.',
+                  },
+                  {
+                    icon: 'delete_sweep',
+                    title: 'Instant Sandbox Purge',
+                    desc: 'Wipe all local CacheStorage buckets, OPFS streams, and session profiles anytime with a single tap.',
+                  },
+                ].map((feat) => (
+                  <div
+                    key={feat.title}
+                    className="m3-card p-4 rounded-2xl border space-y-2"
+                    style={{
+                      backgroundColor: 'var(--md-sys-color-surface-container)',
+                      borderColor: 'var(--md-sys-color-outline-variant)',
+                    }}
+                  >
+                    <div className="flex items-center gap-2.5 text-xs sm:text-sm font-bold text-text">
+                      <div
+                        className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+                        style={{
+                          backgroundColor: 'var(--md-sys-color-primary-container)',
+                          color: 'var(--md-sys-color-on-primary-container)',
+                        }}
+                      >
+                        <MaterialSymbol name={feat.icon} size={18} />
+                      </div>
+                      <span>{feat.title}</span>
                     </div>
-                    <span>Drag & Drop File Transfer</span>
+                    <p className="text-xs text-muted leading-relaxed">{feat.desc}</p>
                   </div>
-                  <p className="text-[11px] text-muted leading-relaxed">
-                    Drop any file into the file zone. Transfers directly via encrypted peer-to-peer WebRTC data channels.
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-surface border border-zinc-200/80 dark:border-border/70 space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs font-bold text-text">
-                    <div className="w-7 h-7 rounded-lg bg-sky-500/15 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-                      <HardDrive className="w-3.5 h-3.5" />
-                    </div>
-                    <span>Direct Disk Streaming</span>
-                  </div>
-                  <p className="text-[11px] text-muted leading-relaxed">
-                    Bypasses browser memory limits so gigabyte-sized transfers save directly to your storage disk.
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-surface border border-zinc-200/80 dark:border-border/70 space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs font-bold text-text">
-                    <div className="w-7 h-7 rounded-lg bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-                      <Video className="w-3.5 h-3.5" />
-                    </div>
-                    <span>Voice & Video Calls</span>
-                  </div>
-                  <p className="text-[11px] text-muted leading-relaxed">
-                    Start live camera, microphone, or screen share sessions directly with connected peers.
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-surface border border-zinc-200/80 dark:border-border/70 space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs font-bold text-text">
-                    <div className="w-7 h-7 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-                      <MessageSquare className="w-3.5 h-3.5" />
-                    </div>
-                    <span>Encrypted Mesh Chat</span>
-                  </div>
-                  <p className="text-[11px] text-muted leading-relaxed">
-                    Real-time direct messaging with zero server logging. Everything disappears when you close the tab.
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-surface border border-zinc-200/80 dark:border-border/70 space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs font-bold text-text">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                      <Lock className="w-3.5 h-3.5" />
-                    </div>
-                    <span>Zero Servers & DTLS Encryption</span>
-                  </div>
-                  <p className="text-[11px] text-muted leading-relaxed">
-                    All packets are end-to-end encrypted with DTLS-SRTP. No central database holds your data.
-                  </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-surface border border-zinc-200/80 dark:border-border/70 space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs font-bold text-text">
-                    <div className="w-7 h-7 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
-                      <Cpu className="w-3.5 h-3.5" />
-                    </div>
-                    <span>Local Storage Purge</span>
-                  </div>
-                  <p className="text-[11px] text-muted leading-relaxed">
-                    Clear local browser cache, cookies, or saved nickname profiles at any time with one click.
-                  </p>
-                </div>
+                ))}
               </div>
             )}
 
             {/* TAB 3: PRIVACY & LEGAL */}
             {activeTab === 'privacy' && (
-              <div className="space-y-4">
-                {/* 4 Simple Guarantees */}
+              <div className="space-y-5">
+                {/* 4 Expressive Guarantees */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-surface border border-zinc-200/80 dark:border-border/70 flex items-start gap-3">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                      <EyeOff className="w-3.5 h-3.5" />
+                  {[
+                    {
+                      icon: 'visibility_off',
+                      title: 'Zero Tracking or Analytics',
+                      desc: 'No telemetry beacons, no advertising pixels, and zero behavioral fingerprinting.',
+                    },
+                    {
+                      icon: 'cloud_off',
+                      title: 'Zero Cloud Storage',
+                      desc: 'Payloads travel directly between peer browsers and never touch a central server.',
+                    },
+                    {
+                      icon: 'no_accounts',
+                      title: 'No Accounts or Sign-Up',
+                      desc: 'No phone numbers, emails, or centralized credentials required to link devices.',
+                    },
+                    {
+                      icon: 'workspace_premium',
+                      title: '100% Free & MIT Open Source',
+                      desc: 'Auditable client-side source code with zero subscriptions or hidden fees.',
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.title}
+                      className="m3-card p-4 rounded-2xl border flex items-start gap-3"
+                      style={{
+                        backgroundColor: 'var(--md-sys-color-surface-container)',
+                        borderColor: 'var(--md-sys-color-outline-variant)',
+                      }}
+                    >
+                      <div
+                        className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+                        style={{
+                          backgroundColor: 'var(--md-sys-color-tertiary-container)',
+                          color: 'var(--md-sys-color-on-tertiary-container)',
+                        }}
+                      >
+                        <MaterialSymbol name={item.icon} size={18} />
+                      </div>
+                      <div className="space-y-0.5">
+                        <h4 className="text-xs font-bold text-text">{item.title}</h4>
+                        <p className="text-[11px] text-muted leading-relaxed">{item.desc}</p>
+                      </div>
                     </div>
-                    <div className="space-0.5">
-                      <h4 className="text-xs font-bold text-text">No Tracking or Ads</h4>
-                      <p className="text-[11px] text-muted">Zero analytics, zero tracking cookies, and zero fingerprinting.</p>
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-surface border border-zinc-200/80 dark:border-border/70 flex items-start gap-3">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                    </div>
-                    <div className="space-0.5">
-                      <h4 className="text-xs font-bold text-text">Zero Cloud Storage</h4>
-                      <p className="text-[11px] text-muted">Files travel directly between devices and never touch a server.</p>
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-surface border border-zinc-200/80 dark:border-border/70 flex items-start gap-3">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                      <Lock className="w-3.5 h-3.5" />
-                    </div>
-                    <div className="space-0.5">
-                      <h4 className="text-xs font-bold text-text">No Accounts Required</h4>
-                      <p className="text-[11px] text-muted">No emails, passwords, or phone numbers needed to connect.</p>
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-surface border border-zinc-200/80 dark:border-border/70 flex items-start gap-3">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                    </div>
-                    <div className="space-0.5">
-                      <h4 className="text-xs font-bold text-text">100% Free & Open Source</h4>
-                      <p className="text-[11px] text-muted">Licensed under MIT. Zero fees, subscriptions, or hidden paywalls.</p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
 
-                {/* Collapsible Full Legal Audit */}
-                <div className="pt-2 border-t border-zinc-200 dark:border-border/40">
+                {/* Collapsible Full Legal & Regulatory Explorer */}
+                <div
+                  className="pt-3 border-t"
+                  style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
+                >
                   <button
                     onClick={() => setShowFullLegalAudit(prev => !prev)}
-                    className="w-full py-2.5 px-4 rounded-xl bg-zinc-50 dark:bg-surface hover:bg-zinc-100 dark:hover:bg-white/5 border border-zinc-200/80 dark:border-border/70 text-xs font-semibold text-text flex items-center justify-between transition-colors cursor-pointer"
+                    className="w-full py-3 px-4 rounded-full m3-surface-interactive border text-xs font-semibold text-text flex items-center justify-between transition-all cursor-pointer"
+                    style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
                   >
                     <span className="flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                      {showFullLegalAudit 
-                        ? "Hide Detailed Legal & Compliance Audit" 
-                        : "Show Detailed Legal, Privacy & Compliance Audit (14 Points)"}
+                      <MaterialSymbol
+                        name="verified_user"
+                        size={18}
+                        className="text-[color:var(--md-sys-color-primary)]"
+                      />
+                      <span>
+                        {showFullLegalAudit
+                          ? 'Hide Interactive Legal & Regulatory Explorer'
+                          : 'Open Full Legal, Privacy & Regulatory Explorer (14 Point Audit)'}
+                      </span>
                     </span>
-                    {showFullLegalAudit ? (
-                      <ChevronUp className="w-4 h-4 text-muted" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-muted" />
-                    )}
+                    <MaterialSymbol
+                      name={showFullLegalAudit ? 'expand_less' : 'expand_more'}
+                      size={18}
+                    />
                   </button>
 
                   {showFullLegalAudit && (
-                    <div className="mt-3 pt-3 border-t border-zinc-200 dark:border-border/40">
+                    <div className="mt-4">
                       <LegalComplianceView />
                     </div>
                   )}
                 </div>
               </div>
             )}
-
           </div>
 
-          {/* Clean Footer */}
-          <div className="flex items-center justify-between px-5 py-3 border-t border-zinc-200 dark:border-border/50 bg-zinc-50/90 dark:bg-surface/50 text-[11px] text-muted flex-shrink-0">
-            <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Direct device-to-device • Zero servers
+          {/* Footer */}
+          <div
+            className="flex items-center justify-between px-6 py-3.5 border-t text-xs text-muted flex-shrink-0"
+            style={{
+              backgroundColor: 'var(--md-sys-color-surface-container-low)',
+              borderColor: 'var(--md-sys-color-outline-variant)',
+            }}
+          >
+            <span className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span>Quantum Link • Direct P2P WebRTC • Zero Servers</span>
             </span>
 
             <button
               onClick={onClose}
-              className="px-3.5 py-1.5 rounded-lg bg-accent text-white hover:bg-accent/90 transition-colors text-xs font-semibold cursor-pointer shadow-sm"
+              className="px-5 py-2 rounded-full m3-btn-filled text-xs font-semibold cursor-pointer shadow-xs transition-all active:scale-95"
             >
-              Got it
+              Done
             </button>
           </div>
         </motion.div>

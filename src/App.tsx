@@ -4245,7 +4245,7 @@ export default function App() {
                     <span aria-hidden="true">·</span>
                     <span className="font-semibold text-text">03. Stream Files & Call</span>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex flex-wrap items-center justify-center gap-2 shrink-0">
                     <button
                       onClick={() => {
                         triggerHaptic('light', materialTheme.hapticsEnabled);
@@ -4259,13 +4259,24 @@ export default function App() {
                     <button
                       onClick={() => {
                         triggerHaptic('light', materialTheme.hapticsEnabled);
+                        setShowNetworkMapModal(true);
+                      }}
+                      className="m3-btn-tertiary flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
+                      title="Open Interactive Quantum Link Mesh Map"
+                    >
+                      <MaterialSymbol name="account_tree" size={16} />
+                      <span>Quantum Link Mesh</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        triggerHaptic('light', materialTheme.hapticsEnabled);
                         setShowFailoverMenu(true);
                       }}
                       className="m3-surface-interactive flex items-center gap-1.5 px-4 py-2 rounded-full border text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
-                      title="Open Mesh Topology & Failover Controls"
+                      title="Open Mesh Failover & Election Controls"
                     >
                       <MaterialSymbol name="hub" size={16} className="text-[color:var(--md-sys-color-primary)]" />
-                      <span>Mesh Controls</span>
+                      <span>Failover HUD</span>
                     </button>
                   </div>
                 </div>
@@ -4334,26 +4345,60 @@ export default function App() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.98, y: 8 }}
               transition={{ duration: 0.15 }}
-              className="w-full max-w-6xl h-full md:h-[90vh] flex flex-col m3-card-xl text-text shadow-2xl overflow-hidden relative"
+              className="w-full max-w-6xl h-full md:h-[90vh] flex flex-col m3-card-xl rounded-[28px] text-text shadow-2xl overflow-hidden relative border"
+              style={{
+                backgroundColor: 'var(--md-sys-color-surface)',
+                borderColor: 'var(--md-sys-color-outline-variant)',
+              }}
             >
               <div
-                className="flex justify-between items-center px-6 py-4 border-b"
+                className="flex flex-wrap justify-between items-center gap-2 px-5 sm:px-6 py-4 border-b"
                 style={{
-                  backgroundColor: 'var(--md-sys-color-surface-container-high)',
+                  backgroundColor: 'var(--md-sys-color-surface-container-low)',
                   borderColor: 'var(--md-sys-color-outline-variant)',
                 }}
               >
-                <h2 className="text-base font-bold flex items-center gap-2 text-text">
-                  <MaterialSymbol name="hub" className="text-[color:var(--md-sys-color-primary)]" />
-                  <span>Quantum Link Mesh & Failover Controls</span>
-                </h2>
-                <button
-                  onClick={() => setShowFailoverMenu(false)}
-                  className="w-9 h-9 rounded-full flex items-center justify-center m3-surface-interactive border cursor-pointer text-text"
-                  title="Close"
-                >
-                  <MaterialSymbol name="close" size={18} />
-                </button>
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-2xl border flex items-center justify-center shrink-0"
+                    style={{
+                      backgroundColor: 'var(--md-sys-color-primary-container)',
+                      color: 'var(--md-sys-color-on-primary-container)',
+                      borderColor: 'var(--md-sys-color-outline-variant)',
+                    }}
+                  >
+                    <MaterialSymbol name="hub" size={20} filled />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold flex items-center gap-2 text-text">
+                      <span>Quantum Link Mesh & Failover HUD</span>
+                    </h2>
+                    <p className="text-xs text-muted">
+                      Deterministic host election, heartbeat watchdogs & quorum protection
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setShowFailoverMenu(false);
+                      setShowNetworkMapModal(true);
+                    }}
+                    className="px-3.5 py-1.5 rounded-full m3-btn-tonal text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                    title="Switch to Interactive Mesh Topology Map"
+                  >
+                    <MaterialSymbol name="account_tree" size={16} />
+                    <span>Topology Map</span>
+                  </button>
+                  <button
+                    onClick={() => setShowFailoverMenu(false)}
+                    className="w-9 h-9 rounded-full flex items-center justify-center m3-surface-interactive border cursor-pointer text-text"
+                    style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
+                    title="Close"
+                  >
+                    <MaterialSymbol name="close" size={18} />
+                  </button>
+                </div>
               </div>
               <div className="flex-1 overflow-hidden relative" style={{ backgroundColor: 'var(--md-sys-color-surface)' }}>
                 <NexusFailoverHUD 
@@ -4388,7 +4433,7 @@ export default function App() {
               initial={{ scale: 0.98, y: 8 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.98, y: 8 }}
-              className="w-full max-w-5xl h-full md:h-[90vh] flex flex-col m3-card-xl shadow-2xl overflow-hidden relative"
+              className="w-full max-w-5xl h-full md:h-[90vh] flex flex-col m3-card-xl rounded-[28px] shadow-2xl overflow-hidden relative"
             >
               <NexusNetworkMap 
                 localProfile={profile}
@@ -4419,6 +4464,7 @@ export default function App() {
                     blob: file
                   }, ...prev]);
                 }}
+                onNavigateToConnect={() => { setShowNetworkMapModal(false); setActiveTab(role ? "chat" : "qr"); }}
                 onClose={() => setShowNetworkMapModal(false)}
                 isModal={true}
               />
