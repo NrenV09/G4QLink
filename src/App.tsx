@@ -25,9 +25,15 @@ import {
   HardDrive,
   Trash2,
   Network,
-  Lock
+  Lock,
+  Eye,
+  EyeOff,
+  Play,
+  Pause,
+  RotateCcw
 } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
+import { SafeQRCode } from './components/SafeQRCode';
+import { encodeCompactSDP, decodeCompactSDP } from './lib/sdpCodec';
 
 import { cn, formatBytes } from './lib/utils';
 import { 
@@ -54,7 +60,6 @@ import { QRUtilityNode } from './components/QRUtilityNode';
 import { SecureChatNode } from './components/SecureChatNode';
 import { Base64ToolNode } from './components/Base64ToolNode';
 import { FilePreview, VideoDropZonePreview } from './components/FilePreview';
-import { NetworkBackground } from './components/NetworkBackground';
 import { DataStream } from './components/DataStream';
 import { PacketTransferAnimation } from './components/PacketTransferAnimation';
 import { ProfileModal } from './components/ProfileModal';
@@ -68,6 +73,8 @@ import { NexusInfoModal } from './components/NexusInfoModal';
 import { DirectDownloadPromptModal } from './components/DirectDownloadPromptModal';
 import { CookieConsentBanner } from './components/CookieConsentBanner';
 import { QuantumAppIcon } from './components/QuantumAppIcon';
+import { QuantumWebGLStage, StageChapterId } from './components/QuantumWebGLStage';
+import { KineticPreloader } from './components/KineticPreloader';
 import { MaterialYouSettingsModal, MaterialYouSettingsContent } from './components/MaterialYouSettingsModal';
 import {
   MaterialThemeState,
@@ -94,6 +101,13 @@ export default function App() {
     return DEFAULT_MATERIAL_THEME;
   });
   const [showThemeModal, setShowThemeModal] = useState(false);
+
+  // --- Offline 3D Spatial Stage & Kinetic Intro State ---
+  const [showPreloader, setShowPreloader] = useState(true);
+  const [stageChapter, setStageChapter] = useState<StageChapterId>(0);
+  const [autoTour, setAutoTour] = useState(true);
+  const [cinemaMode, setCinemaMode] = useState(false);
+  const [hoverRole, setHoverRole] = useState<'host' | 'join' | null>(null);
 
   useEffect(() => {
     applyMaterialThemeToDOM(materialTheme);
@@ -140,10 +154,24 @@ export default function App() {
     triggerHaptic('light', materialTheme.hapticsEnabled);
     setActiveTabState(tab);
     activeTabRef.current = tab;
+    // Choreograph the 3D Galaxy & Black Hole camera smoothly per dedicated tab
+    if (tab === 'p2p' || tab === 'appearance') setStageChapter(0);
+    else if (tab === 'qr') setStageChapter(1);
+    else if (tab === 'base64') setStageChapter(2);
+    else if (tab === 'chat') setStageChapter(3);
   }, [materialTheme.hapticsEnabled]);
   const [role, setRole] = useState<NodeRole>(null);
   const [status, setStatus] = useState<ConnectionStatus>("offline");
   const [isTransferring, setIsTransferring] = useState(false);
+
+  // Smooth automated visual chapter tour on the idle spatial stage
+  useEffect(() => {
+    if (!autoTour || role !== null || activeTab !== 'p2p' || showPreloader) return;
+    const timer = window.setInterval(() => {
+      setStageChapter((prev) => (((prev + 1) % 4) as StageChapterId));
+    }, 6800);
+    return () => clearInterval(timer);
+  }, [autoTour, role, activeTab, showPreloader]);
   
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [remoteStreams, setRemoteStreams] = useState<Record<string, MediaStream>>({});
@@ -1981,28 +2009,27 @@ export default function App() {
     const id = (Math.random().toString(36).substring(2) + Date.now().toString(36));
     setQrPayload("");
     setPasteBuffer("");
-    
-    // QR code generation by host does not connect to STUN servers
-    const pc = createPeer(id, false);
-    const dc = pc.createDataChannel('nexus-transfer');
-    setupDataChannel(dc, id);
-    
+
     if (connectedCount === 0) setStatus("handshaking");
-    
+
     try {
+      // QR code generation by host does not connect to STUN servers
+      const pc = createPeer(id, false);
+      const dc = pc.createDataChannel('nexus-transfer');
+      setupDataChannel(dc, id);
+
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
-      
+
       addLog("Generating matrix offer...", "info");
       await waitForIce(pc);
-      
+
       if (!pc.localDescription) {
         addLog("Failed to gather ICE candidates for offer", "err");
         return;
       }
-      
-      const sdp = JSON.stringify(pc.localDescription);
-      const compressed = btoa(encodeURIComponent(sdp));
+
+      const compressed = await encodeCompactSDP(pc.localDescription);
       setQrPayload(compressed);
       addLog("Offer ready. Peer sync required.", "ok");
     } catch (err: any) {
@@ -2014,33 +2041,10 @@ export default function App() {
     createHostOfferRef.current = createHostOffer;
   }, [createHostOffer]);
 
-  const decodeSDP = (input: string) => {
-    if (!input) throw new Error("Empty protocol string");
-    const clean = input.trim();
-    if (clean.startsWith('{') && clean.endsWith('}')) {
-      return clean;
-    }
-    try {
-      const decompressed = decodeURIComponent(atob(clean));
-      if (decompressed && decompressed.trim().startsWith('{')) return decompressed.trim();
-    } catch {}
-    try {
-      const decoded = atob(clean);
-      if (decoded && decoded.trim().startsWith('{')) return decoded.trim();
-    } catch {}
-    try {
-      const unescaped = decodeURIComponent(clean);
-      if (unescaped.startsWith('{') && unescaped.endsWith('}')) return unescaped.trim();
-      const decoded = atob(unescaped);
-      if (decoded && decoded.trim().startsWith('{')) return decoded.trim();
-    } catch {}
-    throw new Error("Invalid or corrupt protocol string format");
-  };
-
   const handleReceivedOffer = async (input: string) => {
     if (!input) return;
     try {
-      const sdpString = decodeSDP(input);
+      const sdpString = await decodeCompactSDP(input);
       const parsedSdp = JSON.parse(sdpString);
 
       if (!parsedSdp || typeof parsedSdp !== 'object') {
@@ -2068,8 +2072,7 @@ export default function App() {
         throw new Error("Failed to produce answer local description");
       }
 
-      const answerSdp = JSON.stringify(pc.localDescription);
-      const compressed = btoa(encodeURIComponent(answerSdp));
+      const compressed = await encodeCompactSDP(pc.localDescription);
       setQrPayload(compressed);
       addLog("Response generated. Finalize handshake at host.", "ok");
     } catch (e: any) {
@@ -2082,7 +2085,7 @@ export default function App() {
     if (!sdp || !localConnectionRef.current) return;
     
     try {
-      const sdpString = decodeSDP(sdp);
+      const sdpString = await decodeCompactSDP(sdp);
       const parsedSdp = JSON.parse(sdpString);
 
       if (!parsedSdp || typeof parsedSdp !== 'object') {
@@ -3053,13 +3056,27 @@ export default function App() {
         onClose={() => setShowThemeModal(false)}
       />
 
-      <NetworkBackground connectedCount={connectedCount} />
+      <KineticPreloader
+        visible={showPreloader}
+        onComplete={() => setShowPreloader(false)}
+      />
+
+      <QuantumWebGLStage
+        chapter={stageChapter}
+        seedHex={materialTheme.seedHex}
+        isDark={materialTheme.mode === 'dark'}
+        connectedCount={connectedCount}
+        isWorkspaceFocused={Boolean(role) || activeTab !== 'p2p'}
+        hoverRole={hoverRole}
+        autoTour={autoTour}
+      />
       
-      {/* Android 16 Material You (M3 Expressive) Top App Bar - Locked 2-Row Grid on Mobile Portrait, Single Row on Desktop */}
+      {/* Android 16 Material You (M3 Expressive) Top App Bar - Hidden smoothly during pure 3D Cinema Mode */}
+      {!(cinemaMode && !role && activeTab === 'p2p') && (
       <header
         className="z-20 w-full h-auto lg:h-18 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 lg:py-0 border-b grid grid-cols-[minmax(0,1fr)_auto] lg:flex lg:items-center lg:justify-between px-3 sm:px-4 lg:px-6 flex-shrink-0 relative gap-x-2 gap-y-2 lg:gap-4"
         style={{
-          backgroundColor: 'var(--md-sys-color-surface-container-low)',
+          backgroundColor: 'color-mix(in srgb, var(--md-sys-color-surface-container-low) 78%, transparent)',
           borderColor: 'var(--md-sys-color-outline-variant)',
         }}
       >
@@ -3225,7 +3242,7 @@ export default function App() {
           <nav
             className="grid grid-cols-5 lg:flex w-full lg:w-max items-center gap-1 p-1 lg:p-1.5 rounded-2xl lg:rounded-full z-[20] mx-auto border"
             style={{
-              backgroundColor: 'var(--md-sys-color-surface-container)',
+              backgroundColor: 'color-mix(in srgb, var(--md-sys-color-surface-container) 82%, transparent)',
               borderColor: 'var(--md-sys-color-outline-variant)',
             }}
           >
@@ -3237,7 +3254,8 @@ export default function App() {
               )}
             >
               <MaterialSymbol name="hub" size={17} filled={activeTab === "p2p"} />
-              <span className="truncate">Connect</span>
+              <span className="sm:hidden truncate">Trx</span>
+              <span className="hidden sm:inline truncate">Transceiver</span>
             </button>
             <button 
               onClick={() => { setActiveTab("chat"); setUnreadChatCount(0); }}
@@ -3256,7 +3274,7 @@ export default function App() {
               )}
             </button>
             <button 
-              onClick={() => { setActiveTab("qr"); addLog("Entering QR Studio", "info"); }}
+              onClick={() => { setActiveTab("qr"); addLog("Entering QR Customisation Studio", "info"); }}
               className={cn(
                 "nav-tab px-1 sm:px-2.5 lg:px-3.5 py-1.5 lg:py-2 text-[10px] sm:text-xs font-semibold transition-all rounded-xl lg:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
                 activeTab === "qr" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
@@ -3264,7 +3282,7 @@ export default function App() {
             >
               <MaterialSymbol name="qr_code_2" size={17} filled={activeTab === "qr"} />
               <span className="xl:hidden truncate">QR</span>
-              <span className="hidden xl:inline">QR Studio</span>
+              <span className="hidden xl:inline">QR Custom</span>
             </button>
             <button 
               onClick={() => setActiveTab("base64")}
@@ -3285,11 +3303,12 @@ export default function App() {
             >
               <MaterialSymbol name="palette" size={17} filled={activeTab === "appearance"} />
               <span className="xl:hidden truncate">Theme</span>
-              <span className="hidden xl:inline">Material You</span>
+              <span className="hidden xl:inline">Customise</span>
             </button>
           </nav>
         </div>
       </header>
+      )}
 
       {/* Edge-to-Edge Main Surface Canvas with Dynamic Paddings */}
       <main className="z-10 flex-1 min-h-0 p-2.5 sm:p-5 md:p-6 overflow-hidden">
@@ -3301,11 +3320,7 @@ export default function App() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.16 }}
-              className="h-full w-full overflow-hidden rounded-[28px] border"
-              style={{
-                backgroundColor: 'var(--md-sys-color-surface-container-low)',
-                borderColor: 'var(--md-sys-color-outline-variant)',
-              }}
+              className="h-full w-full overflow-hidden rounded-[28px] ql-stage-card"
             >
               <MaterialYouSettingsContent
                 themeState={materialTheme}
@@ -3393,14 +3408,14 @@ export default function App() {
               transition={{ duration: 0.15 }}
               className="grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-[1fr_auto] gap-5 h-full lg:overflow-hidden overflow-y-auto pb-20 lg:pb-0"
             >
-              {/* Left Column: M3 Expressive Connection Setup */}
+              {/* Left Column: M3 Expressive Transceiver Connection Setup */}
               <section className="col-span-1 lg:col-span-4 flex flex-col gap-4 flex-shrink-0 lg:overflow-y-auto scrollbar-hide">
                 {/* Mode Switcher Card (Corner Large 16dp) */}
-                <div className="m3-card p-4 sm:p-5 flex-shrink-0">
+                <div className="ql-stage-card rounded-[24px] p-4 sm:p-5 flex-shrink-0">
                   <div className="flex items-center justify-between mb-3.5 flex-wrap gap-2">
                     <div className="flex items-center gap-2">
                       <MaterialSymbol name="settings_ethernet" size={18} className="text-[color:var(--md-sys-color-primary)]" />
-                      <h3 className="text-sm font-bold text-text">Connection Mode</h3>
+                      <h3 className="text-sm font-bold text-text">WebRTC Transceiver</h3>
                     </div>
                     <button
                       onClick={() => {
@@ -3622,7 +3637,7 @@ export default function App() {
                                   }}
                                   title="Click to copy Invite Code"
                                 >
-                                  <QRCodeSVG value={qrPayload} size={190} level="L" marginSize={2} />
+                                  <SafeQRCode value={qrPayload} size={190} level="L" marginSize={2} />
                                 </div>
                                 <div className="flex gap-2 mt-3.5 w-full">
                                   <button 
@@ -3691,7 +3706,7 @@ export default function App() {
                                     }}
                                     title="Click to copy Reply Code"
                                   >
-                                    <QRCodeSVG value={qrPayload} size={190} level="L" marginSize={2} />
+                                    <SafeQRCode value={qrPayload} size={190} level="L" marginSize={2} />
                                   </div>
                                   <button 
                                     onClick={() => {
@@ -4154,131 +4169,224 @@ export default function App() {
               </section>
             </motion.div>
           ) : (
-            /* Android 16 Material You (M3 Expressive) Home Canvas */
+            /* Brutalist-Cinematic 3D Spatial Home Stage */
             <motion.section 
               key="role-select"
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.99 }}
-              className="flex flex-col h-full overflow-y-auto pb-24 lg:pb-0 z-20"
+              className="flex flex-col h-full overflow-y-auto pb-28 lg:pb-24 z-20 relative"
             >
-              <div className="m-auto flex flex-col items-center gap-6 w-full max-w-4xl py-6 lg:py-0 px-3 sm:px-6">
-                {/* Expressive Hero Container (Corner Extra Large 28dp) */}
-                <div className="w-full m3-card-xl p-5 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 sm:gap-6">
-                  <div className="space-y-2.5 max-w-xl">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] sm:text-xs font-semibold text-[color:var(--md-sys-color-primary)]">
-                      <span className="whitespace-nowrap">Direct WebRTC Mesh</span>
-                      <span aria-hidden="true">·</span>
-                      <span className="whitespace-nowrap">DTLS Encrypted</span>
-                      <span aria-hidden="true">·</span>
-                      <span className="whitespace-nowrap">Zero Cloud Storage</span>
+              {/* Unobstructed 3D Centerpiece + Editorial Architectural Overlay */}
+              <div className="flex-1 flex flex-col justify-between w-full max-w-6xl mx-auto px-3 sm:px-6 pt-2 sm:pt-4">
+                {/* Top Editorial Telemetry Row */}
+                <div className="flex items-start justify-between gap-4 pointer-events-none">
+                  <div className="space-y-1">
+                    <div className="text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase text-[color:var(--md-sys-color-primary)]">
+                      {[
+                        '01 · Event Horizon Singularity',
+                        '02 · Spiral Galaxy Core',
+                        '03 · Binary Black Holes',
+                        '04 · Crimson Quasar Jet',
+                      ][stageChapter]}
                     </div>
-                    <h2 className="text-xl sm:text-4xl font-bold text-text tracking-tight text-balance">
-                      Instant device-to-device sharing with Quantum Link.
-                    </h2>
-                    <p className="text-muted text-sm leading-relaxed">
-                      Stream multi-gigabyte files directly to disk, exchange encrypted messages, or launch HD voice and screen-share calls with QR handshaking.
-                    </p>
+                    {!cinemaMode && (
+                      <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-text leading-[1.03] max-w-2xl text-balance drop-shadow-[0_6px_28px_rgba(0,0,0,0.65)]">
+                        Direct peer sharing, sculpted in real time.
+                      </h2>
+                    )}
                   </div>
 
-                  {/* Adaptive Icon & Theme Customizer Quick Card */}
+                  {!cinemaMode && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        triggerHaptic('light', materialTheme.hapticsEnabled);
+                        setShowThemeModal(true);
+                      }}
+                      className="pointer-events-auto ql-stage-card p-3 sm:p-3.5 rounded-[22px] border flex items-center gap-3 shrink-0 cursor-pointer active:scale-[0.98] transition-all hover:border-[color:var(--md-sys-color-primary)]"
+                      title="Customize Material You Dynamic Colors & App Icon"
+                    >
+                      <QuantumAppIcon
+                        preset={materialTheme.appIconPreset}
+                        shape={materialTheme.appIconShape}
+                        size="md"
+                      />
+                      <div className="hidden sm:block text-left pr-1">
+                        <div className="text-xs font-bold text-text flex items-center gap-1">
+                          <span>Theme Studio</span>
+                          <MaterialSymbol name="tune" size={14} className="text-[color:var(--md-sys-color-primary)]" />
+                        </div>
+                        <div className="text-[10px] font-mono text-muted mt-0.5 uppercase">
+                          {materialTheme.seedHex}
+                        </div>
+                      </div>
+                    </button>
+                  )}
+                </div>
+
+                {/* Middle Breathing Space: Leaves the 3D WebGL Hologram / Gallery / Corridor 100% Unobstructed */}
+                <div className="min-h-[140px] sm:min-h-[210px] lg:min-h-[250px] flex-1 pointer-events-none" />
+
+                {/* Lower Spatial Action Monoliths & Quick Controls */}
+                {!cinemaMode && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="space-y-4 pb-2"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                      <RoleCard 
+                        num="01 · Host Node"
+                        icon={<MaterialSymbol name="wifi_tethering" size={26} />}
+                        title="Create a Mesh Room"
+                        desc="Generate a cryptographic room QR & invite key to stream multi-gigabyte files, encrypted chat, or HD calls."
+                        actionLabel="Host Room"
+                        onClick={() => {
+                          triggerHaptic('medium', materialTheme.hapticsEnabled);
+                          setRole("host");
+                        }}
+                        onHoverChange={(h) => setHoverRole(h ? 'host' : null)}
+                        color="accent"
+                      />
+                      <RoleCard 
+                        num="02 · Peer Node"
+                        icon={<MaterialSymbol name="qr_code_scanner" size={26} />}
+                        title="Join an Existing Room"
+                        desc="Scan a Host QR handshake or paste an invite token to establish a zero-server direct WebRTC tunnel."
+                        actionLabel="Join Room"
+                        onClick={() => {
+                          triggerHaptic('medium', materialTheme.hapticsEnabled);
+                          setRole("join");
+                        }}
+                        onHoverChange={(h) => setHoverRole(h ? 'join' : null)}
+                        color="success"
+                      />
+                    </div>
+
+                    {/* Streamlined Quick-Launch Bar */}
+                    <div className="ql-stage-card rounded-2xl px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted">
+                      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2.5 gap-y-1 text-[11px] font-mono">
+                        <span className="text-text font-medium">Direct WebRTC Mesh</span>
+                        <span aria-hidden="true">·</span>
+                        <span>DTLS-SRTP Encrypted</span>
+                        <span aria-hidden="true">·</span>
+                        <span>100% Offline Bundle</span>
+                      </div>
+                      <div className="flex flex-wrap items-center justify-center gap-2 shrink-0">
+                        <button
+                          onClick={() => {
+                            triggerHaptic('light', materialTheme.hapticsEnabled);
+                            setActiveTab("appearance");
+                          }}
+                          className="m3-btn-tonal flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
+                        >
+                          <MaterialSymbol name="palette" size={15} />
+                          <span>Material You</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            triggerHaptic('light', materialTheme.hapticsEnabled);
+                            setShowNetworkMapModal(true);
+                          }}
+                          className="m3-btn-tertiary flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
+                          title="Open Interactive Quantum Link Mesh Map"
+                        >
+                          <MaterialSymbol name="account_tree" size={15} />
+                          <span>Mesh Map</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            triggerHaptic('light', materialTheme.hapticsEnabled);
+                            setShowFailoverMenu(true);
+                          }}
+                          className="m3-surface-interactive flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
+                          title="Open Mesh Failover & Election Controls"
+                        >
+                          <MaterialSymbol name="hub" size={15} className="text-[color:var(--md-sys-color-primary)]" />
+                          <span>Failover HUD</span>
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Unified Bottom-Center 3D Chapter & Cinema Dock */}
+              <div className="fixed bottom-11 sm:bottom-10 left-1/2 -translate-x-1/2 z-40 max-w-[95vw]">
+                <div className="ql-cinema-hud rounded-full px-2 py-1.5 flex items-center gap-1 sm:gap-1.5 overflow-x-auto scrollbar-hide">
+                  {([
+                    { id: 0 as StageChapterId, label: '01 Singularity' },
+                    { id: 1 as StageChapterId, label: '02 Galaxy' },
+                    { id: 2 as StageChapterId, label: '03 Binary' },
+                    { id: 3 as StageChapterId, label: '04 Quasar' },
+                  ]).map((ch) => {
+                    const active = stageChapter === ch.id;
+                    return (
+                      <button
+                        key={ch.id}
+                        type="button"
+                        onClick={() => {
+                          triggerHaptic('light', materialTheme.hapticsEnabled);
+                          setAutoTour(false);
+                          setStageChapter(ch.id);
+                        }}
+                        className={cn(
+                          'px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] font-mono font-semibold whitespace-nowrap shrink-0 cursor-pointer transition-all active:scale-95',
+                          active
+                            ? 'm3-btn-filled shadow-xs'
+                            : 'text-muted hover:text-text hover:bg-white/5'
+                        )}
+                      >
+                        {ch.label}
+                      </button>
+                    );
+                  })}
+
+                  <span className="w-px h-4 bg-white/15 mx-0.5 shrink-0" />
+
                   <button
                     type="button"
                     onClick={() => {
                       triggerHaptic('light', materialTheme.hapticsEnabled);
-                      setShowThemeModal(true);
+                      setAutoTour((prev) => !prev);
                     }}
-                    className="m3-surface-interactive p-4 rounded-[24px] border flex items-center gap-3.5 shrink-0 cursor-pointer active:scale-[0.98] self-stretch md:self-auto"
-                    title="Customize Material You Dynamic Colors & App Icon"
+                    className="px-2.5 py-1.5 rounded-full text-[11px] font-mono text-muted hover:text-text flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer"
+                    title={autoTour ? 'Pause 3D Chapter Tour' : 'Resume 3D Chapter Tour'}
                   >
-                    <QuantumAppIcon
-                      preset={materialTheme.appIconPreset}
-                      shape={materialTheme.appIconShape}
-                      size="lg"
-                    />
-                    <div className="text-left pr-2">
-                      <div className="text-xs font-bold text-text flex items-center gap-1">
-                        <span>Material You Studio</span>
-                        <MaterialSymbol name="tune" size={15} className="text-[color:var(--md-sys-color-primary)]" />
-                      </div>
-                      <div className="text-[11px] text-muted mt-0.5">
-                        Tap to customize theme & icon
-                      </div>
-                    </div>
+                    {autoTour ? <Pause size={13} /> : <Play size={13} />}
+                    <span className="hidden md:inline">{autoTour ? 'Tour' : 'Paused'}</span>
                   </button>
-                </div>
 
-                {/* Role Selection Bento Grid (Corner Large 16dp) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
-                  <RoleCard 
-                    num="01 · Host Node"
-                    icon={<MaterialSymbol name="wifi_tethering" size={26} />}
-                    title="Create a Mesh Room"
-                    desc="Generate a room QR code and cryptographic invite token to link one or multiple peer devices."
-                    actionLabel="Host Room"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('light', materialTheme.hapticsEnabled);
+                      setShowPreloader(true);
+                    }}
+                    className="px-2.5 py-1.5 rounded-full text-[11px] font-mono text-muted hover:text-text flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer"
+                    title="Replay Kinetic Boot Intro"
+                  >
+                    <RotateCcw size={13} />
+                    <span className="hidden lg:inline">Intro</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={() => {
                       triggerHaptic('medium', materialTheme.hapticsEnabled);
-                      setRole("host");
+                      setCinemaMode((prev) => !prev);
                     }}
-                    color="accent"
-                  />
-                  <RoleCard 
-                    num="02 · Peer Node"
-                    icon={<MaterialSymbol name="qr_code_scanner" size={26} />}
-                    title="Join an Existing Room"
-                    desc="Scan a Host QR code with your camera or paste an invite token to establish a direct peer tunnel."
-                    actionLabel="Join Room"
-                    onClick={() => {
-                      triggerHaptic('medium', materialTheme.hapticsEnabled);
-                      setRole("join");
-                    }}
-                    color="success"
-                  />
-                </div>
-
-                {/* Bottom Action & Workflow Bar (Corner Large 16dp) */}
-                <div className="w-full m3-card p-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted">
-                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1.5">
-                    <span className="font-semibold text-text">01. Create or Join Room</span>
-                    <span aria-hidden="true">·</span>
-                    <span className="font-semibold text-text">02. Scan QR Handshake</span>
-                    <span aria-hidden="true">·</span>
-                    <span className="font-semibold text-text">03. Stream Files & Call</span>
-                  </div>
-                  <div className="flex flex-wrap items-center justify-center gap-2 shrink-0">
-                    <button
-                      onClick={() => {
-                        triggerHaptic('light', materialTheme.hapticsEnabled);
-                        setActiveTab("appearance");
-                      }}
-                      className="m3-btn-tonal flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
-                    >
-                      <MaterialSymbol name="palette" size={16} />
-                      <span>Theme & Icons</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        triggerHaptic('light', materialTheme.hapticsEnabled);
-                        setShowNetworkMapModal(true);
-                      }}
-                      className="m3-btn-tertiary flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
-                      title="Open Interactive Quantum Link Mesh Map"
-                    >
-                      <MaterialSymbol name="account_tree" size={16} />
-                      <span>Quantum Link Mesh</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        triggerHaptic('light', materialTheme.hapticsEnabled);
-                        setShowFailoverMenu(true);
-                      }}
-                      className="m3-surface-interactive flex items-center gap-1.5 px-4 py-2 rounded-full border text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
-                      title="Open Mesh Failover & Election Controls"
-                    >
-                      <MaterialSymbol name="hub" size={16} className="text-[color:var(--md-sys-color-primary)]" />
-                      <span>Failover HUD</span>
-                    </button>
-                  </div>
+                    className={cn(
+                      'px-3 py-1.5 rounded-full text-[11px] font-mono font-semibold flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer transition-all',
+                      cinemaMode ? 'm3-btn-tertiary' : 'text-text hover:bg-white/10'
+                    )}
+                    title={cinemaMode ? 'Show Workspace Controls' : 'Pure 3D Cinema View'}
+                  >
+                    {cinemaMode ? <Eye size={13} /> : <EyeOff size={13} />}
+                    <span>{cinemaMode ? 'Show UI' : 'Cinema'}</span>
+                  </button>
                 </div>
               </div>
             </motion.section>
@@ -4599,24 +4707,27 @@ export default function App() {
   );
 }
 
-function RoleCard({ num, icon, title, desc, actionLabel, onClick, color }: { 
+function RoleCard({ num, icon, title, desc, actionLabel, onClick, onHoverChange, color }: { 
   num: string, 
   icon: React.ReactNode, 
   title: string, 
   desc: string, 
   actionLabel?: string,
   onClick: () => void,
+  onHoverChange?: (hovering: boolean) => void,
   color: 'accent' | 'success'
 }) {
   return (
     <button 
       onClick={onClick}
-      className="m3-card flex-1 p-6 sm:p-7 text-left transition-all group cursor-pointer relative overflow-hidden flex flex-col justify-between active:scale-[0.985] hover:shadow-md"
+      onMouseEnter={() => onHoverChange?.(true)}
+      onMouseLeave={() => onHoverChange?.(false)}
+      className="ql-stage-card rounded-[24px] flex-1 p-5 sm:p-6 text-left transition-all group cursor-pointer relative overflow-hidden flex flex-col justify-between active:scale-[0.985] hover:border-[color:var(--md-sys-color-primary)]"
     >
       <div>
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-3.5">
           <div
-            className="w-13 h-13 rounded-[20px] flex items-center justify-center transition-transform group-hover:scale-105 border"
+            className="w-12 h-12 rounded-[18px] flex items-center justify-center transition-transform group-hover:scale-105 border"
             style={{
               backgroundColor:
                 color === 'accent'
@@ -4631,15 +4742,15 @@ function RoleCard({ num, icon, title, desc, actionLabel, onClick, color }: {
           >
             {icon}
           </div>
-          <span className="text-xs font-mono font-medium text-muted">{num}</span>
+          <span className="text-[11px] font-mono font-medium text-muted">{num}</span>
         </div>
-        <h3 className="text-lg sm:text-xl font-bold mb-2 tracking-tight text-text">{title}</h3>
-        <p className="text-xs sm:text-sm font-normal text-muted leading-relaxed mb-6">{desc}</p>
+        <h3 className="text-lg sm:text-xl font-bold mb-1.5 tracking-tight text-text">{title}</h3>
+        <p className="text-xs sm:text-sm font-normal text-muted leading-relaxed mb-5">{desc}</p>
       </div>
       {actionLabel && (
         <div
           className={cn(
-            "inline-flex items-center gap-2 text-xs font-semibold py-2.5 px-5 rounded-full w-fit transition-all",
+            "inline-flex items-center gap-2 text-xs font-semibold py-2 px-4 rounded-full w-fit transition-all",
             color === 'accent' ? "m3-btn-filled" : "m3-btn-tertiary"
           )}
         >

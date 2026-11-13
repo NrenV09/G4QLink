@@ -13,8 +13,8 @@
   --color-text: var(--color-text-val);
   --color-card: var(--color-card-val);
 
-  --font-sans: "Roboto Flex", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Plus Jakarta Sans", "Roboto Flex", sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Syne", "Space Grotesk", "Plus Jakarta Sans", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
 }
 
@@ -34,18 +34,18 @@
   --md-sys-color-tertiary-container: #CCFBF1;
   --md-sys-color-on-tertiary-container: #042F2E;
 
-  --md-sys-color-surface: #F8F9FF;
+  --md-sys-color-surface: #F4F6FB;
   --md-sys-color-surface-container-lowest: #FFFFFF;
-  --md-sys-color-surface-container-low: #F1F4FA;
-  --md-sys-color-surface-container: #EBEEF5;
-  --md-sys-color-surface-container-high: #E5E8F0;
-  --md-sys-color-surface-container-highest: #DFE3EB;
+  --md-sys-color-surface-container-low: #EEF1F8;
+  --md-sys-color-surface-container: #E7ECF5;
+  --md-sys-color-surface-container-high: #DFE5F0;
+  --md-sys-color-surface-container-highest: #D7DEE9;
 
-  --md-sys-color-on-surface: #181C22;
-  --md-sys-color-on-surface-variant: #434750;
-  --md-sys-color-outline: #737781;
-  --md-sys-color-outline-variant: rgba(115, 119, 129, 0.38);
-  --md-sys-color-outline-variant-solid: #C3C6D2;
+  --md-sys-color-on-surface: #12151C;
+  --md-sys-color-on-surface-variant: #434854;
+  --md-sys-color-outline: #707582;
+  --md-sys-color-outline-variant: rgba(112, 117, 130, 0.34);
+  --md-sys-color-outline-variant-solid: #C2C7D4;
 
   --color-bg-val: var(--md-sys-color-surface);
   --color-surface-val: var(--md-sys-color-surface-container-low);
@@ -76,18 +76,18 @@ html.dark {
   --md-sys-color-tertiary-container: #005048;
   --md-sys-color-on-tertiary-container: #CCFBF1;
 
-  --md-sys-color-surface: #0E1117;
-  --md-sys-color-surface-container-lowest: #090B10;
-  --md-sys-color-surface-container-low: #151921;
-  --md-sys-color-surface-container: #1A1F29;
-  --md-sys-color-surface-container-high: #232936;
-  --md-sys-color-surface-container-highest: #2D3443;
+  --md-sys-color-surface: #05070B;
+  --md-sys-color-surface-container-lowest: #030407;
+  --md-sys-color-surface-container-low: #0B0E14;
+  --md-sys-color-surface-container: #10141D;
+  --md-sys-color-surface-container-high: #171D29;
+  --md-sys-color-surface-container-highest: #202838;
 
-  --md-sys-color-on-surface: #E2E6F0;
-  --md-sys-color-on-surface-variant: #C3C6D2;
-  --md-sys-color-outline: #8D919C;
-  --md-sys-color-outline-variant: rgba(141, 145, 156, 0.36);
-  --md-sys-color-outline-variant-solid: #434750;
+  --md-sys-color-on-surface: #EEF2FA;
+  --md-sys-color-on-surface-variant: #9BA4B8;
+  --md-sys-color-outline: #7E8799;
+  --md-sys-color-outline-variant: rgba(168, 199, 250, 0.22);
+  --md-sys-color-outline-variant-solid: #2E3646;
 
   --color-bg-val: var(--md-sys-color-surface);
   --color-surface-val: var(--md-sys-color-surface-container-low);
@@ -107,10 +107,10 @@ html.dark {
     background-color: var(--bg-color);
     color: var(--color-text);
     font-family: var(--font-sans);
-    letter-spacing: 0.002em;
+    letter-spacing: 0.004em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: background-color 0.2s cubic-bezier(0.2, 0, 0, 1), color 0.2s cubic-bezier(0.2, 0, 0, 1);
+    transition: background-color 0.24s cubic-bezier(0.16, 1, 0.3, 1), color 0.24s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   h1, h2, h3, h4 {
@@ -122,12 +122,12 @@ html.dark {
   }
 
   button {
-    transition: transform 0.14s cubic-bezier(0.2, 0, 0, 1),
-                background-color 0.16s cubic-bezier(0.2, 0, 0, 1),
-                border-color 0.16s cubic-bezier(0.2, 0, 0, 1),
-                color 0.16s cubic-bezier(0.2, 0, 0, 1),
-                box-shadow 0.16s cubic-bezier(0.2, 0, 0, 1),
-                opacity 0.16s cubic-bezier(0.2, 0, 0, 1);
+    transition: transform 0.14s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+                color 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   @keyframes fade-in {
@@ -143,44 +143,58 @@ html.dark {
   }
 
   .fade-transition {
-    animation: fade-in 0.18s cubic-bezier(0.2, 0, 0, 1) both;
+    animation: fade-in 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 }
 
 @layer utilities {
-  /* M3 Corner Large (16dp) standard surface container card with 30-50% outlineVariant border */
+  /* Translucent M3 Expressive + Brutalist Cinema Surface Cards */
   .glass-panel,
   .m3-card {
-    background-color: var(--md-sys-color-surface-container);
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-container) 84%, transparent);
     border: 1px solid var(--md-sys-color-outline-variant);
     border-radius: 16px;
+    box-shadow: 0 12px 36px -18px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
 
-  /* M3 Corner Extra Large (28dp) modal / hero / bottom sheet container */
   .glass-panel-heavy,
   .m3-card-xl {
-    background-color: var(--md-sys-color-surface-container);
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-container) 88%, transparent);
     border: 1px solid var(--md-sys-color-outline-variant);
     border-radius: 28px;
+    box-shadow: 0 24px 64px -24px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .ql-stage-card {
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-container-low) 78%, transparent);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    box-shadow: 0 24px 70px -28px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .ql-cinema-hud {
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-container-lowest) 82%, transparent);
+    border: 1px solid var(--md-sys-color-outline-variant);
+    box-shadow: 0 20px 50px -16px rgba(0, 0, 0, 0.78), inset 0 1px 0 rgba(255, 255, 255, 0.09);
   }
 
   .m3-surface-low {
-    background-color: var(--md-sys-color-surface-container-low);
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-container-low) 86%, transparent);
     border: 1px solid var(--md-sys-color-outline-variant);
   }
 
   .m3-surface-high {
-    background-color: var(--md-sys-color-surface-container-high);
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-container-high) 90%, transparent);
     border: 1px solid var(--md-sys-color-outline-variant);
   }
 
   .m3-surface-interactive {
-    background-color: var(--md-sys-color-surface-container-low);
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-container-low) 82%, transparent);
     border-color: var(--md-sys-color-outline-variant);
     color: var(--md-sys-color-on-surface);
   }
   .m3-surface-interactive:hover {
     background-color: var(--md-sys-color-surface-container-high);
+    border-color: color-mix(in srgb, var(--md-sys-color-primary) 45%, var(--md-sys-color-outline-variant));
   }
 
   .m3-tonal-active {
@@ -195,7 +209,7 @@ html.dark {
     border: 1px solid transparent;
   }
   .m3-btn-filled:hover {
-    filter: brightness(1.06);
+    filter: brightness(1.08);
   }
 
   .m3-btn-tonal {
@@ -204,7 +218,7 @@ html.dark {
     border: 1px solid var(--md-sys-color-outline-variant);
   }
   .m3-btn-tonal:hover {
-    filter: brightness(1.05);
+    filter: brightness(1.06);
   }
 
   .m3-btn-tertiary {
@@ -230,4 +244,3 @@ html.dark {
     mask-image: linear-gradient(to right, transparent, black 15px, black calc(100% - 15px), transparent);
   }
 }
-
