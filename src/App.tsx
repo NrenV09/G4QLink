@@ -3290,77 +3290,6 @@ export default function App() {
             <MaterialSymbol name={materialTheme.mode === 'dark' ? 'light_mode' : 'dark_mode'} size={17} />
           </button>
         </div>
-
-        {/* Row 2 (Mobile col-span-2) / Center (Desktop): Full-Width 5-Column Segmented Navigation Bar */}
-        <div className="col-span-2 w-full lg:w-auto lg:flex-1 flex justify-center min-w-0 lg:order-2">
-          <nav
-            className="grid grid-cols-5 lg:flex w-full lg:w-max items-center gap-1 p-1 lg:p-1.5 rounded-2xl lg:rounded-full z-[20] mx-auto border"
-            style={{
-              backgroundColor: 'color-mix(in srgb, var(--md-sys-color-surface-container) 82%, transparent)',
-              borderColor: 'var(--md-sys-color-outline-variant)',
-            }}
-          >
-            <button 
-              onClick={() => setActiveTab("p2p")}
-              className={cn(
-                "nav-tab px-1 sm:px-2.5 lg:px-3.5 py-1.5 lg:py-2 text-[10px] sm:text-xs font-semibold transition-all rounded-xl lg:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
-                activeTab === "p2p" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
-              )}
-            >
-              <MaterialSymbol name="hub" size={17} filled={activeTab === "p2p"} />
-              <span className="sm:hidden truncate">Trx</span>
-              <span className="hidden sm:inline truncate">Transceiver</span>
-            </button>
-            <button 
-              onClick={() => { setActiveTab("chat"); setUnreadChatCount(0); }}
-              className={cn(
-                "nav-tab px-1 sm:px-2.5 lg:px-3.5 py-1.5 lg:py-2 text-[10px] sm:text-xs font-semibold transition-all rounded-xl lg:rounded-full whitespace-nowrap relative cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
-                activeTab === "chat" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
-              )}
-            >
-              <MaterialSymbol name="forum" size={17} filled={activeTab === "chat"} />
-              <span className="xl:hidden truncate">Chat</span>
-              <span className="hidden xl:inline">Chat & Calls</span>
-              {unreadChatCount > 0 && activeTab !== "chat" && (
-                <span className="absolute top-0.5 right-1 sm:static sm:ml-0.5 inline-flex items-center justify-center min-w-4 h-4 px-1 bg-red-600 text-white text-[9px] sm:text-[10px] font-bold rounded-full tabular-nums">
-                  {unreadChatCount > 9 ? '9+' : unreadChatCount}
-                </span>
-              )}
-            </button>
-            <button 
-              onClick={() => { setActiveTab("qr"); addLog("Entering QR Customisation Studio", "info"); }}
-              className={cn(
-                "nav-tab px-1 sm:px-2.5 lg:px-3.5 py-1.5 lg:py-2 text-[10px] sm:text-xs font-semibold transition-all rounded-xl lg:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
-                activeTab === "qr" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
-              )}
-            >
-              <MaterialSymbol name="qr_code_2" size={17} filled={activeTab === "qr"} />
-              <span className="xl:hidden truncate">QR</span>
-              <span className="hidden xl:inline">QR Custom</span>
-            </button>
-            <button 
-              onClick={() => setActiveTab("base64")}
-              className={cn(
-                "nav-tab px-1 sm:px-2.5 lg:px-3.5 py-1.5 lg:py-2 text-[10px] sm:text-xs font-semibold transition-all rounded-xl lg:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
-                activeTab === "base64" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
-              )}
-            >
-              <MaterialSymbol name="data_object" size={17} filled={activeTab === "base64"} />
-              <span className="truncate">Encoder</span>
-            </button>
-            <button 
-              onClick={() => setActiveTab("appearance")}
-              className={cn(
-                "nav-tab px-1 sm:px-2.5 lg:px-3.5 py-1.5 lg:py-2 text-[10px] sm:text-xs font-semibold transition-all rounded-xl lg:rounded-full whitespace-nowrap cursor-pointer flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 active:scale-[0.97] min-w-0",
-                activeTab === "appearance" ? "m3-tonal-active shadow-2xs" : "text-muted hover:text-text"
-              )}
-            >
-              <MaterialSymbol name="palette" size={17} filled={activeTab === "appearance"} />
-              <span className="xl:hidden truncate">Theme</span>
-              <span className="hidden xl:inline">Customise</span>
-            </button>
-          </nav>
-        </div>
       </header>
 
       {/* Scrollable Vertical Multi-Section Webpage Over Interactive 3D Galaxy & Black Hole Stage */}
@@ -4150,31 +4079,6 @@ export default function App() {
                     Direct peer sharing, sculpted in real time.
                   </h2>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('light', materialTheme.hapticsEnabled);
-                    setActiveTab('appearance');
-                  }}
-                  className="pointer-events-auto ql-stage-card p-3 sm:p-3.5 rounded-[22px] border flex items-center gap-3 shrink-0 cursor-pointer active:scale-[0.98] transition-all hover:border-[color:var(--md-sys-color-primary)]"
-                  title="Scroll to Material You Dynamic Colors & App Icon Studio"
-                >
-                  <QuantumAppIcon
-                    preset={materialTheme.appIconPreset}
-                    shape={materialTheme.appIconShape}
-                    size="md"
-                  />
-                  <div className="hidden sm:block text-left pr-1">
-                    <div className="text-xs font-bold text-text flex items-center gap-1">
-                      <span>Theme Studio</span>
-                      <MaterialSymbol name="tune" size={14} className="text-[color:var(--md-sys-color-primary)]" />
-                    </div>
-                    <div className="text-[10px] font-mono text-muted mt-0.5 uppercase">
-                      {materialTheme.seedHex}
-                    </div>
-                  </div>
-                </button>
               </div>
 
               {/* Middle Breathing Space: Leaves Gargantua Prime Ray-Marched Black Hole 100% Unobstructed */}
