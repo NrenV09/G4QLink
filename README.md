@@ -1,356 +1,251 @@
-# Quantum Link 🌌
+# Quantum Link
 
 [![Deploy to GitHub Pages](https://github.com/namanv2703/quantum-link/actions/workflows/deploy.yml/badge.svg)](https://github.com/namanv2703/quantum-link/actions/workflows/deploy.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8+-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19.x-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-6.x-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Three.js](https://img.shields.io/badge/Three.js-WebGL_Raymarching-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![WebRTC](https://img.shields.io/badge/WebRTC-DTLS_%2F_SCTP_E2EE-FF6B6B?logo=webrtc&logoColor=white)](https://webrtc.org/)
-[![GitHub Pages Ready](https://img.shields.io/badge/GitHub_Pages-Automated_Deploy-22C55E?logo=github&logoColor=white)](https://pages.github.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Quantum Link** (Nexus RTC Suite) is an air-gapped, zero-server Peer-to-Peer (P2P) file transfer station, encrypted voice/video calling suite, and decentralized swarm communication node built exclusively on modern web standards.
+**Quantum Link** is a 100% offline-capable, zero-server Peer-to-Peer (P2P) file streaming station, encrypted messaging & HD calling suite, and decentralized mesh node built exclusively on modern web standards.
 
-It facilitates direct, end-to-end encrypted device-to-device communication across **WebRTC** without relying on intermediary cloud databases, tracking telemetry, centralized storage, or mandatory external signaling infrastructure.
+It enables direct, end-to-end encrypted device-to-device communication over **WebRTC** without intermediary cloud databases, analytics telemetry, centralized storage, or mandatory external signaling servers.
 
 Quantum Link runs seamlessly as:
-1. **A GitHub Pages Web App**: Hosted statically with automated GitHub Actions continuous deployment.
-2. **A Portable Single-File HTML Artifact**: Distributed as a 100% self-contained, zero-dependency offline HTML file (`FINAL NEXUS/FinalNexus.html`) that executes directly from a USB stick over air-gapped local networks (LAN) or mobile hotspots.
-3. **A Containerized Full-Stack Cloud Service**: Backed by a high-throughput Node.js / Express WebSocket signaling server and an optional standalone Go signaling engine (`server/nexussignaling/`).
+1. **A GitHub Pages Web App**: Built cleanly to `dist/` with automated GitHub Actions continuous deployment.
+2. **A Portable Single-File HTML Artifact**: Packaged via `vite-plugin-singlefile` into self-contained, zero-dependency HTML builds (`dist/index.html` and `build/index.html`) that execute offline from local storage or a USB drive over air-gapped local networks.
+3. **A Full-Stack Node.js / Express & Go Service**: Supported by the bundled Express server (`server.ts`) and optional standalone Go WebSocket signaling engine (`server/nexussignaling/`).
 
 ---
 
-## 📑 Table of Contents
+## Table of Contents
 
-- [Architectural Highlights](#-architectural-highlights)
-- [System Architecture Diagram](#-system-architecture-diagram)
-- [Core Feature Matrix](#-core-feature-matrix)
-- [Dual Signaling Engines (Optical vs WebSocket Mesh)](#-dual-signaling-engines)
-- [Bypass RAM Limits: Native Disk Streaming](#-bypass-ram-limits-native-disk-streaming)
-- [Push-to-Talk Voice Notes & Calling Suite](#-push-to-talk-voice-notes--calling-suite)
-- [Decentralized Swarm Topology & Failover HUD](#-decentralized-swarm-topology--failover-hud)
-- [Offline Single-File Distribution (`FINAL NEXUS`)](#-offline-single-file-distribution-final-nexus)
-- [Project File Structure](#-project-file-structure)
-- [GitHub Pages Deployment Guide](#-github-pages-deployment-guide)
-- [Quick Start & Local Development](#-quick-start--local-development)
-- [Production Deployment](#-production-deployment)
-- [Privacy, Threat Model & Legal Compliance](#-privacy-threat-model--legal-compliance)
-- [Browser Compatibility](#-browser-compatibility)
-- [License](#-license)
+- [Architectural Highlights](#architectural-highlights)
+- [Vertical Scroll Experience & 3D Cosmic Stage](#vertical-scroll-experience--3d-cosmic-stage)
+- [Material You & Clear Liquid Glass UI](#material-you--clear-liquid-glass-ui)
+- [Core Feature Matrix](#core-feature-matrix)
+- [Dual Signaling Engines](#dual-signaling-engines)
+- [Bypass RAM Limits: Native Disk Streaming](#bypass-ram-limits-native-disk-streaming)
+- [Offline Single-File Distribution](#offline-single-file-distribution)
+- [Project File Structure](#project-file-structure)
+- [Quick Start & Local Development](#quick-start--local-development)
+- [Production Deployment](#production-deployment)
+- [Privacy, Threat Model & Legal Compliance](#privacy-threat-model--legal-compliance)
+- [Browser Compatibility](#browser-compatibility)
+- [License](#license)
 
 ---
 
-## 🧠 Architectural Highlights
+## Architectural Highlights
 
-- **Air-Gapped Optical Handshaking**: Generates and parses LZ-String compressed WebRTC SDP offer/answer tokens encoded directly into high-density QR codes. Devices link by aiming cameras at each other's screens—zero internet packets required during session negotiation.
-- **WebSocket Room Discovery & Mesh Signaling**: Optional hybrid signaling fallback via `/ws/nexus` for rapid multi-peer room joining, peer announcement, and decentralized mesh synchronization.
-- **Zero Memory Bloat Disk Streaming**: Slices large files (tested 5GB+) into 64KB chunks below the WebRTC SCTP limit and streams directly to native disk via the Chromium `FileSystemWritableFileStream` API (`showSaveFilePicker()`), keeping browser heap memory under 50MB.
-- **Flow Control & Backpressure Management**: Real-time SCTP buffer monitoring (`bufferedAmount < 512KB`) prevents socket packet drops and stalls across asynchronous transmission channels.
-- **Hardware-Accelerated Audio & Video Calling**: Peer-to-peer SRTP audio/video negotiation with camera flip, mute controls, real-time volume visualizers, draggable Picture-in-Picture (PiP), and full-screen display sharing.
-- **Voice Message Notes**: In-browser audio capture and waveform playback with retro-cyber acoustic synthesized chimes.
-- **Decentralized Swarm Failover**: Dynamic heartbeat health-checking, automated host election algorithms, and interactive network-split drill simulations.
-- **Persistent Sandbox Storage**: CacheStorage integration for local file staging, instant media previews, and drag-and-drop file re-sharing.
-- **Legal & Privacy Hub**: Built-in 4-tab user manual featuring a connection guide, cyber-terminology dictionary, offline handbook, and full compliance disclosures.
+- **Air-Gapped Optical QR Handshaking**: Encodes compressed WebRTC SDP offers and answers (`src/lib/sdpCodec.ts`) into resilient QR codes rendered locally via `<SafeQRCode />`. Devices pair by scanning screens camera-to-camera or pasting compact tokens with zero internet packets required.
+- **WebSocket Mesh Signaling Fallback**: Optional `/ws/nexus` signaling path for multi-peer room discovery and rapid session setup across local or remote hosts.
+- **Zero Memory Bloat Disk Streaming**: Slices large payloads (tested 5GB+) into 64KB WebRTC SCTP-safe chunks with flow-control backpressure (`bufferedAmount < 512KB`) and streams directly to disk via `window.showSaveFilePicker()` (`FileSystemWritableFileStream`), keeping browser heap overhead minimal.
+- **Encrypted Chat, Voice Notes & HD Calling**: Peer-to-peer SRTP audio/video calling with camera flipping, mic/camera track toggles, live spectrum feedback, draggable Picture-in-Picture (PiP), screen sharing, and push-to-talk waveform voice memos.
+- **Decentralized Mesh Topology & Failover HUD**: Interactive canvas topology map, heartbeat latency tracking, automated host migration/election, and simulated network-split drills.
+- **Zero External Runtime Assets**: Fonts (`@fontsource/*`), icons (`lucide-react`), QR canvas emblems, procedural sky/nebula textures, and GLSL shaders are completely bundled offline.
 
 ---
 
-## 📐 System Architecture Diagram
+## Vertical Scroll Experience & 3D Cosmic Stage
 
-```text
-+---------------------------------------------------------------------------------------+
-|                                    QUANTUM LINK                                       |
-|                                                                                       |
-|   +-------------------+                                       +-------------------+   |
-|   | Station A (Host)  |                                       | Station B (Peer)  |   |
-|   |-------------------|                                       |-------------------|   |
-|   | - React 19 UI     |      1. Optical QR Exchange (Air-Gap) | - React 19 UI     |   |
-|   | - WebRTC Node     | <===================================> | - WebRTC Node     |   |
-|   | - Disk Streamer   |      or 2. WebSocket Fallback (/ws)   | - Disk Streamer   |   |
-|   +-------------------+                                       +-------------------+   |
-|             \                                                           /             |
-|              \                                                         /              |
-|               ======= [ Direct P2P SCTP / DTLS Data Channel ] ========                |
-|                      | - 64KB Chunk Slicing + Backpressure     |                      |
-|                      | - Direct Hard Drive File Writes         |                      |
-|                      | - End-to-End Encrypted Secure Chat      |                      |
-|                      | - Push-to-Talk Voice Notes              |                      |
-|                                                                                       |
-|               ======= [ Direct P2P SRTP Media Stream ] ===============                |
-|                      | - HD Video & Audio Calling              |                      |
-|                      | - Low-Latency Screen Sharing            |                      |
-|                      | - Hardware-Accelerated Rendering        |                      |
-+---------------------------------------------------------------------------------------+
-```
+Quantum Link uses a continuous vertical scrolling multi-section layout synchronized to an interactive 100% offline **Three.js WebGL** backdrop (`src/components/QuantumWebGLStage.tsx`):
+
+1. **01 · Event Horizon Singularity (`#section-transceiver`)**: Role selection (`Host Room` / `Join Room`) and live WebRTC file streaming workbench.
+2. **02 · Ionized Nebula Passage (`#section-chat`)**: Encrypted mesh chat channel, voice notes, and HD voice/video calls.
+3. **03 · Barred Spiral Galaxy Core (`#section-qr`)**: Standalone QR Customisation Studio with color presets, corner styling, and offline canvas PNG emblem badges.
+4. **04 · Binary Black Hole Jets (`#section-encoder`)**: Base64 and AES-256-GCM payload encoder/decoder utility.
+5. **05 · Crimson Quasar Horizon (`#section-appearance`)**: Material You appearance customizer and launcher icon studio.
+
+Scrolling through the page drives camera flight smoothly along a 5-waypoint `CatmullRomCurve3` spline through:
+- **Schwarzschild Geodesic Ray-Marched Black Holes** (`src/three/shaders.ts`): Adaptive null-geodesic light bending producing gravitationally lensed upper and lower accretion arches, pitch-black event horizon shadows, ISCO photon rings, Keplerian plasma turbulence, and Doppler beaming.
+- **Procedural 360° Milky Way Sky Dome & Nebulae** (`src/three/proceduralTextures.ts`): Offline pixel-synthesized galactic band with dark molecular dust lanes, domain-warped ridged-FBM nebulae, 26,000-star barred spiral galaxy, and 9,500 Harvard spectral-class stars with four-spike Newtonian diffraction sprites.
+- **HDR Post-Processing**: GPU-accelerated `EffectComposer` with `UnrealBloomPass` and `OutputPass` (with automatic fallback on software WebGL renderers).
 
 ---
 
-## ⚡ Core Feature Matrix
+## Material You & Clear Liquid Glass UI
 
-| Station Module | Key Capabilities |
+- **Android 16 Material You (M3 Expressive)**: Dynamic color generation from custom hex seeds or extracted uploaded wallpaper palettes (`src/lib/materialTheme.ts`).
+- **Clear Liquid Glass (Dark Mode)**: Untinted refractive crystal surfaces (`backdrop-filter: blur(22px) saturate(165%)`, subtle specular diagonal highlights, and crisp rim outlines) so foreground panels float clearly over the 3D galaxy and black holes.
+- **Accessibility & Micro-Interactions**: Light, Dark, and High-Contrast modes, squircle/pill geometry tokens (`16dp` / `28dp` / `9999px`), tabular numeric telemetry, and Web Vibration API haptic hooks.
+- **Custom App Icon Presets**: Adaptive icon presets (`Dynamic Adaptive`, `Monochrome`, `Quantum Core`, `Obsidian Pulse`, `Solar Horizon`, `Blueprint Grid`) and launcher mask shapes (`Squircle`, `Circle`, `Teardrop`, `Soft Clover`, `Rounded 16dp`).
+
+---
+
+## Core Feature Matrix
+
+| Module | Key Capabilities |
 | :--- | :--- |
-| **P2P Transceiver** | Slices files into 64KB segments, tracks real-time MB/s throughput, displays dynamic progress bars, and enables instant cancel and re-transfer. |
-| **Direct Disk Streaming (RAM Bypass)** | Uses the File System Access API to stream multi-gigabyte files directly to the receiver's disk, bypassing browser memory allocation. |
-| **Persistent Sandbox Cache** | Stores received files in `CacheStorage` for immediate in-app media preview (images, audio, video, text) and re-downloading across sessions. |
-| **Secure Chat Node** | End-to-end encrypted messaging, push-to-talk voice recording with waveform visualization, avatar color indicators, and bandwidth optimization. |
-| **WebRTC Audio & Video Calling** | HD video, microphone mute, front/back camera toggling, screen broadcasting, live volume spectrum meters, and PiP background mode. |
-| **Nexus Failover HUD & Topology** | Visualizes swarm node topology, tracks heartbeat latency, executes host election algorithms, and simulates network dropouts. |
-| **Standalone QR Utility** | High-density QR code generator with LZ-String compression and camera-based optical scanner with instant clipboard support. |
-| **Base64 Converter** | Standalone UTF-8 and binary Base64 encoder and decoder utility with one-click copy and character counters. |
-| **Info & Compliance Hub** | 4-tab interactive manual: Step-by-Step Connection Guide, Cyber Glossary, Air-Gapped Offline Guide, and Legal/Privacy Hub. |
-| **Cyber Atmosphere & Themes** | Dark/Light theme switching, ambient particle network canvas, audio-haptic feedback, and retro diagnostic shell. |
+| **P2P Transceiver** | 64KB chunk streaming, live throughput metrics, cancel/retry support, and persistent Activity Feed. |
+| **Direct Disk Streaming** | Streams payloads directly to disk via the File System Access API (`showSaveFilePicker()`), bypassing browser RAM limits. |
+| **Persistent Sandbox Cache** | Uses `CacheStorage` for offline file staging, video/image/PDF/HTML inspection (`FilePreview.tsx`), and re-downloads. |
+| **Encrypted Chat & Calls** | End-to-end encrypted messaging, waveform voice messages, HD voice/video calls, screen sharing, and PiP overlay. |
+| **QR Customisation Studio** | Standalone QR generator and camera optical scanner (`html5-qrcode`) with custom eye styles, gradients, and offline emblems. |
+| **Base64 & AES Codec** | Standalone UTF-8 / binary Base64 converter with authenticated cipher tooling. |
+| **Mesh Map & Failover HUD** | Live interactive node graph, latency monitoring, host migration election, and simulation drills. |
+| **Legal & Guide Hub** | Built-in 4-tab handbook covering setup guides, terminology glossary, offline workflows, and legal compliance. |
 
 ---
 
-## 🔄 Dual Signaling Engines
-
-Quantum Link supports two distinct connection workflows depending on network conditions and operational security requirements:
+## Dual Signaling Engines
 
 ### 1. Zero-Server Optical Air-Gapped Handshaking
-For high-security, air-gapped, or isolated local network environments:
-1. **Station A (Host)** generates a local WebRTC Session Description Protocol (SDP) offer.
-2. The SDP and ICE candidates are compressed via **LZ-String** and rendered into a high-density QR code on Station A's screen.
-3. **Station B (Joiner)** opens the optical QR scanner and scans Station A's screen.
-4. Station B calculates an SDP Answer, compresses it, and displays an **Answer QR Code**.
-5. Station A scans Station B's Answer QR Code.
-6. The cryptographic DTLS/SCTP tunnel initializes immediately. **No internet packets or external servers were contacted.**
+1. **Host Node** generates a WebRTC SDP offer compressed into a QR code and compact invite token.
+2. **Joiner Node** scans the Host QR with their camera (or pastes the token) and outputs a Reply QR / token.
+3. **Host Node** scans or pastes the Reply token to establish the direct **DTLS/SCTP** tunnel with zero external network dependencies.
 
-### 2. WebSocket Mesh Signaling Fallback
-When devices are on different networks or screen scanning is impractical:
-- Stations connect to `/ws/nexus` on the local or hosted server.
-- The first station to connect becomes the room Host; subsequent stations join as peers.
-- WebRTC SDP and ICE candidates are routed over lightweight WebSocket envelopes.
-- Once connected, media and data channels transition to direct peer-to-peer communication.
+### 2. WebSocket Mesh Signaling (`/ws/nexus`)
+When peers connect via the hosted Express or Go signaling server, SDP offers/answers and ICE candidates exchange automatically over `/ws/nexus` before transitioning media and file streams directly peer-to-peer.
 
 ---
 
-## 💾 Bypass RAM Limits: Native Disk Streaming
+## Bypass RAM Limits: Native Disk Streaming
 
-Standard browsers crash or terminate tabs when buffering multi-gigabyte files in JavaScript heap memory (`ArrayBuffer` / `Blob`). Quantum Link bypasses this bottleneck:
-
-1. **Sender Activation**: The sender marks **"Download Bypass RAM Limits"** before initiating a transfer.
-2. **Receiver Notification**: The receiver receives a modal prompt detailing the filename, file size, and sender identity.
-3. **Save File Picker**: Upon acceptance, the receiver's browser invokes `window.showSaveFilePicker()` to request a physical destination on their hard drive.
-4. **Pipelined Streaming**: As 64KB WebRTC data chunks arrive across SCTP channels, they are written directly to the `FileSystemWritableFileStream`.
-5. **Constant Memory Footprint**: Heap allocation remains stable (< 50MB) even when receiving 5GB+ files.
-6. **Fallback**: On platforms lacking File System Access API support (Firefox, Safari iOS), Quantum Link automatically falls back to indexed memory streaming and blob downloads.
+1. Sender enables **Direct Disk: ON** before queuing files.
+2. Receiver approves the incoming transfer prompt (`DirectDownloadPromptModal.tsx`) and picks a save location with `window.showSaveFilePicker()`.
+3. Incoming 64KB chunks pipe directly into `FileSystemWritableFileStream` to maintain low memory usage across multi-gigabyte files (with automatic blob fallback on unsupported browsers).
 
 ---
 
-## 🎙️ Push-to-Talk Voice Notes & Calling Suite
+## Offline Single-File Distribution
 
-Quantum Link includes an integrated encrypted communications center:
+`vite-plugin-singlefile` bundles all JavaScript, Tailwind CSS, offline fonts, shaders, and procedural textures into single standalone HTML files during `npm run build`:
 
-- **Push-to-Talk Voice Notes**: Record voice memos with real-time waveform visualization, compress the audio data, and transmit over the encrypted data channel with synthetic chime confirmation.
-- **Peer-to-Peer Calling**: One-click audio and HD video calls negotiated directly via WebRTC SRTP.
-- **Picture-in-Picture (PiP)**: Keep video calls active in an unobtrusive floating window while browsing the P2P Transceiver or sending files.
-- **Screen Sharing**: Broadcast your monitor, application window, or browser tab with full audio pass-through.
-- **Bandwidth Optimization Mode**: Toggle low-bandwidth audio-only mode to preserve connection stability on unstable networks.
+- `dist/index.html` — Primary production static distribution & GitHub Pages entry point.
+- `build/index.html` / `build/finalwork.html` — Portable standalone single-file HTML artifact.
+- `private/finalwork.html` — Internal portable archive build.
 
----
-
-## 🛡️ Decentralized Swarm Topology & Failover HUD
-
-Quantum Link incorporates a peer coordinator designed for mesh and star networks:
-
-- **Interactive Network Map**: Real-time canvas visualization of connected nodes, link latencies, and roles (Host vs Peer).
-- **Heartbeat & Latency Tracking**: Periodic ping/pong packets measure round-trip link health.
-- **Host Migration**: If the designated Host station leaves or drops connection, connected nodes trigger an automated consensus election to promote the next candidate node.
-- **Failover Simulation Drills**: Test split-brain scenarios, graceful host departure, and node reconnection without interrupting active file transfers.
+Open `build/index.html` directly in any modern browser with zero Node.js server or internet connection required to use QR handshaking, QR Customisation Studio, Encoder, and Material You Customiser offline.
 
 ---
 
-## 🌐 Offline Single-File Distribution (`FINAL NEXUS`)
-
-Quantum Link can be compiled into a single, self-contained HTML file where all JavaScript, CSS stylesheets, and icons are inlined:
-
-```text
-FINAL NEXUS/
-├── FinalNexus.html     # Completely offline single-file executable web application
-└── index.html          # Secondary portable single-file distribution
-```
-
-### Running 100% Offline:
-1. Download or copy `FINAL NEXUS/FinalNexus.html` to a USB drive or local disk.
-2. Double-click the file to open it in Chrome, Edge, Safari, Brave, or Firefox.
-3. **No Node.js, internet connection, or external dependencies are required.**
-4. Connect multiple devices to the same local Wi-Fi router or mobile hotspot to transfer files at full line-speed.
-
----
-
-## 📁 Project File Structure
+## Project File Structure
 
 ```text
 .
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml              # Automated GitHub Pages CI/CD workflow
-├── FINAL NEXUS/                    # Portable single-file HTML distributions
-│   ├── FinalNexus.html             # Zero-dependency self-contained offline application
-│   └── index.html                  # Duplicate portable deployment file
-├── public/                         # Public static assets & favicon
+│       └── deploy.yml                  # Automated GitHub Pages CI/CD workflow
+├── public/                             # Static public assets & offline icons
 ├── server/
-│   └── nexussignaling/             # High-performance Go WebSocket signaling package
-│       ├── README.md               # Go package documentation & usage guide
-│       ├── client.go               # Goroutine-safe client connection handler
-│       ├── room.go                 # Swarm room coordinator & host election logic
-│       ├── signaling.go            # Hub dispatcher and WebSocket routing
-│       └── types.go                # WebRTC message & signaling protocol definitions
+│   └── nexussignaling/                 # Optional Go WebSocket signaling server package
+│       ├── README.md
+│       ├── client.go
+│       ├── room.go
+│       ├── signaling.go
+│       └── types.go
 ├── src/
-│   ├── components/                 # UI components and station modules
-│   │   ├── Base64ToolNode.tsx      # Standalone Base64 text & binary encoder/decoder
-│   │   ├── CallOverlay.tsx         # Full-screen / PiP audio & video call interface
-│   │   ├── CookieConsentBanner.tsx # Local privacy & cookie consent disclosure
-│   │   ├── DataStream.tsx          # Real-time WebRTC packet throughput monitor
-│   │   ├── DirectDownloadPromptModal.tsx # RAM-bypass receiver authorization dialog
-│   │   ├── EasterEggModal.tsx      # Retro diagnostic terminal & audio synthesis shell
-│   │   ├── FilePreview.tsx         # Media previewer (images, video, audio, text)
-│   │   ├── IncomingCallModal.tsx   # Audio/video incoming call notification with ringtone
-│   │   ├── LegalComplianceView.tsx # Terms of Service & Privacy Policy modal view
-│   │   ├── NetworkBackground.tsx   # Canvas-based ambient particle network background
-│   │   ├── NexusFailoverHUD.tsx    # Swarm consensus dashboard & failover drill controls
-│   │   ├── NexusInfoModal.tsx      # Multi-tab connection manual, glossary & legal hub
-│   │   ├── NexusNetworkMap.tsx     # Dynamic node topology visualization canvas
-│   │   ├── PacketTransferAnimation.tsx # Visual packet animation along transfer vectors
-│   │   ├── ProfileModal.tsx        # Local identity, avatar color, and username editor
-│   │   ├── QRScanner.tsx           # Camera-based optical QR reader using html5-qrcode
-│   │   ├── QRUtilityNode.tsx       # Standalone QR code generator and optical scanner tab
-│   │   ├── SecureChatNode.tsx      # Encrypted chat, voice note recorder & call triggers
-│   │   ├── ViewProfileModal.tsx    # Peer profile inspector with bio and connection stats
-│   │   └── VoiceMessagePlayer.tsx  # Push-to-talk voice note playback with waveform bar
+│   ├── components/
+│   │   ├── Base64ToolNode.tsx          # Base64 & AES-256-GCM encoder/decoder utility
+│   │   ├── CallOverlay.tsx             # M3 Expressive voice/video/screen-share overlay
+│   │   ├── CookieConsentBanner.tsx     # Local-only storage disclosure banner
+│   │   ├── DataStream.tsx              # Real-time packet transfer visual indicator
+│   │   ├── DirectDownloadPromptModal.tsx # Direct-to-disk receiver confirmation modal
+│   │   ├── EasterEggModal.tsx          # Diagnostic terminal & audio synth modal
+│   │   ├── FilePreview.tsx             # Media, document & payload previewer
+│   │   ├── IncomingCallModal.tsx       # Incoming call sheet with synthesized ringtone
+│   │   ├── KineticPreloader.tsx        # Boot intro overlay
+│   │   ├── LegalComplianceView.tsx     # Terms, privacy & air-gapped compliance view
+│   │   ├── MaterialYouSettingsModal.tsx # Theme palette, wallpaper & app icon studio
+│   │   ├── NetworkBackground.tsx       # Secondary particle canvas helper
+│   │   ├── NexusFailoverHUD.tsx        # Mesh failover, host election & split drills
+│   │   ├── NexusInfoModal.tsx          # Multi-tab user guide, glossary & legal hub
+│   │   ├── NexusNetworkMap.tsx         # Interactive peer topology visualization
+│   │   ├── PacketTransferAnimation.tsx # Live chunk transfer progress visualizer
+│   │   ├── ProfileModal.tsx            # Local username, avatar color & bio editor
+│   │   ├── QRScanner.tsx               # Camera QR code scanner (html5-qrcode)
+│   │   ├── QRUtilityNode.tsx           # QR Customisation Studio & PNG badge renderer
+│   │   ├── QuantumAppIcon.tsx          # Adaptive launcher icon renderer
+│   │   ├── QuantumWebGLStage.tsx       # 3D galaxy, black holes, bloom & scroll spline
+│   │   ├── SafeQRCode.tsx              # Resilient error-guarded QR SVG component
+│   │   ├── SecureChatNode.tsx          # Encrypted chat, voice notes & call controls
+│   │   ├── ViewProfileModal.tsx        # Connected peer profile inspector
+│   │   └── VoiceMessagePlayer.tsx      # Audio note waveform player
 │   ├── data/
-│   │   └── legalPolicies.ts        # Comprehensive Terms, Privacy & Compliance copy
+│   │   └── legalPolicies.ts            # Offline legal, privacy & compliance documents
 │   ├── lib/
-│   │   ├── NexusNetworkNode.ts     # P2P mesh coordinator & WebSocket node client
-│   │   ├── cacheStorage.ts         # Persistent browser CacheStorage sandbox management
-│   │   ├── diskStreamer.ts         # Direct-to-disk streaming & File System Access API
-│   │   ├── nameGenerator.ts        # Random cyberpunk callsign & station name generator
-│   │   ├── nexusFailover.ts        # Decentralized host priority & failover consensus engine
-│   │   └── utils.ts                # Styling utilities (tailwind-merge, clsx, formatBytes)
-│   ├── nexus/                      # Modular swarm architecture & multi-peer state
-│   │   ├── BatchTransferManager.ts # Multi-file batch transfer queue and chunk scheduler
-│   │   ├── GlobalLog.tsx           # Synchronized network-wide audit event log
-│   │   ├── NetworkMap.tsx          # Swarm node layout and connection link renderer
-│   │   ├── NexusContainer.tsx      # Unified multi-peer workspace container
-│   │   ├── NexusContext.tsx        # React Context providing global swarm state
-│   │   ├── UnifiedVideoGrid.tsx    # Responsive grid layout for multi-peer video feeds
-│   │   ├── index.ts                # Barrel export for modular Nexus subsystem
-│   │   ├── syntheticMedia.ts       # Canvas-generated test patterns for call simulation
-│   │   ├── types.ts                # Nexus swarm interfaces and event signatures
-│   │   └── useNexusRTC.ts          # Custom hook orchestrating WebRTC swarm mesh
-│   ├── transfer/                   # Dedicated lightweight transfer client bundle
-│   │   ├── TransferApp.tsx         # Standalone file transfer focused interface
-│   │   ├── main.tsx                # Transfer applet mounting entry point
-│   │   ├── motion-mock.tsx         # Lightweight animation fallback for reduced overhead
-│   │   └── transfer.html           # Dedicated HTML entry point for transfer client
-│   ├── App.tsx                     # Main application coordinator & WebRTC engine
-│   ├── index.css                   # Tailwind CSS v4 design tokens and theme styling
-│   ├── main.tsx                    # React DOM root entry point
-│   └── types.ts                    # Core TypeScript definitions (payloads, roles, logs)
-├── index.html                      # Root HTML template with meta headers & CSP
-├── metadata.json                   # Applet manifest & hardware permissions
-├── package.json                    # Dependencies, scripts & build configuration
-├── server.ts                       # Express + Vite development & production server
-├── tsconfig.json                   # TypeScript project configuration
-├── vite.config.ts                  # Vite build pipeline with single-file HTML plugin
-└── vite.transfer.config.ts         # Secondary build configuration for transfer client
+│   │   ├── NexusNetworkNode.ts         # P2P mesh & WebSocket client coordinator
+│   │   ├── cacheStorage.ts             # Browser CacheStorage payload staging
+│   │   ├── diskStreamer.ts             # File System Access API streaming helper
+│   │   ├── materialTheme.ts            # Material You token & Clear Liquid Glass engine
+│   │   ├── nameGenerator.ts            # Procedural station callsign generator
+│   │   ├── nexusFailover.ts            # Failover & host priority election logic
+│   │   ├── sdpCodec.ts                 # Compact SDP compression & token codec
+│   │   └── utils.ts                    # Shared class & byte formatting helpers
+│   ├── nexus/                          # Multi-peer swarm coordination hooks & state
+│   ├── three/
+│   │   ├── proceduralTextures.ts       # Offline Milky Way, nebula & diffraction textures
+│   │   └── shaders.ts                  # Schwarzschild ray-marched black hole & galaxy GLSL
+│   ├── transfer/                       # Dedicated lightweight transfer client entry
+│   ├── App.tsx                         # Vertical multi-section coordinator & WebRTC core
+│   ├── index.css                       # Tailwind CSS v4 & Clear Liquid Glass tokens
+│   ├── main.tsx                        # React mount & RootErrorBoundary
+│   └── types.ts                        # Shared TypeScript interfaces
+├── index.html                          # Root HTML entry point
+├── metadata.json                       # Applet manifest & hardware permissions
+├── package.json                        # Scripts & dependencies
+├── server.ts                           # Express + Vite dev/production server
+├── tsconfig.json                       # TypeScript config
+├── vite.config.ts                      # Single-file Vite build configuration
+└── vite.transfer.config.ts             # Transfer bundle Vite config
 ```
 
 ---
 
-## 🚀 GitHub Pages Deployment Guide
-
-This repository includes a pre-configured GitHub Actions workflow (`.github/workflows/deploy.yml`) that builds and deploys Quantum Link automatically upon pushing to the `main` or `master` branch.
-
-### Enabling GitHub Pages on your Repository:
-1. Push your repository to GitHub:
-   ```bash
-   git add .
-   git commit -m "Deploy Quantum Link with updated structure"
-   git push origin main
-   ```
-2. Navigate to your repository on GitHub: **Settings** > **Pages**.
-3. Under **Build and deployment**:
-   - Set **Source** to **GitHub Actions**.
-4. The workflow in `.github/workflows/deploy.yml` will trigger, run the production build, package `./dist`, and publish your application.
-5. Your live app will be accessible at:
-   ```text
-   https://<your-username>.github.io/<repository-name>/
-   ```
-
----
-
-## 🛠️ Quick Start & Local Development
+## Quick Start & Local Development
 
 ### Prerequisites
-- **Node.js**: `v18.0.0` or higher (Node 22 recommended)
-- **npm**, **pnpm**, or **bun**
-- Modern Web Browser with WebRTC support
+- **Node.js** `v18+` (Node 22 recommended)
+- Modern WebRTC-capable browser
 
-### 1. Installation
+### Installation & Local Dev
 ```bash
-git clone https://github.com/namanv2703/quantum-link.git
-cd quantum-link
 npm install
-```
-
-### 2. Start Local Development Server
-```bash
-# Launches Express server + Vite HMR on port 3000
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in two separate browser windows (or on separate devices on the same Wi-Fi) to test P2P connections.
+Open [http://localhost:3000](http://localhost:3000) across two tabs or devices on the same network.
 
-### 3. Type Checking & Code Validation
+### Type Checking
 ```bash
 npm run lint
 ```
 
 ---
 
-## 📦 Production Deployment
+## Production Deployment
 
-### 1. Build Production Artifacts
 ```bash
 npm run build
-```
-This single command executes:
-- `vite build` — Compiles and optimizes assets into `dist/`.
-- `vite-plugin-singlefile` — Packages self-contained single-file HTML builds into `FINAL NEXUS/` and `build/`.
-- `esbuild server.ts` — Bundles the hybrid Node.js/WebSocket backend into `dist/server.cjs`.
-
-### 2. Start Production Server
-```bash
 npm start
 ```
-The server binds to `0.0.0.0:3000` (or the environment-specified `$PORT`), serves static assets, provides WebSocket signaling at `/ws/nexus`, and exposes health checks at `/api/health` and `/health` for container orchestrators like Google Cloud Run, Docker, and Kubernetes.
+`npm run build` compiles the Vite single-file client bundles into `dist/`, `build/`, and `private/`, and bundles `server.ts` into `dist/server.cjs`. `npm start` serves the app on `0.0.0.0:3000` (or `$PORT`) with WebSocket signaling at `/ws/nexus`.
 
 ---
 
-## 🔒 Privacy, Threat Model & Legal Compliance
+## Privacy, Threat Model & Legal Compliance
 
-- **Zero Cloud Storage**: Transferred files stream directly between peers and are never cached or stored on any remote cloud server.
-- **End-to-End Cryptography**:
-  - WebRTC DataChannels utilize **DTLS 1.2/1.3** and **SCTP** encryption (AES-128 / AES-256 GCM).
-  - Media streams (audio, video, screen share) utilize **SRTP**.
-- **No Centralized Telemetry**: No trackers, analytics SDKs, user fingerprinting, or external logging tools are embedded.
-- **Local Sovereignty**: User profile information, avatars, custom usernames, and temporary file caches are stored exclusively in the browser's `localStorage` and `CacheStorage`.
-- **Integrated Legal Hub**: Complete Terms of Service, Privacy Disclosures, Cookie Explanations, and Air-Gapped Security compliance documentation are directly accessible within the application via the **(i)** Info menu.
+- **Zero Cloud Storage**: Files and messages flow directly peer-to-peer and are never uploaded to third-party storage servers.
+- **End-to-End Transport Encryption**: WebRTC DataChannels use **DTLS / SCTP** and media streams use **SRTP**.
+- **No Telemetry**: Zero analytics scripts, tracking cookies, or external CDN calls.
+- **Local Data Sovereignty**: Themes, profiles, and staged payloads stay locally inside `localStorage`, `CacheStorage`, and user-selected disk targets.
 
 ---
 
-## 🌍 Browser Compatibility
+## Browser Compatibility
 
-| Browser | WebRTC DataChannels | Optical QR Scanning | Direct Disk Streaming (Bypass RAM) | Audio / Video Calling |
+| Browser | WebRTC DataChannels | Optical QR Scanning | Direct Disk Streaming | Audio / Video Calling |
 | :--- | :---: | :---: | :---: | :---: |
-| **Google Chrome** (v88+) | ✅ Full | ✅ Full | ✅ Native File System Access API | ✅ Full |
-| **Microsoft Edge** (v88+) | ✅ Full | ✅ Full | ✅ Native File System Access API | ✅ Full |
-| **Brave / Chromium** | ✅ Full | ✅ Full | ✅ Native File System Access API | ✅ Full |
-| **Mozilla Firefox** (v90+) | ✅ Full | ✅ Full | ⚠️ Instant Blob Fallback | ✅ Full |
-| **Apple Safari** (macOS 14+) | ✅ Full | ✅ Full | ⚠️ Instant Blob Fallback | ✅ Full |
-| **Apple Safari** (iOS 15+) | ✅ Full | ✅ Full | ⚠️ Instant Blob Fallback | ✅ Full |
+| **Google Chrome (v88+)** | Full | Full | Native File System Access API | Full |
+| **Microsoft Edge (v88+)** | Full | Full | Native File System Access API | Full |
+| **Brave / Chromium** | Full | Full | Native File System Access API | Full |
+| **Mozilla Firefox (v90+)** | Full | Full | Blob Download Fallback | Full |
+| **Apple Safari (macOS / iOS)** | Full | Full | Blob Download Fallback | Full |
 
 ---
 
-## 📜 License
+## License
 
 Distributed under the **MIT License**. See `LICENSE` for details.

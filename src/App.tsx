@@ -26,9 +26,6 @@ import {
   Trash2,
   Network,
   Lock,
-  Eye,
-  EyeOff,
-  RotateCcw,
   ChevronDown
 } from 'lucide-react';
 import { SafeQRCode } from './components/SafeQRCode';
@@ -105,7 +102,6 @@ export default function App() {
   const [showPreloader, setShowPreloader] = useState(true);
   const [stageChapter, setStageChapter] = useState<StageChapterId>(0);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [cinemaMode, setCinemaMode] = useState(false);
   const [hoverRole, setHoverRole] = useState<'host' | 'join' | null>(null);
   const manualScrollLockRef = useRef<number>(0);
 
@@ -3125,10 +3121,7 @@ export default function App() {
       
       {/* Sticky Android 16 Material You (M3 Expressive) Top App Bar */}
       <header
-        className={cn(
-          "ql-liquid-bar sticky top-0 z-30 w-full h-auto lg:h-18 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 lg:py-0 border-b grid grid-cols-[minmax(0,1fr)_auto] lg:flex lg:items-center lg:justify-between px-3 sm:px-4 lg:px-6 flex-shrink-0 gap-x-2 gap-y-2 lg:gap-4 transition-opacity duration-300",
-          cinemaMode && "opacity-0 pointer-events-none"
-        )}
+        className="ql-liquid-bar sticky top-0 z-30 w-full h-auto lg:h-18 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 lg:py-0 border-b grid grid-cols-[minmax(0,1fr)_auto] lg:flex lg:items-center lg:justify-between px-3 sm:px-4 lg:px-6 flex-shrink-0 gap-x-2 gap-y-2 lg:gap-4 transition-opacity duration-300"
       >
         {/* Row 1 Col 1 (Mobile) / Left (Desktop): Brand Cluster */}
         <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 lg:order-1">
@@ -3290,10 +3283,7 @@ export default function App() {
 
       {/* Scrollable Vertical Multi-Section Webpage Over Interactive 3D Galaxy & Black Hole Stage */}
       <main
-        className={cn(
-          "z-10 w-full flex-1 px-3 sm:px-5 md:px-8 pt-4 sm:pt-6 pb-28 space-y-24 sm:space-y-36 transition-opacity duration-300",
-          cinemaMode && "opacity-0 pointer-events-none select-none"
-        )}
+        className="z-10 w-full flex-1 px-3 sm:px-5 md:px-8 pt-4 sm:pt-6 pb-20 space-y-24 sm:space-y-36 transition-opacity duration-300"
       >
         {/* SECTION 01: TRANSCEIVER HERO & LIVE WEBRTC WORKBENCH */}
         <section
@@ -4272,80 +4262,9 @@ export default function App() {
         </section>
       </main>
 
-      {/* Unified Floating Cosmic Scroll Scrubber & Cinema Dock (Always Accessible) */}
-      <div className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-40 max-w-[96vw]">
-        <div className="ql-cinema-hud rounded-full px-2 py-1.5 flex items-center gap-1 sm:gap-1.5 overflow-x-auto scrollbar-hide">
-          {([
-            { tab: 'p2p', ch: 0 as StageChapterId, label: '01 Singularity' },
-            { tab: 'chat', ch: 1 as StageChapterId, label: '02 Channel' },
-            { tab: 'qr', ch: 2 as StageChapterId, label: '03 Galaxy' },
-            { tab: 'base64', ch: 3 as StageChapterId, label: '04 Binary' },
-            { tab: 'appearance', ch: 4 as StageChapterId, label: '05 Quasar' },
-          ]).map((item) => {
-            const active = stageChapter === item.ch;
-            return (
-              <button
-                key={item.tab}
-                type="button"
-                onClick={() => setActiveTab(item.tab)}
-                className={cn(
-                  'px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] font-mono font-semibold whitespace-nowrap shrink-0 cursor-pointer transition-all active:scale-95',
-                  active
-                    ? 'm3-btn-filled shadow-xs'
-                    : 'text-muted hover:text-text hover:bg-white/5'
-                )}
-              >
-                {item.label}
-              </button>
-            );
-          })}
-
-          <span className="w-px h-4 bg-white/15 mx-0.5 shrink-0" />
-
-          <span
-            className="hidden sm:inline-block text-[10px] font-mono tabular-nums text-muted px-1.5 shrink-0"
-            title="Scroll flight depth"
-          >
-            {Math.round(scrollProgress * 100)}%
-          </span>
-
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('light', materialTheme.hapticsEnabled);
-              setShowPreloader(true);
-            }}
-            className="px-2.5 py-1.5 rounded-full text-[11px] font-mono text-muted hover:text-text flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer"
-            title="Replay Kinetic Boot Intro"
-          >
-            <RotateCcw size={13} />
-            <span className="hidden lg:inline">Intro</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('medium', materialTheme.hapticsEnabled);
-              setCinemaMode((prev) => !prev);
-            }}
-            className={cn(
-              'px-3 py-1.5 rounded-full text-[11px] font-mono font-semibold flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer transition-all',
-              cinemaMode ? 'm3-btn-tertiary' : 'text-text hover:bg-white/10'
-            )}
-            title={cinemaMode ? 'Show Page Sections' : 'Hide UI to Inspect 3D Cosmos'}
-          >
-            {cinemaMode ? <Eye size={13} /> : <EyeOff size={13} />}
-            <span>{cinemaMode ? 'Show UI' : 'Cinema'}</span>
-          </button>
-        </div>
-      </div>
-
       {/* Quiet Footer Bar */}
       <footer
-        className={cn(
-          "ql-liquid-bar z-10 min-h-8 py-2.5 border-t flex flex-wrap sm:flex-nowrap items-center px-4 md:px-6 justify-center sm:justify-between text-xs text-muted flex-shrink-0 gap-2 sm:gap-4 transition-opacity duration-300",
-          cinemaMode && "opacity-0 pointer-events-none"
-        )}
+        className="ql-liquid-bar z-10 min-h-8 py-2.5 border-t flex flex-wrap sm:flex-nowrap items-center px-4 md:px-6 justify-center sm:justify-between text-xs text-muted flex-shrink-0 gap-2 sm:gap-4 transition-opacity duration-300"
       >
         <div className="hidden md:flex items-center gap-2">
           <span>Quantum Link</span>
