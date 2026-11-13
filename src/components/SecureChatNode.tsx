@@ -401,7 +401,7 @@ export const SecureChatNode: React.FC<SecureChatNodeProps> = ({
       {/* Messages */}
       <div
         ref={messagesScrollRef}
-        className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 flex flex-col bg-[var(--md-sys-color-surface)]/60"
+        className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 flex flex-col bg-transparent"
       >
         <AnimatePresence>
           {messages.length === 0 && (

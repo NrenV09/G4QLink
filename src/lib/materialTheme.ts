@@ -351,33 +351,33 @@ export function computeM3Tokens(seedHex: string, mode: ThemeMode, contrast: Cont
       success: isHigh ? '#0F7638' : '#15803D',
     };
   } else {
-    // Dark Mode M3 Expressive
-    const primary = hslToHex(h, Math.min(95, sat + 10), isHigh ? 82 : 74);
-    const onPrimary = hslToHex(h, sat, 14);
-    const primaryContainer = hslToHex(h, Math.max(45, sat * 0.8), isHigh ? 32 : 25);
-    const onPrimaryContainer = hslToHex(h, Math.min(96, sat + 12), 90);
+    // Dark Mode — Clear Liquid Glass (Untinted Refractive Crystal Surfaces)
+    const primary = hslToHex(h, Math.min(95, sat + 10), isHigh ? 82 : 76);
+    const onPrimary = hslToHex(h, sat, 12);
+    const primaryContainer = hexToRgba(primary, isHigh ? 0.28 : 0.16);
+    const onPrimaryContainer = '#FFFFFF';
 
-    const secondary = hslToHex(secH, Math.max(28, sat * 0.45), 76);
-    const onSecondary = hslToHex(secH, Math.max(30, sat * 0.5), 16);
-    const secondaryContainer = hslToHex(secH, Math.max(30, sat * 0.45), isHigh ? 30 : 23);
-    const onSecondaryContainer = hslToHex(secH, Math.max(35, sat * 0.55), 89);
+    const secondary = hslToHex(secH, Math.max(28, sat * 0.45), 84);
+    const onSecondary = hslToHex(secH, Math.max(30, sat * 0.5), 14);
+    const secondaryContainer = isHigh ? 'rgba(255, 255, 255, 0.14)' : 'rgba(255, 255, 255, 0.075)';
+    const onSecondaryContainer = '#F8FAFC';
 
-    const tertiary = hslToHex(tertH, Math.max(45, sat * 0.75), 76);
-    const onTertiary = hslToHex(tertH, Math.max(45, sat * 0.75), 16);
-    const tertiaryContainer = hslToHex(tertH, Math.max(45, sat * 0.7), isHigh ? 30 : 24);
-    const onTertiaryContainer = hslToHex(tertH, Math.max(50, sat * 0.8), 90);
+    const tertiary = hslToHex(tertH, Math.max(45, sat * 0.75), 78);
+    const onTertiary = hslToHex(tertH, Math.max(45, sat * 0.75), 14);
+    const tertiaryContainer = hexToRgba(tertiary, isHigh ? 0.26 : 0.15);
+    const onTertiaryContainer = '#F0FDFA';
 
-    const surface = hslToHex(h, 16, 6);
-    const surfaceContainerLowest = hslToHex(h, 18, 4);
-    const surfaceContainerLow = hslToHex(h, 16, 10);
-    const surfaceContainer = hslToHex(h, 16, 13);
-    const surfaceContainerHigh = hslToHex(h, 16, 17);
-    const surfaceContainerHighest = hslToHex(h, 16, 22);
+    const surface = '#030508';
+    const surfaceContainerLowest = 'rgba(255, 255, 255, 0.025)';
+    const surfaceContainerLow = 'rgba(255, 255, 255, 0.04)';
+    const surfaceContainer = 'rgba(255, 255, 255, 0.055)';
+    const surfaceContainerHigh = 'rgba(255, 255, 255, 0.08)';
+    const surfaceContainerHighest = 'rgba(255, 255, 255, 0.12)';
 
-    const onSurface = isHigh ? '#FFFFFF' : hslToHex(h, 15, 93);
-    const onSurfaceVariant = isHigh ? hslToHex(h, 15, 86) : hslToHex(h, 12, 72);
-    const outlineHex = hslToHex(h, 12, isHigh ? 72 : 54);
-    const outlineVariantHex = hslToHex(h, 16, isHigh ? 58 : 34);
+    const onSurface = '#FFFFFF';
+    const onSurfaceVariant = isHigh ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.74)';
+    const outlineHex = isHigh ? 'rgba(255, 255, 255, 0.65)' : 'rgba(255, 255, 255, 0.36)';
+    const outlineVariantHex = hslToHex(h, 16, isHigh ? 68 : 48);
 
     return {
       primary,
@@ -401,7 +401,7 @@ export function computeM3Tokens(seedHex: string, mode: ThemeMode, contrast: Cont
       onSurface,
       onSurfaceVariant,
       outline: outlineHex,
-      outlineVariant: hexToRgba(outlineVariantHex, isHigh ? 0.75 : 0.42),
+      outlineVariant: isHigh ? 'rgba(255, 255, 255, 0.36)' : 'rgba(255, 255, 255, 0.18)',
       outlineVariantSolid: outlineVariantHex,
       success: isHigh ? '#4ADE80' : '#22C55E',
     };

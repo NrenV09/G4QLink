@@ -3126,13 +3126,9 @@ export default function App() {
       {/* Sticky Android 16 Material You (M3 Expressive) Top App Bar */}
       <header
         className={cn(
-          "sticky top-0 z-30 w-full h-auto lg:h-18 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 lg:py-0 border-b grid grid-cols-[minmax(0,1fr)_auto] lg:flex lg:items-center lg:justify-between px-3 sm:px-4 lg:px-6 flex-shrink-0 gap-x-2 gap-y-2 lg:gap-4 backdrop-blur-md transition-opacity duration-300",
+          "ql-liquid-bar sticky top-0 z-30 w-full h-auto lg:h-18 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 lg:py-0 border-b grid grid-cols-[minmax(0,1fr)_auto] lg:flex lg:items-center lg:justify-between px-3 sm:px-4 lg:px-6 flex-shrink-0 gap-x-2 gap-y-2 lg:gap-4 transition-opacity duration-300",
           cinemaMode && "opacity-0 pointer-events-none"
         )}
-        style={{
-          backgroundColor: 'color-mix(in srgb, var(--md-sys-color-surface-container-low) 78%, transparent)',
-          borderColor: 'var(--md-sys-color-outline-variant)',
-        }}
       >
         {/* Row 1 Col 1 (Mobile) / Left (Desktop): Brand Cluster */}
         <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 lg:order-1">
@@ -4347,13 +4343,9 @@ export default function App() {
       {/* Quiet Footer Bar */}
       <footer
         className={cn(
-          "z-10 min-h-8 py-2.5 border-t flex flex-wrap sm:flex-nowrap items-center px-4 md:px-6 justify-center sm:justify-between text-xs text-muted flex-shrink-0 gap-2 sm:gap-4 transition-opacity duration-300",
+          "ql-liquid-bar z-10 min-h-8 py-2.5 border-t flex flex-wrap sm:flex-nowrap items-center px-4 md:px-6 justify-center sm:justify-between text-xs text-muted flex-shrink-0 gap-2 sm:gap-4 transition-opacity duration-300",
           cinemaMode && "opacity-0 pointer-events-none"
         )}
-        style={{
-          backgroundColor: 'var(--md-sys-color-surface-container-low)',
-          borderColor: 'var(--md-sys-color-outline-variant)',
-        }}
       >
         <div className="hidden md:flex items-center gap-2">
           <span>Quantum Link</span>

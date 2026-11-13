@@ -63,31 +63,31 @@
 html.dark {
   --md-sys-color-primary: #A8C7FA;
   --md-sys-color-on-primary: #002E69;
-  --md-sys-color-primary-container: #0842A0;
-  --md-sys-color-on-primary-container: #D8E2FF;
+  --md-sys-color-primary-container: rgba(168, 199, 250, 0.16);
+  --md-sys-color-on-primary-container: #FFFFFF;
 
   --md-sys-color-secondary: #BBC6E4;
   --md-sys-color-on-secondary: #253048;
-  --md-sys-color-secondary-container: #3B465F;
-  --md-sys-color-on-secondary-container: #D7E2FF;
+  --md-sys-color-secondary-container: rgba(255, 255, 255, 0.075);
+  --md-sys-color-on-secondary-container: #F8FAFC;
 
   --md-sys-color-tertiary: #5EEAD4;
   --md-sys-color-on-tertiary: #003731;
-  --md-sys-color-tertiary-container: #005048;
-  --md-sys-color-on-tertiary-container: #CCFBF1;
+  --md-sys-color-tertiary-container: rgba(94, 234, 212, 0.15);
+  --md-sys-color-on-tertiary-container: #F0FDFA;
 
-  --md-sys-color-surface: #05070B;
-  --md-sys-color-surface-container-lowest: #030407;
-  --md-sys-color-surface-container-low: #0B0E14;
-  --md-sys-color-surface-container: #10141D;
-  --md-sys-color-surface-container-high: #171D29;
-  --md-sys-color-surface-container-highest: #202838;
+  --md-sys-color-surface: #030508;
+  --md-sys-color-surface-container-lowest: rgba(255, 255, 255, 0.025);
+  --md-sys-color-surface-container-low: rgba(255, 255, 255, 0.04);
+  --md-sys-color-surface-container: rgba(255, 255, 255, 0.055);
+  --md-sys-color-surface-container-high: rgba(255, 255, 255, 0.08);
+  --md-sys-color-surface-container-highest: rgba(255, 255, 255, 0.12);
 
-  --md-sys-color-on-surface: #EEF2FA;
-  --md-sys-color-on-surface-variant: #9BA4B8;
-  --md-sys-color-outline: #7E8799;
-  --md-sys-color-outline-variant: rgba(168, 199, 250, 0.22);
-  --md-sys-color-outline-variant-solid: #2E3646;
+  --md-sys-color-on-surface: #FFFFFF;
+  --md-sys-color-on-surface-variant: rgba(255, 255, 255, 0.74);
+  --md-sys-color-outline: rgba(255, 255, 255, 0.36);
+  --md-sys-color-outline-variant: rgba(255, 255, 255, 0.18);
+  --md-sys-color-outline-variant-solid: #3B465F;
 
   --color-bg-val: var(--md-sys-color-surface);
   --color-surface-val: var(--md-sys-color-surface-container-low);
@@ -153,7 +153,7 @@ html.dark {
 }
 
 @layer utilities {
-  /* Translucent M3 Expressive + Brutalist Cinema Surface Cards */
+  /* Light Mode Translucent M3 Expressive Surfaces */
   .glass-panel,
   .m3-card {
     background-color: color-mix(in srgb, var(--md-sys-color-surface-container) 84%, transparent);
@@ -180,6 +180,13 @@ html.dark {
     background-color: color-mix(in srgb, var(--md-sys-color-surface-container-lowest) 82%, transparent);
     border: 1px solid var(--md-sys-color-outline-variant);
     box-shadow: 0 20px 50px -16px rgba(0, 0, 0, 0.78), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  }
+
+  .ql-liquid-bar {
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-container-low) 80%, transparent);
+    border-color: var(--md-sys-color-outline-variant);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
   }
 
   .m3-surface-low {
@@ -230,6 +237,113 @@ html.dark {
     background-color: var(--md-sys-color-tertiary-container);
     color: var(--md-sys-color-on-tertiary-container);
     border: 1px solid var(--md-sys-color-outline-variant);
+  }
+
+  /* Dark Theme — Pure Untinted Clear Liquid Glass (Refractive Crystal Specular) */
+  html.dark .glass-panel,
+  html.dark .m3-card,
+  html.dark .glass-panel-heavy,
+  html.dark .m3-card-xl,
+  html.dark .ql-stage-card,
+  html.dark .ql-cinema-hud {
+    background-color: rgba(255, 255, 255, 0.03);
+    background-image: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.13) 0%,
+      rgba(255, 255, 255, 0.025) 40%,
+      rgba(255, 255, 255, 0.008) 70%,
+      rgba(255, 255, 255, 0.07) 100%
+    );
+    backdrop-filter: blur(22px) saturate(165%);
+    -webkit-backdrop-filter: blur(22px) saturate(165%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 20px 52px -18px rgba(0, 0, 0, 0.55),
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.38),
+      inset 1px 0 1px 0 rgba(255, 255, 255, 0.16),
+      inset 0 -1px 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  html.dark .ql-liquid-bar {
+    background-color: rgba(255, 255, 255, 0.025);
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.11) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    backdrop-filter: blur(22px) saturate(165%);
+    -webkit-backdrop-filter: blur(22px) saturate(165%);
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow:
+      0 10px 32px -12px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+  }
+
+  html.dark .m3-surface-low {
+    background-color: rgba(255, 255, 255, 0.028);
+    background-image: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.09) 0%,
+      rgba(255, 255, 255, 0.015) 100%
+    );
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.24);
+  }
+
+  html.dark .m3-surface-high {
+    background-color: rgba(255, 255, 255, 0.055);
+    background-image: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.025) 100%
+    );
+    backdrop-filter: blur(18px) saturate(155%);
+    -webkit-backdrop-filter: blur(18px) saturate(155%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+  }
+
+  html.dark .m3-surface-interactive {
+    background-color: rgba(255, 255, 255, 0.035);
+    background-image: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.11) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.26);
+  }
+  html.dark .m3-surface-interactive:hover {
+    background-color: rgba(255, 255, 255, 0.085);
+    border-color: rgba(255, 255, 255, 0.34);
+    box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.42);
+  }
+
+  html.dark .m3-btn-tonal {
+    background-color: rgba(255, 255, 255, 0.065);
+    background-image: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.03) 100%
+    );
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.34);
+  }
+  html.dark .m3-btn-tonal:hover {
+    background-color: rgba(255, 255, 255, 0.11);
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+
+  html.dark .m3-btn-tertiary {
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
   }
 
   .status-dot {
