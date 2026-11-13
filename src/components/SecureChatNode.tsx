@@ -66,11 +66,15 @@ export const SecureChatNode: React.FC<SecureChatNodeProps> = ({
   const animFrameRef = useRef<number | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const isCancelledRef = useRef<boolean>(false);
+  const messagesScrollRef = useRef<HTMLDivElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Auto-scroll to bottom on new messages
+  // Auto-scroll inner message box (never hijacking window scroll)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const el = messagesScrollRef.current;
+    if (el) {
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    }
   }, [messages.length]);
 
   // Clean up recording stream on unmount
@@ -395,7 +399,10 @@ export const SecureChatNode: React.FC<SecureChatNodeProps> = ({
       </AnimatePresence>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 flex flex-col bg-[var(--md-sys-color-surface)]/60">
+      <div
+        ref={messagesScrollRef}
+        className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 flex flex-col bg-[var(--md-sys-color-surface)]/60"
+      >
         <AnimatePresence>
           {messages.length === 0 && (
             <motion.div 

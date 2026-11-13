@@ -123,13 +123,13 @@ export const Base64ToolNode: React.FC = () => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="h-full flex flex-col gap-4 w-full max-w-6xl mx-auto overflow-y-auto pb-24 lg:pb-4"
+      className="w-full max-w-6xl mx-auto flex flex-col gap-5"
     >
-      {/* Top Brutalist Exhibition Header */}
+      {/* Exhibition Header */}
       <div className="flex flex-wrap items-end justify-between gap-3 px-1">
         <div>
-          <div className="text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase text-[color:var(--md-sys-color-primary)]">
-            MODULE 04 · SIGNAL CODEC & PAYLOAD ENCODER
+          <div className="text-[11px] font-mono tracking-[0.18em] uppercase text-[color:var(--md-sys-color-primary)]">
+            04 · Multi-Codec Signal Utility
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-text leading-tight mt-0.5">
             Offline Multi-Codec Encoder
@@ -137,14 +137,14 @@ export const Base64ToolNode: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2 text-[11px] font-mono text-muted tabular-nums">
-          <span>IN: {input.length} CH</span>
+          <span>IN: {input.length} ch</span>
           <span>·</span>
-          <span>OUT: {output.length} CH</span>
+          <span>OUT: {output.length} ch</span>
         </div>
       </div>
 
       {/* Main Translucent Obsidian Stage Card */}
-      <div className="ql-stage-card rounded-[28px] p-5 sm:p-7 flex flex-col gap-5 flex-1 min-h-0">
+      <div className="ql-stage-card rounded-[28px] p-5 sm:p-7 flex flex-col gap-5">
         {/* Codec Format & Direction Bar */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[var(--md-sys-color-outline-variant)] pb-4">
           {/* Format Switcher */}

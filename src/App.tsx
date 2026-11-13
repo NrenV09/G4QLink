@@ -28,9 +28,8 @@ import {
   Lock,
   Eye,
   EyeOff,
-  Play,
-  Pause,
-  RotateCcw
+  RotateCcw,
+  ChevronDown
 } from 'lucide-react';
 import { SafeQRCode } from './components/SafeQRCode';
 import { encodeCompactSDP, decodeCompactSDP } from './lib/sdpCodec';
@@ -102,12 +101,13 @@ export default function App() {
   });
   const [showThemeModal, setShowThemeModal] = useState(false);
 
-  // --- Offline 3D Spatial Stage & Kinetic Intro State ---
+  // --- Offline 3D Spatial Stage, Scroll Flight & Kinetic Intro State ---
   const [showPreloader, setShowPreloader] = useState(true);
   const [stageChapter, setStageChapter] = useState<StageChapterId>(0);
-  const [autoTour, setAutoTour] = useState(true);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [cinemaMode, setCinemaMode] = useState(false);
   const [hoverRole, setHoverRole] = useState<'host' | 'join' | null>(null);
+  const manualScrollLockRef = useRef<number>(0);
 
   useEffect(() => {
     applyMaterialThemeToDOM(materialTheme);
@@ -150,28 +150,80 @@ export default function App() {
   const [activeTab, setActiveTabState] = useState<string>("p2p");
   const activeTabRef = useRef<string>("p2p");
 
+  const SECTION_META: { tab: string; id: string; chapter: StageChapterId }[] = [
+    { tab: 'p2p', id: 'section-transceiver', chapter: 0 },
+    { tab: 'chat', id: 'section-chat', chapter: 1 },
+    { tab: 'qr', id: 'section-qr', chapter: 2 },
+    { tab: 'base64', id: 'section-encoder', chapter: 3 },
+    { tab: 'appearance', id: 'section-appearance', chapter: 4 },
+  ];
+
   const setActiveTab = useCallback((tab: string) => {
     triggerHaptic('light', materialTheme.hapticsEnabled);
     setActiveTabState(tab);
     activeTabRef.current = tab;
-    // Choreograph the 3D Galaxy & Black Hole camera smoothly per dedicated tab
-    if (tab === 'p2p' || tab === 'appearance') setStageChapter(0);
-    else if (tab === 'qr') setStageChapter(1);
-    else if (tab === 'base64') setStageChapter(2);
-    else if (tab === 'chat') setStageChapter(3);
+
+    const target = SECTION_META.find((s) => s.tab === tab) ?? SECTION_META[0];
+    setStageChapter(target.chapter);
+    if (tab === 'chat') {
+      setUnreadChatCount(0);
+    }
+
+    manualScrollLockRef.current = Date.now() + 750;
+    const el = document.getElementById(target.id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }, [materialTheme.hapticsEnabled]);
   const [role, setRole] = useState<NodeRole>(null);
   const [status, setStatus] = useState<ConnectionStatus>("offline");
   const [isTransferring, setIsTransferring] = useState(false);
 
-  // Smooth automated visual chapter tour on the idle spatial stage
+  // Synchronize 3D Galaxy & Black Hole camera flight + active navigation pill with page scroll
   useEffect(() => {
-    if (!autoTour || role !== null || activeTab !== 'p2p' || showPreloader) return;
-    const timer = window.setInterval(() => {
-      setStageChapter((prev) => (((prev + 1) % 4) as StageChapterId));
-    }, 6800);
-    return () => clearInterval(timer);
-  }, [autoTour, role, activeTab, showPreloader]);
+    const updateOnScroll = () => {
+      const doc = document.documentElement;
+      const maxScroll = Math.max(1, doc.scrollHeight - window.innerHeight);
+      const progress = Math.min(1, Math.max(0, window.scrollY / maxScroll));
+      setScrollProgress(progress);
+
+      if (Date.now() < manualScrollLockRef.current) return;
+
+      const atBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 24;
+      const triggerY = window.innerHeight * 0.38;
+      let current = SECTION_META[0];
+
+      if (atBottom) {
+        current = SECTION_META[SECTION_META.length - 1];
+      } else {
+        for (const sec of SECTION_META) {
+          const el = document.getElementById(sec.id);
+          if (!el) continue;
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= triggerY) {
+            current = sec;
+          }
+        }
+      }
+
+      if (activeTabRef.current !== current.tab) {
+        activeTabRef.current = current.tab;
+        setActiveTabState(current.tab);
+        setStageChapter(current.chapter);
+        if (current.tab === 'chat') {
+          setUnreadChatCount(0);
+        }
+      }
+    };
+
+    updateOnScroll();
+    window.addEventListener('scroll', updateOnScroll, { passive: true });
+    window.addEventListener('resize', updateOnScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', updateOnScroll);
+      window.removeEventListener('resize', updateOnScroll);
+    };
+  }, []);
   
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [remoteStreams, setRemoteStreams] = useState<Record<string, MediaStream>>({});
@@ -3002,7 +3054,7 @@ export default function App() {
   const isPeerConnectedToHost = role === 'join' && (status === 'connected' || connectedCount > 0);
 
   return (
-    <div className="h-[100dvh] w-full overflow-hidden flex flex-col relative text-[14px] bg-transparent text-text antialiased">
+    <div className="min-h-[100dvh] w-full overflow-x-clip flex flex-col relative text-[14px] bg-transparent text-text antialiased">
       <AnimatePresence>
         {showProfileModal && (
           <ProfileModal 
@@ -3063,18 +3115,20 @@ export default function App() {
 
       <QuantumWebGLStage
         chapter={stageChapter}
+        scrollProgress={scrollProgress}
         seedHex={materialTheme.seedHex}
         isDark={materialTheme.mode === 'dark'}
         connectedCount={connectedCount}
-        isWorkspaceFocused={Boolean(role) || activeTab !== 'p2p'}
+        isWorkspaceFocused={Boolean(role)}
         hoverRole={hoverRole}
-        autoTour={autoTour}
       />
       
-      {/* Android 16 Material You (M3 Expressive) Top App Bar - Hidden smoothly during pure 3D Cinema Mode */}
-      {!(cinemaMode && !role && activeTab === 'p2p') && (
+      {/* Sticky Android 16 Material You (M3 Expressive) Top App Bar */}
       <header
-        className="z-20 w-full h-auto lg:h-18 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 lg:py-0 border-b grid grid-cols-[minmax(0,1fr)_auto] lg:flex lg:items-center lg:justify-between px-3 sm:px-4 lg:px-6 flex-shrink-0 relative gap-x-2 gap-y-2 lg:gap-4"
+        className={cn(
+          "sticky top-0 z-30 w-full h-auto lg:h-18 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 lg:py-0 border-b grid grid-cols-[minmax(0,1fr)_auto] lg:flex lg:items-center lg:justify-between px-3 sm:px-4 lg:px-6 flex-shrink-0 gap-x-2 gap-y-2 lg:gap-4 backdrop-blur-md transition-opacity duration-300",
+          cinemaMode && "opacity-0 pointer-events-none"
+        )}
         style={{
           backgroundColor: 'color-mix(in srgb, var(--md-sys-color-surface-container-low) 78%, transparent)',
           borderColor: 'var(--md-sys-color-outline-variant)',
@@ -3308,106 +3362,21 @@ export default function App() {
           </nav>
         </div>
       </header>
-      )}
 
-      {/* Edge-to-Edge Main Surface Canvas with Dynamic Paddings */}
-      <main className="z-10 flex-1 min-h-0 p-2.5 sm:p-5 md:p-6 overflow-hidden">
-        <AnimatePresence mode="wait">
-          {activeTab === "appearance" ? (
-            <motion.div
-              key="appearance"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.16 }}
-              className="h-full w-full overflow-hidden rounded-[28px] ql-stage-card"
-            >
-              <MaterialYouSettingsContent
-                themeState={materialTheme}
-                onUpdateTheme={setMaterialTheme}
-              />
-            </motion.div>
-          ) : activeTab === "qr" ? (
-            <motion.div 
-              key="qr" 
-              initial={{ opacity: 0, y: 6 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -6 }} 
-              transition={{ duration: 0.15 }}
-              className="h-full w-full"
-            >
-              <QRUtilityNode />
-            </motion.div>
-          ) : activeTab === "chat" ? (
-            <motion.div 
-              key="chat" 
-              initial={{ opacity: 0, y: 6 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -6 }} 
-              transition={{ duration: 0.15 }}
-              className="h-full w-full"
-            >
-              <SecureChatNode 
-                messages={messages} 
-                sendMessage={sendMessage} 
-                connectedPeers={connectedCount} 
-                role={role} 
-                onClickProfile={(senderId) => {
-                  const p = peerProfiles[senderId];
-                  if (p) setSelectedPeerProfile(p);
-                }}
-                startCall={startCall}
-                bandwidthOptimized={bandwidthOptimized}
-                onToggleBandwidthOptimized={() => setBandwidthOptimized(prev => !prev)}
-                isCallActive={isCallActive}
-              />
-            </motion.div>
-          ) : activeTab === "base64" ? (
-            <motion.div 
-              key="base64" 
-              initial={{ opacity: 0, y: 6 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -6 }} 
-              transition={{ duration: 0.15 }}
-              className="h-full w-full"
-            >
-              <Base64ToolNode />
-            </motion.div>
-          ) : activeTab === "registry" ? (
-            <motion.div 
-              key="nexus-registry" 
-              initial={{ opacity: 0, y: 6 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -6 }} 
-              transition={{ duration: 0.15 }}
-              className="h-full w-full overflow-hidden"
-            >
-              <NexusFailoverHUD 
-                localUsername={profile.username}
-                localAvatarColor={profile.avatarColor}
-                localAvatarImage={profile.avatarImage}
-                localPeerId={profile.id}
-                realConnectedCount={connectedCount}
-                peerProfiles={peerProfiles}
-                role={role}
-                networkStatus={status}
-                isSimulation={isSimulation}
-                onToggleSimulation={toggleSimulation}
-                onNavigateToConnect={() => setActiveTab(role ? "chat" : "qr")}
-                onTransferHostControl={handleTransferHostControl}
-                onGracefulHostDrop={handleGracefulHostDrop}
-                onNetworkSplit={handleNetworkSplit}
-              />
-            </motion.div>
-          ) : role ? (
-            <motion.div 
-              key="p2p-active"
-              initial={{ opacity: 0, y: 6 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              exit={{ opacity: 0, y: -6 }} 
-              transition={{ duration: 0.15 }}
-              className="grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-[1fr_auto] gap-5 h-full lg:overflow-hidden overflow-y-auto pb-20 lg:pb-0"
-            >
+      {/* Scrollable Vertical Multi-Section Webpage Over Interactive 3D Galaxy & Black Hole Stage */}
+      <main
+        className={cn(
+          "z-10 w-full flex-1 px-3 sm:px-5 md:px-8 pt-4 sm:pt-6 pb-28 space-y-24 sm:space-y-36 transition-opacity duration-300",
+          cinemaMode && "opacity-0 pointer-events-none select-none"
+        )}
+      >
+        {/* SECTION 01: TRANSCEIVER HERO & LIVE WEBRTC WORKBENCH */}
+        <section
+          id="section-transceiver"
+          className="scroll-mt-24 min-h-[calc(100dvh-6rem)] flex flex-col justify-between max-w-7xl mx-auto w-full"
+        >
+          {role ? (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch min-h-[680px]">
               {/* Left Column: M3 Expressive Transceiver Connection Setup */}
               <section className="col-span-1 lg:col-span-4 flex flex-col gap-4 flex-shrink-0 lg:overflow-y-auto scrollbar-hide">
                 {/* Mode Switcher Card (Corner Large 16dp) */}
@@ -4167,236 +4136,316 @@ export default function App() {
                   </div>
                 </div>
               </section>
-            </motion.div>
+            </div>
           ) : (
-            /* Brutalist-Cinematic 3D Spatial Home Stage */
-            <motion.section 
-              key="role-select"
-              initial={false}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.99 }}
-              className="flex flex-col h-full overflow-y-auto pb-28 lg:pb-24 z-20 relative"
-            >
-              {/* Unobstructed 3D Centerpiece + Editorial Architectural Overlay */}
-              <div className="flex-1 flex flex-col justify-between w-full max-w-6xl mx-auto px-3 sm:px-6 pt-2 sm:pt-4">
-                {/* Top Editorial Telemetry Row */}
-                <div className="flex items-start justify-between gap-4 pointer-events-none">
-                  <div className="space-y-1">
-                    <div className="text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase text-[color:var(--md-sys-color-primary)]">
-                      {[
-                        '01 · Event Horizon Singularity',
-                        '02 · Spiral Galaxy Core',
-                        '03 · Binary Black Holes',
-                        '04 · Crimson Quasar Jet',
-                      ][stageChapter]}
-                    </div>
-                    {!cinemaMode && (
-                      <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-text leading-[1.03] max-w-2xl text-balance drop-shadow-[0_6px_28px_rgba(0,0,0,0.65)]">
-                        Direct peer sharing, sculpted in real time.
-                      </h2>
-                    )}
+            /* Unobstructed Gargantua Singularity Stage + Editorial Hero */
+            <div className="flex-1 flex flex-col justify-between w-full max-w-6xl mx-auto pt-2 sm:pt-4">
+              {/* Top Editorial Telemetry Row */}
+              <div className="flex items-start justify-between gap-4 pointer-events-none">
+                <div className="space-y-1.5">
+                  <div className="text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase text-[color:var(--md-sys-color-primary)]">
+                    01 · Event Horizon Singularity
                   </div>
-
-                  {!cinemaMode && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        triggerHaptic('light', materialTheme.hapticsEnabled);
-                        setShowThemeModal(true);
-                      }}
-                      className="pointer-events-auto ql-stage-card p-3 sm:p-3.5 rounded-[22px] border flex items-center gap-3 shrink-0 cursor-pointer active:scale-[0.98] transition-all hover:border-[color:var(--md-sys-color-primary)]"
-                      title="Customize Material You Dynamic Colors & App Icon"
-                    >
-                      <QuantumAppIcon
-                        preset={materialTheme.appIconPreset}
-                        shape={materialTheme.appIconShape}
-                        size="md"
-                      />
-                      <div className="hidden sm:block text-left pr-1">
-                        <div className="text-xs font-bold text-text flex items-center gap-1">
-                          <span>Theme Studio</span>
-                          <MaterialSymbol name="tune" size={14} className="text-[color:var(--md-sys-color-primary)]" />
-                        </div>
-                        <div className="text-[10px] font-mono text-muted mt-0.5 uppercase">
-                          {materialTheme.seedHex}
-                        </div>
-                      </div>
-                    </button>
-                  )}
+                  <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-text leading-[1.03] max-w-2xl text-balance drop-shadow-[0_6px_28px_rgba(0,0,0,0.65)]">
+                    Direct peer sharing, sculpted in real time.
+                  </h2>
                 </div>
 
-                {/* Middle Breathing Space: Leaves the 3D WebGL Hologram / Gallery / Corridor 100% Unobstructed */}
-                <div className="min-h-[140px] sm:min-h-[210px] lg:min-h-[250px] flex-1 pointer-events-none" />
-
-                {/* Lower Spatial Action Monoliths & Quick Controls */}
-                {!cinemaMode && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="space-y-4 pb-2"
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                      <RoleCard 
-                        num="01 · Host Node"
-                        icon={<MaterialSymbol name="wifi_tethering" size={26} />}
-                        title="Create a Mesh Room"
-                        desc="Generate a cryptographic room QR & invite key to stream multi-gigabyte files, encrypted chat, or HD calls."
-                        actionLabel="Host Room"
-                        onClick={() => {
-                          triggerHaptic('medium', materialTheme.hapticsEnabled);
-                          setRole("host");
-                        }}
-                        onHoverChange={(h) => setHoverRole(h ? 'host' : null)}
-                        color="accent"
-                      />
-                      <RoleCard 
-                        num="02 · Peer Node"
-                        icon={<MaterialSymbol name="qr_code_scanner" size={26} />}
-                        title="Join an Existing Room"
-                        desc="Scan a Host QR handshake or paste an invite token to establish a zero-server direct WebRTC tunnel."
-                        actionLabel="Join Room"
-                        onClick={() => {
-                          triggerHaptic('medium', materialTheme.hapticsEnabled);
-                          setRole("join");
-                        }}
-                        onHoverChange={(h) => setHoverRole(h ? 'join' : null)}
-                        color="success"
-                      />
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('light', materialTheme.hapticsEnabled);
+                    setActiveTab('appearance');
+                  }}
+                  className="pointer-events-auto ql-stage-card p-3 sm:p-3.5 rounded-[22px] border flex items-center gap-3 shrink-0 cursor-pointer active:scale-[0.98] transition-all hover:border-[color:var(--md-sys-color-primary)]"
+                  title="Scroll to Material You Dynamic Colors & App Icon Studio"
+                >
+                  <QuantumAppIcon
+                    preset={materialTheme.appIconPreset}
+                    shape={materialTheme.appIconShape}
+                    size="md"
+                  />
+                  <div className="hidden sm:block text-left pr-1">
+                    <div className="text-xs font-bold text-text flex items-center gap-1">
+                      <span>Theme Studio</span>
+                      <MaterialSymbol name="tune" size={14} className="text-[color:var(--md-sys-color-primary)]" />
                     </div>
-
-                    {/* Streamlined Quick-Launch Bar */}
-                    <div className="ql-stage-card rounded-2xl px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted">
-                      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2.5 gap-y-1 text-[11px] font-mono">
-                        <span className="text-text font-medium">Direct WebRTC Mesh</span>
-                        <span aria-hidden="true">·</span>
-                        <span>DTLS-SRTP Encrypted</span>
-                        <span aria-hidden="true">·</span>
-                        <span>100% Offline Bundle</span>
-                      </div>
-                      <div className="flex flex-wrap items-center justify-center gap-2 shrink-0">
-                        <button
-                          onClick={() => {
-                            triggerHaptic('light', materialTheme.hapticsEnabled);
-                            setActiveTab("appearance");
-                          }}
-                          className="m3-btn-tonal flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
-                        >
-                          <MaterialSymbol name="palette" size={15} />
-                          <span>Material You</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            triggerHaptic('light', materialTheme.hapticsEnabled);
-                            setShowNetworkMapModal(true);
-                          }}
-                          className="m3-btn-tertiary flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
-                          title="Open Interactive Quantum Link Mesh Map"
-                        >
-                          <MaterialSymbol name="account_tree" size={15} />
-                          <span>Mesh Map</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            triggerHaptic('light', materialTheme.hapticsEnabled);
-                            setShowFailoverMenu(true);
-                          }}
-                          className="m3-surface-interactive flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
-                          title="Open Mesh Failover & Election Controls"
-                        >
-                          <MaterialSymbol name="hub" size={15} className="text-[color:var(--md-sys-color-primary)]" />
-                          <span>Failover HUD</span>
-                        </button>
-                      </div>
+                    <div className="text-[10px] font-mono text-muted mt-0.5 uppercase">
+                      {materialTheme.seedHex}
                     </div>
-                  </motion.div>
-                )}
+                  </div>
+                </button>
               </div>
 
-              {/* Unified Bottom-Center 3D Chapter & Cinema Dock */}
-              <div className="fixed bottom-11 sm:bottom-10 left-1/2 -translate-x-1/2 z-40 max-w-[95vw]">
-                <div className="ql-cinema-hud rounded-full px-2 py-1.5 flex items-center gap-1 sm:gap-1.5 overflow-x-auto scrollbar-hide">
-                  {([
-                    { id: 0 as StageChapterId, label: '01 Singularity' },
-                    { id: 1 as StageChapterId, label: '02 Galaxy' },
-                    { id: 2 as StageChapterId, label: '03 Binary' },
-                    { id: 3 as StageChapterId, label: '04 Quasar' },
-                  ]).map((ch) => {
-                    const active = stageChapter === ch.id;
-                    return (
-                      <button
-                        key={ch.id}
-                        type="button"
-                        onClick={() => {
-                          triggerHaptic('light', materialTheme.hapticsEnabled);
-                          setAutoTour(false);
-                          setStageChapter(ch.id);
-                        }}
-                        className={cn(
-                          'px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] font-mono font-semibold whitespace-nowrap shrink-0 cursor-pointer transition-all active:scale-95',
-                          active
-                            ? 'm3-btn-filled shadow-xs'
-                            : 'text-muted hover:text-text hover:bg-white/5'
-                        )}
-                      >
-                        {ch.label}
-                      </button>
-                    );
-                  })}
+              {/* Middle Breathing Space: Leaves Gargantua Prime Ray-Marched Black Hole 100% Unobstructed */}
+              <div className="min-h-[180px] sm:min-h-[250px] lg:min-h-[300px] flex-1 pointer-events-none" />
 
-                  <span className="w-px h-4 bg-white/15 mx-0.5 shrink-0" />
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      triggerHaptic('light', materialTheme.hapticsEnabled);
-                      setAutoTour((prev) => !prev);
-                    }}
-                    className="px-2.5 py-1.5 rounded-full text-[11px] font-mono text-muted hover:text-text flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer"
-                    title={autoTour ? 'Pause 3D Chapter Tour' : 'Resume 3D Chapter Tour'}
-                  >
-                    {autoTour ? <Pause size={13} /> : <Play size={13} />}
-                    <span className="hidden md:inline">{autoTour ? 'Tour' : 'Paused'}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      triggerHaptic('light', materialTheme.hapticsEnabled);
-                      setShowPreloader(true);
-                    }}
-                    className="px-2.5 py-1.5 rounded-full text-[11px] font-mono text-muted hover:text-text flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer"
-                    title="Replay Kinetic Boot Intro"
-                  >
-                    <RotateCcw size={13} />
-                    <span className="hidden lg:inline">Intro</span>
-                  </button>
-
-                  <button
-                    type="button"
+              {/* Lower Spatial Action Monoliths & Scroll Prompt */}
+              <div className="space-y-4 pb-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                  <RoleCard 
+                    num="01 · Host Node"
+                    icon={<MaterialSymbol name="wifi_tethering" size={26} />}
+                    title="Create a Mesh Room"
+                    desc="Generate a cryptographic room QR & invite key to stream multi-gigabyte files, encrypted chat, or HD calls."
+                    actionLabel="Host Room"
                     onClick={() => {
                       triggerHaptic('medium', materialTheme.hapticsEnabled);
-                      setCinemaMode((prev) => !prev);
+                      setRole("host");
                     }}
-                    className={cn(
-                      'px-3 py-1.5 rounded-full text-[11px] font-mono font-semibold flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer transition-all',
-                      cinemaMode ? 'm3-btn-tertiary' : 'text-text hover:bg-white/10'
-                    )}
-                    title={cinemaMode ? 'Show Workspace Controls' : 'Pure 3D Cinema View'}
-                  >
-                    {cinemaMode ? <Eye size={13} /> : <EyeOff size={13} />}
-                    <span>{cinemaMode ? 'Show UI' : 'Cinema'}</span>
-                  </button>
+                    onHoverChange={(h) => setHoverRole(h ? 'host' : null)}
+                    color="accent"
+                  />
+                  <RoleCard 
+                    num="02 · Peer Node"
+                    icon={<MaterialSymbol name="qr_code_scanner" size={26} />}
+                    title="Join an Existing Room"
+                    desc="Scan a Host QR handshake or paste an invite token to establish a zero-server direct WebRTC tunnel."
+                    actionLabel="Join Room"
+                    onClick={() => {
+                      triggerHaptic('medium', materialTheme.hapticsEnabled);
+                      setRole("join");
+                    }}
+                    onHoverChange={(h) => setHoverRole(h ? 'join' : null)}
+                    color="success"
+                  />
+                </div>
+
+                {/* Quick-Launch & Scroll Down Cue */}
+                <div className="ql-stage-card rounded-2xl px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted">
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2.5 gap-y-1 text-[11px] font-mono">
+                    <span className="text-text font-medium">Direct WebRTC Mesh</span>
+                    <span aria-hidden="true">·</span>
+                    <span>DTLS-SRTP Encrypted</span>
+                    <span aria-hidden="true">·</span>
+                    <span>100% Offline Bundle</span>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-center gap-2 shrink-0">
+                    <button
+                      onClick={() => {
+                        triggerHaptic('light', materialTheme.hapticsEnabled);
+                        setShowNetworkMapModal(true);
+                      }}
+                      className="m3-btn-tertiary flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
+                      title="Open Interactive Quantum Link Mesh Map"
+                    >
+                      <MaterialSymbol name="account_tree" size={15} />
+                      <span>Mesh Map</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        triggerHaptic('light', materialTheme.hapticsEnabled);
+                        setShowFailoverMenu(true);
+                      }}
+                      className="m3-surface-interactive flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
+                      title="Open Mesh Failover & Election Controls"
+                    >
+                      <MaterialSymbol name="hub" size={15} className="text-[color:var(--md-sys-color-primary)]" />
+                      <span>Failover HUD</span>
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('chat')}
+                      className="m3-btn-tonal flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
+                    >
+                      <span>Scroll Sections</span>
+                      <ChevronDown size={14} className="animate-bounce" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </motion.section>
+            </div>
           )}
-        </AnimatePresence>
+        </section>
+
+        {/* SECTION 02: ENCRYPTED CHAT & CALLS */}
+        <section
+          id="section-chat"
+          className="scroll-mt-24 max-w-6xl mx-auto w-full space-y-4"
+        >
+          <div className="flex flex-wrap items-end justify-between gap-3 px-1">
+            <div>
+              <div className="text-[11px] font-mono tracking-[0.22em] uppercase text-[color:var(--md-sys-color-primary)]">
+                02 · Ionized Nebula Passage
+              </div>
+              <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-text">
+                Encrypted Chat & HD Calls
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light', materialTheme.hapticsEnabled);
+                  setShowNetworkMapModal(true);
+                }}
+                className="m3-surface-interactive px-3.5 py-2 rounded-full border text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+              >
+                <MaterialSymbol name="account_tree" size={15} className="text-[color:var(--md-sys-color-primary)]" />
+                <span>Mesh Topology</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light', materialTheme.hapticsEnabled);
+                  setShowFailoverMenu(true);
+                }}
+                className="m3-btn-tonal px-3.5 py-2 rounded-full text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+              >
+                <MaterialSymbol name="hub" size={15} />
+                <span>Failover HUD</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="h-[640px] lg:h-[700px] w-full">
+            <SecureChatNode 
+              messages={messages} 
+              sendMessage={sendMessage} 
+              connectedPeers={connectedCount} 
+              role={role} 
+              onClickProfile={(senderId) => {
+                const p = peerProfiles[senderId];
+                if (p) setSelectedPeerProfile(p);
+              }}
+              startCall={startCall}
+              bandwidthOptimized={bandwidthOptimized}
+              onToggleBandwidthOptimized={() => setBandwidthOptimized(prev => !prev)}
+              isCallActive={isCallActive}
+            />
+          </div>
+        </section>
+
+        {/* SECTION 03: QR CUSTOMISATION STUDIO */}
+        <section
+          id="section-qr"
+          className="scroll-mt-24 max-w-7xl mx-auto w-full space-y-4"
+        >
+          <div className="px-1">
+            <div className="text-[11px] font-mono tracking-[0.22em] uppercase text-[color:var(--md-sys-color-primary)]">
+              03 · Barred Spiral Galaxy Core
+            </div>
+            <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-text">
+              QR Customisation Studio
+            </h2>
+          </div>
+
+          <QRUtilityNode />
+        </section>
+
+        {/* SECTION 04: ZERO-KNOWLEDGE ENCODER */}
+        <section
+          id="section-encoder"
+          className="scroll-mt-24 max-w-7xl mx-auto w-full space-y-4"
+        >
+          <div className="px-1">
+            <div className="text-[11px] font-mono tracking-[0.22em] uppercase text-[color:var(--md-sys-color-primary)]">
+              04 · Binary Black Hole Jets
+            </div>
+            <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-text">
+              Base64 & AES-256-GCM Encoder
+            </h2>
+          </div>
+
+          <Base64ToolNode />
+        </section>
+
+        {/* SECTION 05: MATERIAL YOU STUDIO & CUSTOM APP ICON */}
+        <section
+          id="section-appearance"
+          className="scroll-mt-24 max-w-7xl mx-auto w-full space-y-4"
+        >
+          <div className="px-1">
+            <div className="text-[11px] font-mono tracking-[0.22em] uppercase text-[color:var(--md-sys-color-primary)]">
+              05 · Crimson Quasar Horizon
+            </div>
+            <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-text">
+              Customise Appearance & App Icon
+            </h2>
+          </div>
+
+          <div className="w-full rounded-[28px] ql-stage-card overflow-hidden">
+            <MaterialYouSettingsContent
+              themeState={materialTheme}
+              onUpdateTheme={setMaterialTheme}
+            />
+          </div>
+        </section>
       </main>
+
+      {/* Unified Floating Cosmic Scroll Scrubber & Cinema Dock (Always Accessible) */}
+      <div className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-40 max-w-[96vw]">
+        <div className="ql-cinema-hud rounded-full px-2 py-1.5 flex items-center gap-1 sm:gap-1.5 overflow-x-auto scrollbar-hide">
+          {([
+            { tab: 'p2p', ch: 0 as StageChapterId, label: '01 Singularity' },
+            { tab: 'chat', ch: 1 as StageChapterId, label: '02 Channel' },
+            { tab: 'qr', ch: 2 as StageChapterId, label: '03 Galaxy' },
+            { tab: 'base64', ch: 3 as StageChapterId, label: '04 Binary' },
+            { tab: 'appearance', ch: 4 as StageChapterId, label: '05 Quasar' },
+          ]).map((item) => {
+            const active = stageChapter === item.ch;
+            return (
+              <button
+                key={item.tab}
+                type="button"
+                onClick={() => setActiveTab(item.tab)}
+                className={cn(
+                  'px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] font-mono font-semibold whitespace-nowrap shrink-0 cursor-pointer transition-all active:scale-95',
+                  active
+                    ? 'm3-btn-filled shadow-xs'
+                    : 'text-muted hover:text-text hover:bg-white/5'
+                )}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+
+          <span className="w-px h-4 bg-white/15 mx-0.5 shrink-0" />
+
+          <span
+            className="hidden sm:inline-block text-[10px] font-mono tabular-nums text-muted px-1.5 shrink-0"
+            title="Scroll flight depth"
+          >
+            {Math.round(scrollProgress * 100)}%
+          </span>
+
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light', materialTheme.hapticsEnabled);
+              setShowPreloader(true);
+            }}
+            className="px-2.5 py-1.5 rounded-full text-[11px] font-mono text-muted hover:text-text flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer"
+            title="Replay Kinetic Boot Intro"
+          >
+            <RotateCcw size={13} />
+            <span className="hidden lg:inline">Intro</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('medium', materialTheme.hapticsEnabled);
+              setCinemaMode((prev) => !prev);
+            }}
+            className={cn(
+              'px-3 py-1.5 rounded-full text-[11px] font-mono font-semibold flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer transition-all',
+              cinemaMode ? 'm3-btn-tertiary' : 'text-text hover:bg-white/10'
+            )}
+            title={cinemaMode ? 'Show Page Sections' : 'Hide UI to Inspect 3D Cosmos'}
+          >
+            {cinemaMode ? <Eye size={13} /> : <EyeOff size={13} />}
+            <span>{cinemaMode ? 'Show UI' : 'Cinema'}</span>
+          </button>
+        </div>
+      </div>
 
       {/* Quiet Footer Bar */}
       <footer
-        className="z-10 min-h-8 py-1.5 border-t flex flex-wrap sm:flex-nowrap items-center px-4 md:px-6 justify-center sm:justify-between text-xs text-muted flex-shrink-0 gap-2 sm:gap-4"
+        className={cn(
+          "z-10 min-h-8 py-2.5 border-t flex flex-wrap sm:flex-nowrap items-center px-4 md:px-6 justify-center sm:justify-between text-xs text-muted flex-shrink-0 gap-2 sm:gap-4 transition-opacity duration-300",
+          cinemaMode && "opacity-0 pointer-events-none"
+        )}
         style={{
           backgroundColor: 'var(--md-sys-color-surface-container-low)',
           borderColor: 'var(--md-sys-color-outline-variant)',

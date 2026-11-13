@@ -257,20 +257,20 @@ export const QRUtilityNode: React.FC = () => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="max-w-7xl mx-auto h-full flex flex-col gap-4 overflow-y-auto pb-24 lg:pb-4 relative"
+      className="max-w-7xl mx-auto w-full flex flex-col gap-5 relative"
     >
       {/* Exhibition Header Row */}
       <div className="flex flex-wrap items-end justify-between gap-3 px-1">
         <div>
-          <div className="text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase text-[color:var(--md-sys-color-primary)]">
-            MODULE 03 · OPTICAL HANDSHAKE & QR CUSTOMISATION
+          <div className="text-[11px] font-mono tracking-[0.18em] uppercase text-[color:var(--md-sys-color-primary)]">
+            03 · Optical Handshake &amp; Matrix Styling
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-text leading-tight mt-0.5">
             QR Code Customisation Studio
           </h2>
         </div>
-        <div className="text-[11px] font-mono text-muted flex items-center gap-2">
-          <span>{size}×{size}PX</span>
+        <div className="text-[11px] font-mono text-muted flex items-center gap-2 tabular-nums">
+          <span>{size}×{size}px</span>
           <span>·</span>
           <span>ECC-{ecLevel}</span>
           <span>·</span>
@@ -279,9 +279,9 @@ export const QRUtilityNode: React.FC = () => {
       </div>
 
       {/* Main 12-Col Exhibition Split */}
-      <div className="grid grid-cols-12 gap-5 flex-1 min-h-0">
+      <div className="grid grid-cols-12 gap-5 items-stretch">
         {/* Left Column: Payload & Customisation Controls */}
-        <div className="col-span-12 lg:col-span-5 flex flex-col gap-4 lg:overflow-y-auto scrollbar-hide pr-0.5">
+        <div className="col-span-12 lg:col-span-5 flex flex-col gap-4">
           {/* Card 01: Payload Input */}
           <div className="ql-stage-card rounded-[24px] p-5 flex flex-col gap-3">
             <div className="flex items-center justify-between gap-2">

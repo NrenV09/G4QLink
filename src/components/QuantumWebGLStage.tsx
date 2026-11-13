@@ -1,82 +1,65 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import {
+  createMilkyWaySkyTexture,
   createNebulaCloudTexture,
   createParticleGlowTexture,
   createStarDiffractionTexture,
 } from '../three/proceduralTextures';
 import {
-  createAccretionDiskShaderMaterial,
-  createPhotonLensingHaloShaderMaterial,
+  createRayMarchedBlackHoleMaterial,
   createSpiralGalaxyShaderMaterial,
   createStarfieldShaderMaterial,
   createVolumetricBeamShaderMaterial,
 } from '../three/shaders';
 
-export type StageChapterId = 0 | 1 | 2 | 3;
+export type StageChapterId = 0 | 1 | 2 | 3 | 4;
 
 export interface QuantumWebGLStageProps {
   chapter: StageChapterId;
+  scrollProgress: number;
   seedHex: string;
   isDark: boolean;
   connectedCount: number;
   isWorkspaceFocused: boolean;
   hoverRole: 'host' | 'join' | null;
-  autoTour: boolean;
-  onChapterChange?: (ch: StageChapterId) => void;
 }
 
 const _camTargetPos = new THREE.Vector3();
 const _camTargetLook = new THREE.Vector3();
-const _currentLook = new THREE.Vector3(0, 0.3, -4);
+const _currentLook = new THREE.Vector3(0.2, 0.25, -4.5);
 const _tmpBgColor = new THREE.Color();
 const _tmpSeedColor = new THREE.Color();
 const _mouseWorld = new THREE.Vector3();
+const _tmpMat4 = new THREE.Matrix4();
+const _vX = new THREE.Vector3();
+const _vY = new THREE.Vector3();
+const _vZ = new THREE.Vector3();
 
-const CHAPTER_PRESETS: Record<
-  StageChapterId,
-  {
-    camPos: [number, number, number];
-    lookAt: [number, number, number];
-    bgDark: string;
-    bgLight: string;
-    fogDensity: number;
-  }
-> = {
-  // 01: Gargantua-Class Supermassive Black Hole + Spiral Galaxy backdrop
-  0: {
-    camPos: [-1.2, 1.35, 11.4],
-    lookAt: [0.4, 0.25, -4.5],
-    bgDark: '#020308',
-    bgLight: '#070b18',
-    fogDensity: 0.0045,
-  },
-  // 02: Sweeping Logarithmic Spiral Galaxy & Volumetric Nebulae
-  1: {
-    camPos: [14.5, 11.5, 6.0],
-    lookAt: [24.0, -1.2, -20.0],
-    bgDark: '#03040b',
-    bgLight: '#080d1c',
-    fogDensity: 0.0038,
-  },
-  // 03: Twin Binary Black Holes & Relativistic Polar Jets
-  2: {
-    camPos: [1.5, 3.2, -28.0],
-    lookAt: [0.0, 1.2, -46.0],
-    bgDark: '#02040a',
-    bgLight: '#070c18',
-    fogDensity: 0.0052,
-  },
-  // 04: Crimson Quasar Singularity Horizon
-  3: {
-    camPos: [-25.5, 2.2, -1.5],
-    lookAt: [-36.0, 0.6, -12.0],
-    bgDark: '#070204',
-    bgLight: '#13060a',
-    fogDensity: 0.0058,
-  },
-};
+// Smooth cosmic flight path mapped 0.0 -> 1.0 across the scrollable webpage sections
+const CAM_POS_WAYPOINTS = [
+  new THREE.Vector3(-1.3, 1.45, 9.6),   // 01: Gargantua Singularity Horizon
+  new THREE.Vector3(9.4, 3.8, -5.2),    // 02: Ionized Nebula Filament Passage
+  new THREE.Vector3(22.5, 11.8, -2.5),  // 03: Spiral Galaxy High Observatory
+  new THREE.Vector3(2.4, 2.9, -31.8),   // 04: Binary Black Holes & Polar Jets
+  new THREE.Vector3(-24.2, 2.3, -1.2),  // 05: Crimson Quasar Lookout
+];
+
+const LOOK_AT_WAYPOINTS = [
+  new THREE.Vector3(0.2, 0.25, -4.5),   // Gargantua Core
+  new THREE.Vector3(16.0, 0.4, -18.0),  // Emission Nebulae & Inner Arms
+  new THREE.Vector3(24.0, -1.6, -22.0), // Barred Spiral Galaxy Bulge
+  new THREE.Vector3(0.0, 1.1, -46.0),   // Binary Barycenter
+  new THREE.Vector3(-36.0, 0.65, -12.0),// Crimson Quasar Singularity
+];
+
+const CAM_SPLINE = new THREE.CatmullRomCurve3(CAM_POS_WAYPOINTS, false, 'catmullrom', 0.45);
+const LOOK_SPLINE = new THREE.CatmullRomCurve3(LOOK_AT_WAYPOINTS, false, 'catmullrom', 0.45);
 
 function detectSoftwareWebGL(): boolean {
   try {
@@ -93,16 +76,18 @@ function detectSoftwareWebGL(): boolean {
   }
 }
 
-interface BlackHoleRig {
-  group: THREE.Group;
-  haloMesh: THREE.Mesh;
-  diskMat: THREE.ShaderMaterial;
-  haloMat: THREE.ShaderMaterial;
+interface RayBlackHoleRig {
+  anchor: THREE.Group;
+  diskFrame: THREE.Object3D;
+  lensMesh: THREE.Mesh;
+  lensMat: THREE.ShaderMaterial;
   jetMats: THREE.ShaderMaterial[];
+  scale: number;
 }
 
 export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
   chapter,
+  scrollProgress,
   seedHex,
   isDark,
   connectedCount,
@@ -114,6 +99,7 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
 
   const liveStateRef = useRef({
     chapter,
+    scrollProgress,
     seedHex,
     isDark,
     connectedCount,
@@ -122,6 +108,7 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
   });
   liveStateRef.current = {
     chapter,
+    scrollProgress,
     seedHex,
     isDark,
     connectedCount,
@@ -150,14 +137,14 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       return;
     }
 
+    const initW = container.clientWidth || window.innerWidth;
+    const initH = Math.max(1, container.clientHeight || window.innerHeight);
+
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.18;
+    renderer.toneMappingExposure = 1.12;
     renderer.setPixelRatio(isSoftwareGl ? 1 : Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setSize(
-      container.clientWidth || window.innerWidth,
-      Math.max(1, container.clientHeight || window.innerHeight)
-    );
+    renderer.setSize(initW, initH);
     renderer.shadowMap.enabled = false;
     renderer.domElement.style.display = 'block';
     renderer.domElement.style.width = '100%';
@@ -179,11 +166,11 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
 
     const maxAniso = renderer.capabilities.getMaxAnisotropy();
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#020308');
-    const fog = new THREE.FogExp2('#020308', 0.0045);
+    scene.background = new THREE.Color('#020307');
+    const fog = new THREE.FogExp2('#020307', 0.0028);
     scene.fog = fog;
 
-    // Studio reflection environment for subtle metallic peer orbiters
+    // PMREM environment reflection for physical orbital satellites
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     const roomEnv = new RoomEnvironment();
     const envRT = pmremGenerator.fromScene(roomEnv, 0.04);
@@ -191,51 +178,59 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
     roomEnv.dispose();
     pmremGenerator.dispose();
 
-    const camera = new THREE.PerspectiveCamera(
-      54,
-      (container.clientWidth || window.innerWidth) /
-        Math.max(1, container.clientHeight || window.innerHeight),
-      0.1,
-      400
-    );
-    camera.position.set(-1.2, 1.35, 11.4);
+    const camera = new THREE.PerspectiveCamera(52, initW / initH, 0.1, 520);
+    camera.position.copy(CAM_POS_WAYPOINTS[0]);
 
-    // Subtle cosmic point & rim illumination
-    const hemiLight = new THREE.HemisphereLight('#a8c7fa', '#070910', 0.85);
+    // Post-processing optical bloom on GPU-accelerated WebGL
+    let composer: EffectComposer | null = null;
+    let bloomPass: UnrealBloomPass | null = null;
+    if (!isSoftwareGl) {
+      composer = new EffectComposer(renderer);
+      composer.addPass(new RenderPass(scene, camera));
+      bloomPass = new UnrealBloomPass(new THREE.Vector2(initW, initH), 0.56, 0.52, 0.72);
+      composer.addPass(bloomPass);
+      composer.addPass(new OutputPass());
+    }
+
+    // Cosmic lighting
+    const hemiLight = new THREE.HemisphereLight('#b8d0ff', '#05070e', 0.8);
     scene.add(hemiLight);
-
-    const primeLight = new THREE.PointLight('#fbbf24', 28, 45, 1.4);
-    primeLight.position.set(0, 1.5, -4);
+    const primeLight = new THREE.PointLight('#fbbf24', 28, 48, 1.35);
+    primeLight.position.set(0.2, 0.8, -4.5);
     scene.add(primeLight);
 
-    const quasarLight = new THREE.PointLight('#ff3b1f', 36, 52, 1.3);
-    quasarLight.position.set(-36, 1.0, -12);
-    scene.add(quasarLight);
+    // =========================================================================
+    // 1. 360° MILKY WAY PANORAMA DOME (Deep-Space Dust & Barnard Rifts)
+    // =========================================================================
+    const skyTex = createMilkyWaySkyTexture(maxAniso);
+    textures.push(skyTex);
+    const skyGeo = new THREE.SphereGeometry(240, 48, 32);
+    const skyMat = new THREE.MeshBasicMaterial({
+      map: skyTex,
+      side: THREE.BackSide,
+      depthWrite: false,
+      fog: false,
+      transparent: true,
+      opacity: 0.92,
+    });
+    geometries.push(skyGeo);
+    materials.push(skyMat);
+    const skyDome = new THREE.Mesh(skyGeo, skyMat);
+    skyDome.rotation.set(0.32, 0.55, -0.42);
+    skyDome.renderOrder = -5;
+    scene.add(skyDome);
 
-    const binaryLight = new THREE.PointLight('#38bdf8', 28, 48, 1.4);
-    binaryLight.position.set(0, 2.0, -46);
-    scene.add(binaryLight);
+    // =========================================================================
+    // 2. SCHWARZSCHILD RAY-MARCHED BLACK HOLE SYSTEMS
+    // =========================================================================
+    const lensQuadGeo = new THREE.PlaneGeometry(10.2, 10.2);
+    const jetBladeGeo = new THREE.PlaneGeometry(1.5, 19.0);
+    geometries.push(lensQuadGeo, jetBladeGeo);
 
-    // Shared black-hole geometries
-    const shadowSphereGeo = new THREE.SphereGeometry(1, 48, 48);
-    const diskPlaneGeo = new THREE.PlaneGeometry(6.6, 6.6);
-    // Remap diskPlaneGeo vertex positions to [-1, 1] so shader polar math aligns seamlessly
-    const posAttr = diskPlaneGeo.attributes.position as THREE.BufferAttribute;
-    for (let i = 0; i < posAttr.count; i++) {
-      posAttr.setX(i, posAttr.getX(i) / 3.3);
-      posAttr.setY(i, posAttr.getY(i) / 3.3);
-    }
-    const unitDiskGeo = new THREE.PlaneGeometry(2, 2);
-    const unitHaloGeo = new THREE.PlaneGeometry(2, 2);
-    const jetBladeGeo = new THREE.PlaneGeometry(1.5, 18.0);
-    geometries.push(shadowSphereGeo, diskPlaneGeo, unitDiskGeo, unitHaloGeo, jetBladeGeo);
+    const blackHoles: RayBlackHoleRig[] = [];
 
-    const eventHorizonMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
-    materials.push(eventHorizonMat);
-
-    const blackHoles: BlackHoleRig[] = [];
-
-    function createBlackHole(opts: {
+    function createRayBlackHole(opts: {
+      parent?: THREE.Object3D;
       position: [number, number, number];
       scale: number;
       tiltX: number;
@@ -244,61 +239,57 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       midColor: string;
       outerColor: string;
       ringColor: string;
-      haloColor: string;
       spinSpeed: number;
       withJets?: boolean;
       jetColor?: string;
-    }): BlackHoleRig {
-      const group = new THREE.Group();
-      group.position.set(...opts.position);
-      group.scale.setScalar(opts.scale);
-      scene.add(group);
+    }): RayBlackHoleRig {
+      const anchor = new THREE.Group();
+      anchor.position.set(...opts.position);
+      (opts.parent ?? scene).add(anchor);
 
-      // 1. Pitch-black Event Horizon Sphere (radius = 0.88 relative to unit disk 1.0 -> matches r=0.305*3.0)
-      const horizonRadius = 0.91;
-      const horizonMesh = new THREE.Mesh(shadowSphereGeo, eventHorizonMat);
-      horizonMesh.scale.setScalar(horizonRadius);
-      horizonMesh.renderOrder = 1;
-      group.add(horizonMesh);
+      const diskFrame = new THREE.Object3D();
+      diskFrame.rotation.set(opts.tiltX, 0, opts.tiltZ);
+      anchor.add(diskFrame);
 
-      // 2. Swirling Relativistic Accretion Disk (normalized [-1, 1] * 3.0 scale)
-      const diskMat = createAccretionDiskShaderMaterial(
-        opts.innerColor,
-        opts.midColor,
-        opts.outerColor,
-        opts.spinSpeed
+      anchor.updateWorldMatrix(true, true);
+      const worldCenter = new THREE.Vector3().setFromMatrixPosition(anchor.matrixWorld);
+      const basisMat = new THREE.Matrix3();
+      _tmpMat4.copy(diskFrame.matrixWorld);
+      _vX.setFromMatrixColumn(_tmpMat4, 0).normalize();
+      _vY.setFromMatrixColumn(_tmpMat4, 1).normalize();
+      _vZ.setFromMatrixColumn(_tmpMat4, 2).normalize();
+      basisMat.set(
+        _vX.x, _vY.x, _vZ.x,
+        _vX.y, _vY.y, _vZ.y,
+        _vX.z, _vY.z, _vZ.z
       );
-      materials.push(diskMat);
-      const diskMesh = new THREE.Mesh(unitDiskGeo, diskMat);
-      diskMesh.scale.setScalar(3.05);
-      diskMesh.rotation.x = -Math.PI / 2 + opts.tiltX;
-      diskMesh.rotation.y = opts.tiltZ;
-      diskMesh.renderOrder = 2;
-      group.add(diskMesh);
 
-      // 3. Secondary Faint Outer Matter Dust Disk
-      const outerDustMesh = new THREE.Mesh(unitDiskGeo, diskMat);
-      outerDustMesh.scale.setScalar(3.85);
-      outerDustMesh.rotation.x = -Math.PI / 2 + opts.tiltX + 0.05;
-      outerDustMesh.rotation.y = opts.tiltZ - 0.12;
-      outerDustMesh.rotation.z = 1.7;
-      outerDustMesh.renderOrder = 2;
-      group.add(outerDustMesh);
+      const lensMat = createRayMarchedBlackHoleMaterial({
+        center: [worldCenter.x, worldCenter.y, worldCenter.z],
+        scale: opts.scale,
+        diskBasis: basisMat,
+        innerColor: opts.innerColor,
+        midColor: opts.midColor,
+        outerColor: opts.outerColor,
+        ringColor: opts.ringColor,
+        spinSpeed: opts.spinSpeed,
+      });
+      materials.push(lensMat);
 
-      // 4. Billboarded Gravitational Lensing Halo + Einstein Photon Ring
-      const haloMat = createPhotonLensingHaloShaderMaterial(opts.ringColor, opts.haloColor);
-      materials.push(haloMat);
-      const haloMesh = new THREE.Mesh(unitHaloGeo, haloMat);
-      haloMesh.scale.setScalar(2.98);
-      haloMesh.renderOrder = 3;
-      group.add(haloMesh);
+      // Mounted at scene root so billboard faces camera without parent scale distortion
+      const lensMesh = new THREE.Mesh(lensQuadGeo, lensMat);
+      lensMesh.position.copy(worldCenter);
+      lensMesh.scale.setScalar(opts.scale);
+      lensMesh.renderOrder = 10;
+      lensMesh.frustumCulled = false;
+      scene.add(lensMesh);
 
-      // 5. Optional Relativistic Polar Jets along black hole spin axis
       const jetMats: THREE.ShaderMaterial[] = [];
       if (opts.withJets) {
-        const jetGroup = new THREE.Group();
-        jetGroup.rotation.x = opts.tiltX;
-        jetGroup.rotation.z = -opts.tiltZ;
+        const jetHolder = new THREE.Group();
+        jetHolder.scale.setScalar(opts.scale);
+        diskFrame.add(jetHolder);
+
         const jMat = createVolumetricBeamShaderMaterial(opts.jetColor || opts.ringColor);
         materials.push(jMat);
         jetMats.push(jMat);
@@ -306,40 +297,44 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
         const bladeA = new THREE.Mesh(jetBladeGeo, jMat);
         const bladeB = new THREE.Mesh(jetBladeGeo, jMat);
         bladeB.rotation.y = Math.PI / 2;
-        jetGroup.add(bladeA, bladeB);
-        group.add(jetGroup);
+        bladeA.renderOrder = 4;
+        bladeB.renderOrder = 4;
+        jetHolder.add(bladeA, bladeB);
       }
 
-      const rig = { group, haloMesh, diskMat, haloMat, jetMats };
+      const rig: RayBlackHoleRig = {
+        anchor,
+        diskFrame,
+        lensMesh,
+        lensMat,
+        jetMats,
+        scale: opts.scale,
+      };
       blackHoles.push(rig);
       return rig;
     }
 
-    // 1. SINGULARITY PRIME (Gargantua Gold / Molten Amber / Cosmic Ice)
-    const primeBH = createBlackHole({
-      position: [0, 0.25, -4.5],
-      scale: 2.35,
-      tiltX: 0.24,
-      tiltZ: -0.14,
-      innerColor: '#fffbeb',
+    // Gargantua Prime (Hero Horizon)
+    const primeBH = createRayBlackHole({
+      position: [0.2, 0.25, -4.5],
+      scale: 1.52,
+      tiltX: 0.22,
+      tiltZ: -0.15,
+      innerColor: '#fffdf2',
       midColor: '#f59e0b',
-      outerColor: '#991b1b',
+      outerColor: '#7c2d12',
       ringColor: '#fef3c7',
-      haloColor: '#fb923c',
-      spinSpeed: 1.05,
-      withJets: false,
+      spinSpeed: 1.08,
     });
 
-    // Connected WebRTC Peer Stars Orbiting Singularity Prime
-    const peerOrbitGroup = new THREE.Group();
-    primeBH.group.add(peerOrbitGroup);
-    const orbiterGeo = new THREE.OctahedronGeometry(0.09, 0);
+    // Live WebRTC Peer Satellites Orbiting Gargantua Prime
+    const orbiterGeo = new THREE.OctahedronGeometry(0.11, 0);
     const orbiterMat = new THREE.MeshStandardMaterial({
-      color: '#5eead4',
+      color: '#67e8f9',
       emissive: '#38bdf8',
-      emissiveIntensity: 2.8,
-      metalness: 0.85,
-      roughness: 0.15,
+      emissiveIntensity: 2.4,
+      metalness: 0.88,
+      roughness: 0.14,
     });
     geometries.push(orbiterGeo);
     materials.push(orbiterMat);
@@ -348,125 +343,128 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
     for (let i = 0; i < 6; i++) {
       const orb = new THREE.Mesh(orbiterGeo, orbiterMat);
       orb.visible = false;
-      peerOrbitGroup.add(orb);
+      primeBH.anchor.add(orb);
       peerOrbiters.push(orb);
     }
 
-    // 2. BINARY BLACK HOLE SYSTEM (Rotating twin singularities with Cyan & Violet-Amber Polar Jets)
+    // Twin Orbiting Binary Black Holes with Relativistic Jets
     const binaryBarycenter = new THREE.Group();
-    binaryBarycenter.position.set(0, 1.1, -46);
+    binaryBarycenter.position.set(0.0, 1.1, -46.0);
     scene.add(binaryBarycenter);
 
-    const binaryAlpha = createBlackHole({
-      position: [-3.4, 0.2, 0],
-      scale: 1.35,
-      tiltX: 0.3,
-      tiltZ: 0.22,
+    createRayBlackHole({
+      parent: binaryBarycenter,
+      position: [-3.8, 0.25, 0],
+      scale: 0.92,
+      tiltX: 0.28,
+      tiltZ: 0.2,
       innerColor: '#ecfeff',
       midColor: '#38bdf8',
-      outerColor: '#312e81',
+      outerColor: '#1e1b4b',
       ringColor: '#bae6fd',
-      haloColor: '#6366f1',
-      spinSpeed: 1.5,
+      spinSpeed: 1.45,
       withJets: true,
       jetColor: '#7dd3fc',
     });
-    binaryBarycenter.add(binaryAlpha.group);
 
-    const binaryBeta = createBlackHole({
-      position: [3.4, -0.2, 0],
-      scale: 1.05,
-      tiltX: -0.25,
+    createRayBlackHole({
+      parent: binaryBarycenter,
+      position: [3.8, -0.25, 0],
+      scale: 0.74,
+      tiltX: -0.24,
       tiltZ: -0.18,
       innerColor: '#fdf4ff',
       midColor: '#a855f7',
       outerColor: '#7f1d1d',
       ringColor: '#f5d0fe',
-      haloColor: '#f43f5e',
-      spinSpeed: 1.85,
+      spinSpeed: 1.75,
       withJets: true,
       jetColor: '#c084fc',
     });
-    binaryBarycenter.add(binaryBeta.group);
 
-    // 3. CRIMSON QUASAR HORIZON (Chapter 04 active volcanic singularity)
-    createBlackHole({
-      position: [-36, 0.55, -12],
-      scale: 2.25,
-      tiltX: 0.2,
-      tiltZ: 0.18,
+    // Crimson Quasar Horizon (Chapter 05)
+    createRayBlackHole({
+      position: [-36.0, 0.65, -12.0],
+      scale: 1.48,
+      tiltX: 0.19,
+      tiltZ: 0.22,
       innerColor: '#fff7ed',
-      midColor: '#ff4500',
-      outerColor: '#4c0519',
+      midColor: '#ea580c',
+      outerColor: '#450a0a',
       ringColor: '#fed7aa',
-      haloColor: '#ef4444',
-      spinSpeed: 1.45,
+      spinSpeed: 1.38,
       withJets: true,
       jetColor: '#fb7185',
     });
 
     // =========================================================================
-    // 12,000-PARTICLE ROTATING LOGARITHMIC SPIRAL GALAXY & NEBULA BELT
+    // 3. 26,000-STAR LOGARITHMIC BARRED SPIRAL GALAXY & H-II KNOTS
     // =========================================================================
     const galaxyGroup = new THREE.Group();
-    galaxyGroup.position.set(24, -1.6, -21);
-    galaxyGroup.rotation.x = 0.48;
-    galaxyGroup.rotation.z = -0.22;
+    galaxyGroup.position.set(24.0, -1.6, -22.0);
+    galaxyGroup.rotation.set(0.46, 0.1, -0.24);
     scene.add(galaxyGroup);
 
-    const galaxyCount = 12000;
+    const galaxyCount = 26000;
     const gPos = new Float32Array(galaxyCount * 3);
     const gCol = new Float32Array(galaxyCount * 3);
     const gScale = new Float32Array(galaxyCount);
     const gPhase = new Float32Array(galaxyCount);
     const gSpeed = new Float32Array(galaxyCount);
 
-    const colCore = new THREE.Color('#fff1d0');
-    const colArmInner = new THREE.Color('#60a5fa');
-    const colArmOuter = new THREE.Color('#a855f7');
-    const colTealKnot = new THREE.Color('#2dd4bf');
-    const colCrimsonDust = new THREE.Color('#fb7185');
+    const colBulge = new THREE.Color('#fff1d6');
+    const colArmOB = new THREE.Color('#7cb3ff');
+    const colArmMid = new THREE.Color('#a78bfa');
+    const colHII = new THREE.Color('#f43f5e');
+    const colReflect = new THREE.Color('#22d3ee');
     const tmpCol = new THREE.Color();
 
     const arms = 4;
-    const maxRadius = 26;
+    const maxRadius = 29;
 
     for (let i = 0; i < galaxyCount; i++) {
       const i3 = i * 3;
-      const rNorm = Math.pow(Math.random(), 1.35);
-      const radius = 0.35 + rNorm * maxRadius;
+      const rNorm = Math.pow(Math.random(), 1.48);
+      const radius = 0.25 + rNorm * maxRadius;
       const armIndex = i % arms;
-      const armBaseAngle = (armIndex / arms) * Math.PI * 2;
-      const spiralTwist = radius * 0.36;
+      const armOffset = armIndex % 2 === 0 ? 0 : 0.18;
+      const armBaseAngle = (armIndex / arms) * Math.PI * 2 + armOffset;
+      const spiralTwist = radius * 0.34;
 
-      // Gaussian-like spread wider near outer edge
-      const spread = (Math.random() - 0.5) * (0.42 + rNorm * 1.45) * (Math.random() < 0.75 ? 0.65 : 1.5);
+      const spread =
+        (Math.random() - 0.5) *
+        (0.32 + rNorm * 1.38) *
+        (Math.random() < 0.78 ? 0.58 : 1.55);
       const angle = armBaseAngle + spiralTwist + spread;
 
-      const thickness = (1.15 - rNorm * 0.75) * 1.15;
-      const y = (Math.random() - 0.5) * thickness * (Math.random() < 0.7 ? 0.55 : 1.6);
+      // Central ellipsoidal bulge transitions to thin disk plane
+      const bulgeHeight = rNorm < 0.18 ? 1.85 * (1 - rNorm / 0.18) : 0;
+      const diskThickness = 0.42 + (1 - rNorm) * 0.65;
+      const y = (Math.random() - 0.5) * (bulgeHeight + diskThickness) * (Math.random() < 0.75 ? 0.55 : 1.35);
 
       gPos[i3] = Math.cos(angle) * radius;
       gPos[i3 + 1] = y;
       gPos[i3 + 2] = Math.sin(angle) * radius;
 
-      // Spectral radial + knot coloring
-      if (rNorm < 0.16) {
-        tmpCol.copy(colCore).lerp(colArmInner, rNorm / 0.16 * 0.4);
+      if (rNorm < 0.18) {
+        tmpCol.copy(colBulge).lerp(colArmOB, (rNorm / 0.18) * 0.3);
       } else {
-        tmpCol.copy(colArmInner).lerp(colArmOuter, (rNorm - 0.16) / 0.84);
+        tmpCol.copy(colArmOB).lerp(colArmMid, (rNorm - 0.18) / 0.82);
         const knotRoll = Math.random();
-        if (knotRoll < 0.14) tmpCol.lerp(colTealKnot, 0.75);
-        else if (knotRoll < 0.22) tmpCol.lerp(colCrimsonDust, 0.68);
+        if (knotRoll < 0.11) tmpCol.lerp(colHII, 0.78);
+        else if (knotRoll < 0.21) tmpCol.lerp(colReflect, 0.65);
       }
 
       gCol[i3] = tmpCol.r;
       gCol[i3 + 1] = tmpCol.g;
       gCol[i3 + 2] = tmpCol.b;
 
-      gScale[i] = (0.35 + Math.random() * 1.65) * (rNorm < 0.2 ? 1.4 : 1.0);
+      const isBrightStar = Math.random() < 0.05;
+      gScale[i] = isBrightStar
+        ? 1.65 + Math.random() * 1.5
+        : (0.28 + Math.random() * 0.95) * (rNorm < 0.18 ? 1.25 : 1.0);
       gPhase[i] = Math.random();
-      gSpeed[i] = 0.085 / (0.45 + Math.sqrt(radius) * 0.55);
+      gSpeed[i] = 0.068 / (0.42 + Math.sqrt(radius) * 0.58);
     }
 
     const galaxyGeo = new THREE.BufferGeometry();
@@ -485,30 +483,34 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
 
     const spiralGalaxy = new THREE.Points(galaxyGeo, galaxyMat);
     spiralGalaxy.frustumCulled = false;
+    spiralGalaxy.renderOrder = 1;
     galaxyGroup.add(spiralGalaxy);
 
-    // Distant Secondary Inclined Galaxy visible in background sky
+    // Distant Secondary Inclined Galaxy
     const farGalaxy = new THREE.Points(galaxyGeo, galaxyMat);
-    farGalaxy.position.set(-55, 24, -95);
-    farGalaxy.rotation.set(1.1, 0.4, 0.7);
-    farGalaxy.scale.setScalar(0.85);
+    farGalaxy.position.set(-58, 22, -108);
+    farGalaxy.rotation.set(1.12, 0.35, 0.72);
+    farGalaxy.scale.setScalar(0.88);
+    farGalaxy.renderOrder = 1;
     scene.add(farGalaxy);
 
-    // Wispy Volumetric Nebula Clouds (100% offline CanvasTextures)
-    const nebTexBlue = createNebulaCloudTexture('#3b82f6', '#7c3aed', maxAniso);
-    const nebTexTeal = createNebulaCloudTexture('#06b6d4', '#10b981', maxAniso);
-    const nebTexCrimson = createNebulaCloudTexture('#e11d48', '#f59e0b', maxAniso);
+    // =========================================================================
+    // 4. REALISTIC FBM FILAMENT EMISSION & REFLECTION NEBULAE
+    // =========================================================================
+    const nebTexBlue = createNebulaCloudTexture('#2563eb', '#6366f1', maxAniso, 17);
+    const nebTexTeal = createNebulaCloudTexture('#0891b2', '#0d9488', maxAniso, 41);
+    const nebTexCrimson = createNebulaCloudTexture('#e11d48', '#d97706', maxAniso, 73);
     textures.push(nebTexBlue, nebTexTeal, nebTexCrimson);
 
-    const nebPlaneGeo = new THREE.PlaneGeometry(34, 34);
+    const nebPlaneGeo = new THREE.PlaneGeometry(36, 36);
     geometries.push(nebPlaneGeo);
 
     const nebulaSpecs = [
-      { pos: [20, -2, -26], tex: nebTexBlue, rot: 0.4, scale: 1.4, opacity: 0.42 },
-      { pos: [30, 1, -18], tex: nebTexTeal, rot: -0.6, scale: 1.15, opacity: 0.34 },
-      { pos: [-38, 2, -16], tex: nebTexCrimson, rot: 0.9, scale: 1.35, opacity: 0.46 },
-      { pos: [2, 3, -58], tex: nebTexBlue, rot: -0.3, scale: 1.5, opacity: 0.38 },
-      { pos: [-14, -8, -42], tex: nebTexTeal, rot: 1.2, scale: 1.25, opacity: 0.28 },
+      { pos: [14, -1, -24], tex: nebTexBlue, rot: 0.35, scale: 1.35, opacity: 0.42 },
+      { pos: [26, 2, -20], tex: nebTexTeal, rot: -0.55, scale: 1.25, opacity: 0.36 },
+      { pos: [-38, 2, -18], tex: nebTexCrimson, rot: 0.85, scale: 1.45, opacity: 0.48 },
+      { pos: [1, 3.2, -56], tex: nebTexBlue, rot: -0.25, scale: 1.45, opacity: 0.4 },
+      { pos: [-12, -5, -36], tex: nebTexTeal, rot: 1.15, scale: 1.18, opacity: 0.3 },
     ];
     const nebulaBillboards: THREE.Mesh[] = [];
     nebulaSpecs.forEach((spec) => {
@@ -525,26 +527,29 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       m.position.set(...(spec.pos as [number, number, number]));
       m.scale.setScalar(spec.scale);
       m.rotation.z = spec.rot;
+      m.renderOrder = 2;
       scene.add(m);
       nebulaBillboards.push(m);
     });
 
     // =========================================================================
-    // 8,500 MULTI-SPECTRAL DEEP-SPACE TWINKLING STARS
+    // 5. 9,500 HARVARD BLACKBODY MULTI-MAGNITUDE STARS
     // =========================================================================
-    const starCount = 8500;
+    const starCount = 9500;
     const sPos = new Float32Array(starCount * 3);
     const sCol = new Float32Array(starCount * 3);
     const sScale = new Float32Array(starCount);
+    const sScaleOrig = new Float32Array(starCount);
     const sPhase = new Float32Array(starCount);
 
     const stellarPalette = [
-      new THREE.Color('#9bbcff'), // Hot Blue O/B
-      new THREE.Color('#e2ecff'), // Blue-white A
-      new THREE.Color('#ffffff'), // Pure white F
-      new THREE.Color('#fef3c7'), // Warm Solar G
-      new THREE.Color('#fdba74'), // Amber K
-      new THREE.Color('#fca5a5'), // Red giant M
+      new THREE.Color('#9bb8ff'), // O/B blue-white
+      new THREE.Color('#cad7ff'), // B/A ice white
+      new THREE.Color('#f8f7ff'), // A white
+      new THREE.Color('#fff4ea'), // F warm white
+      new THREE.Color('#ffd2a1'), // G solar amber
+      new THREE.Color('#ffcc6f'), // K orange
+      new THREE.Color('#ffad75'), // M ember red
     ];
 
     for (let i = 0; i < starCount; i++) {
@@ -553,20 +558,27 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       const v = Math.random();
       const theta = 2 * Math.PI * u;
       const phi = Math.acos(2 * v - 1);
-      const r = 38 + Math.random() * 145;
+      const r = 46 + Math.random() * 175;
 
       sPos[i3] = r * Math.sin(phi) * Math.cos(theta);
       sPos[i3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      sPos[i3 + 2] = r * Math.cos(phi) - 18;
+      sPos[i3 + 2] = r * Math.cos(phi) - 20;
 
-      const c = stellarPalette[Math.floor(Math.pow(Math.random(), 0.85) * stellarPalette.length)];
+      const c = stellarPalette[Math.floor(Math.random() * stellarPalette.length)];
       sCol[i3] = c.r;
       sCol[i3 + 1] = c.g;
       sCol[i3 + 2] = c.b;
 
-      // Occasional super-bright hero stars with diffraction flares
-      const isHeroStar = Math.random() < 0.045;
-      sScale[i] = isHeroStar ? 2.6 + Math.random() * 2.4 : 0.45 + Math.random() * 1.15;
+      // Astronomical power-law magnitude distribution: mostly pinpoint background + rare hero magnitude-0 stars
+      const magRoll = Math.random();
+      const magSize =
+        magRoll < 0.015
+          ? 3.1 + Math.random() * 2.2
+          : magRoll < 0.08
+            ? 1.3 + Math.random() * 1.1
+            : 0.35 + Math.random() * 0.72;
+      sScale[i] = magSize;
+      sScaleOrig[i] = magSize;
       sPhase[i] = Math.random();
     }
 
@@ -585,9 +597,9 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
 
     const starfield = new THREE.Points(starGeo, starMat);
     starfield.frustumCulled = false;
+    starfield.renderOrder = 0;
     scene.add(starfield);
 
-    // Pre-warm shaders when GPU-backed
     if (!isSoftwareGl) {
       renderer.compile(scene, camera);
     }
@@ -608,15 +620,17 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       const pr = isSoftwareGl ? 1 : Math.min(window.devicePixelRatio || 1, 2);
       renderer.setPixelRatio(pr);
       renderer.setSize(w, h);
+      composer?.setSize(w, h);
+      bloomPass?.resolution.set(w, h);
       starMat.uniforms.uPixelRatio.value = pr;
       galaxyMat.uniforms.uPixelRatio.value = pr;
     };
     window.addEventListener('resize', handleResize);
 
-    // Animation Loop (paced for software WebGL via afterDraw)
     const clock = new THREE.Clock();
     let frameId = 0;
     let disposed = false;
+    let smoothScroll = liveStateRef.current.scrollProgress;
 
     function afterDraw(cb: () => void) {
       if (disposed) return;
@@ -629,8 +643,8 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       gl.flush();
       const poll = () => {
         if (disposed) return;
-        const status = sync ? gl.getSyncParameter(sync, gl.SYNC_STATUS) : gl.SIGNALED;
-        if (status === gl.UNSIGNALED) {
+        const st = sync ? gl.getSyncParameter(sync, gl.SYNC_STATUS) : gl.SIGNALED;
+        if (st === gl.UNSIGNALED) {
           frameId = window.setTimeout(poll, 5);
         } else {
           if (sync) gl.deleteSync(sync);
@@ -647,98 +661,118 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       const elapsed = clock.getElapsedTime();
       const st = liveStateRef.current;
 
-      const preset = CHAPTER_PRESETS[st.chapter];
-      const motionMul = prefersReducedMotion ? 0.15 : 1.0;
+      const motionMul = prefersReducedMotion ? 0.12 : 1.0;
 
-      mouseNdc.smoothX = THREE.MathUtils.damp(mouseNdc.smoothX, mouseNdc.x * motionMul, 4.2, delta);
-      mouseNdc.smoothY = THREE.MathUtils.damp(mouseNdc.smoothY, mouseNdc.y * motionMul, 4.2, delta);
-
-      const [px, py, pz] = preset.camPos;
-      const [lx, ly, lz] = preset.lookAt;
-      const zoomOut = st.isWorkspaceFocused ? 3.2 : 0;
-      const roleShiftX = st.hoverRole === 'host' ? -1.1 : st.hoverRole === 'join' ? 1.1 : 0;
-
-      _camTargetPos.set(
-        px + mouseNdc.smoothX * 2.1 + roleShiftX,
-        py + mouseNdc.smoothY * 1.1,
-        pz + zoomOut
-      );
-      _camTargetLook.set(
-        lx + mouseNdc.smoothX * 0.8 + roleShiftX * 0.35,
-        ly + mouseNdc.smoothY * 0.45,
-        lz
+      // Silky scroll-spline camera progression
+      smoothScroll = THREE.MathUtils.damp(
+        smoothScroll,
+        Math.min(1, Math.max(0, st.scrollProgress)),
+        4.0,
+        delta
       );
 
-      camera.position.x = THREE.MathUtils.damp(camera.position.x, _camTargetPos.x, 2.5, delta);
-      camera.position.y = THREE.MathUtils.damp(camera.position.y, _camTargetPos.y, 2.5, delta);
-      camera.position.z = THREE.MathUtils.damp(camera.position.z, _camTargetPos.z, 2.5, delta);
+      mouseNdc.smoothX = THREE.MathUtils.damp(mouseNdc.smoothX, mouseNdc.x * motionMul, 4.0, delta);
+      mouseNdc.smoothY = THREE.MathUtils.damp(mouseNdc.smoothY, mouseNdc.y * motionMul, 4.0, delta);
 
-      _currentLook.x = THREE.MathUtils.damp(_currentLook.x, _camTargetLook.x, 3.0, delta);
-      _currentLook.y = THREE.MathUtils.damp(_currentLook.y, _camTargetLook.y, 3.0, delta);
-      _currentLook.z = THREE.MathUtils.damp(_currentLook.z, _camTargetLook.z, 3.0, delta);
+      CAM_SPLINE.getPointAt(smoothScroll, _camTargetPos);
+      LOOK_SPLINE.getPointAt(smoothScroll, _camTargetLook);
+
+      const roleShiftX = st.hoverRole === 'host' ? -0.95 : st.hoverRole === 'join' ? 0.95 : 0;
+      const gentleBreath = prefersReducedMotion ? 0 : Math.sin(elapsed * 0.35) * 0.16;
+
+      _camTargetPos.x += mouseNdc.smoothX * 1.9 + roleShiftX;
+      _camTargetPos.y += mouseNdc.smoothY * 1.0 + gentleBreath;
+      _camTargetLook.x += mouseNdc.smoothX * 0.75 + roleShiftX * 0.35;
+      _camTargetLook.y += mouseNdc.smoothY * 0.4;
+
+      camera.position.x = THREE.MathUtils.damp(camera.position.x, _camTargetPos.x, 3.6, delta);
+      camera.position.y = THREE.MathUtils.damp(camera.position.y, _camTargetPos.y, 3.6, delta);
+      camera.position.z = THREE.MathUtils.damp(camera.position.z, _camTargetPos.z, 3.6, delta);
+
+      _currentLook.x = THREE.MathUtils.damp(_currentLook.x, _camTargetLook.x, 4.0, delta);
+      _currentLook.y = THREE.MathUtils.damp(_currentLook.y, _camTargetLook.y, 4.0, delta);
+      _currentLook.z = THREE.MathUtils.damp(_currentLook.z, _camTargetLook.z, 4.0, delta);
       camera.lookAt(_currentLook);
 
-      // Deep Space Background & Fog
-      _tmpBgColor.set(st.isDark ? preset.bgDark : preset.bgLight);
+      // Deep space color & skybox dim tuning
+      _tmpBgColor.set(st.isDark ? '#020307' : '#050814');
       (scene.background as THREE.Color).lerp(_tmpBgColor, 1 - Math.exp(-3 * delta));
       fog.color.copy(scene.background as THREE.Color);
-      fog.density = THREE.MathUtils.damp(fog.density, preset.fogDensity, 3.0, delta);
+      skyMat.opacity = THREE.MathUtils.damp(
+        skyMat.opacity,
+        st.isWorkspaceFocused ? 0.72 : 0.94,
+        3.2,
+        delta
+      );
 
-      // Dim gently when dense P2P forms/chats are open
-      const targetExp = st.isWorkspaceFocused ? 0.68 : 1.18;
+      const targetExp = st.isWorkspaceFocused ? 0.86 : 1.15;
       renderer.toneMappingExposure = THREE.MathUtils.damp(renderer.toneMappingExposure, targetExp, 3.5, delta);
 
       const shaderTime = prefersReducedMotion ? 0 : elapsed;
 
-      // Update Black Holes (Billboard lensing rings + Accretion Plasma + Jets)
+      // Binary orbital revolution & celestial sky drift
+      if (!prefersReducedMotion) {
+        binaryBarycenter.rotation.y = elapsed * 0.28;
+        binaryBarycenter.rotation.z = Math.sin(elapsed * 0.22) * 0.1;
+        starfield.rotation.y = elapsed * 0.005;
+        skyDome.rotation.y = 0.55 + elapsed * 0.0025;
+      }
+
+      // Sync ray-marched Schwarzschild black holes to world transforms & camera billboard
+      scene.updateMatrixWorld(false);
       for (let i = 0; i < blackHoles.length; i++) {
         const bh = blackHoles[i];
-        bh.haloMesh.quaternion.copy(camera.quaternion);
-        bh.diskMat.uniforms.uTime.value = shaderTime;
-        bh.haloMat.uniforms.uTime.value = shaderTime;
-        bh.diskMat.uniforms.uOpacity.value = THREE.MathUtils.damp(
-          bh.diskMat.uniforms.uOpacity.value,
-          st.isWorkspaceFocused ? 0.62 : 1.0,
+        bh.lensMesh.position.setFromMatrixPosition(bh.anchor.matrixWorld);
+        bh.lensMesh.quaternion.copy(camera.quaternion);
+        bh.lensMat.uniforms.uCenter.value.copy(bh.lensMesh.position);
+        bh.lensMat.uniforms.uTime.value = shaderTime;
+
+        _tmpMat4.copy(bh.diskFrame.matrixWorld);
+        _vX.setFromMatrixColumn(_tmpMat4, 0).normalize();
+        _vY.setFromMatrixColumn(_tmpMat4, 1).normalize();
+        _vZ.setFromMatrixColumn(_tmpMat4, 2).normalize();
+        bh.lensMat.uniforms.uDiskBasis.value.set(
+          _vX.x, _vY.x, _vZ.x,
+          _vX.y, _vY.y, _vZ.y,
+          _vX.z, _vY.z, _vZ.z
+        );
+
+        bh.lensMat.uniforms.uOpacity.value = THREE.MathUtils.damp(
+          bh.lensMat.uniforms.uOpacity.value,
+          st.isWorkspaceFocused ? 0.85 : 1.0,
           3.5,
           delta
         );
-        bh.haloMat.uniforms.uOpacity.value = bh.diskMat.uniforms.uOpacity.value;
+
         for (let j = 0; j < bh.jetMats.length; j++) {
           bh.jetMats[j].uniforms.uTime.value = shaderTime;
         }
       }
 
-      // Binary Black Hole Mutual Orbital Dance
-      if (!prefersReducedMotion) {
-        binaryBarycenter.rotation.y = elapsed * 0.34;
-        binaryBarycenter.rotation.z = Math.sin(elapsed * 0.25) * 0.12;
-        starfield.rotation.y = elapsed * 0.008;
-      }
-
-      // Live Peer Satellites Orbiting Singularity Prime
+      // Live Connected Peer Satellites Orbiting Gargantua Prime
       const activeOrbCount = Math.min(peerOrbiters.length, st.connectedCount);
       for (let i = 0; i < peerOrbiters.length; i++) {
         const orb = peerOrbiters[i];
         if (i < activeOrbCount) {
           orb.visible = true;
-          const a = elapsed * 0.85 + (i / Math.max(1, activeOrbCount)) * Math.PI * 2;
-          orb.position.set(Math.cos(a) * 1.45, Math.sin(a * 1.3) * 0.32, Math.sin(a) * 1.45);
-          orb.rotation.y = elapsed * 1.8;
+          const a = elapsed * 0.75 + (i / Math.max(1, activeOrbCount)) * Math.PI * 2;
+          orb.position.set(Math.cos(a) * 2.25, Math.sin(a * 1.4) * 0.42, Math.sin(a) * 2.25);
+          orb.rotation.y = elapsed * 1.6;
         } else {
           orb.visible = false;
         }
       }
 
-      // Nebula Billboards face camera gently
+      // Nebula alignment
       for (let i = 0; i < nebulaBillboards.length; i++) {
         nebulaBillboards[i].quaternion.copy(camera.quaternion);
       }
 
-      // Update Starfield & Spiral Galaxy Uniforms
+      // Starfield & Spiral Galaxy Uniforms
       starMat.uniforms.uTime.value = shaderTime;
       starMat.uniforms.uOpacity.value = THREE.MathUtils.damp(
         starMat.uniforms.uOpacity.value,
-        st.isWorkspaceFocused ? 0.55 : 1.0,
+        st.isWorkspaceFocused ? 0.65 : 1.0,
         3.5,
         delta
       );
@@ -750,12 +784,16 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       galaxyMat.uniforms.uSeedTint.value.lerp(_tmpSeedColor, 1 - Math.exp(-3 * delta));
       galaxyMat.uniforms.uOpacity.value = THREE.MathUtils.damp(
         galaxyMat.uniforms.uOpacity.value,
-        st.isWorkspaceFocused ? 0.45 : 0.94,
+        st.isWorkspaceFocused ? 0.58 : 0.96,
         3.5,
         delta
       );
 
-      renderer.render(scene, camera);
+      if (composer && !isSoftwareGl) {
+        composer.render();
+      } else {
+        renderer.render(scene, camera);
+      }
 
       if (isSoftwareGl) {
         afterDraw(animate);
@@ -778,6 +816,7 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       geometries.forEach((g) => g.dispose());
       materials.forEach((m) => m.dispose());
       textures.forEach((t) => t.dispose());
+      composer?.dispose();
       envRT.dispose();
       renderer.dispose();
       container.innerHTML = '';
@@ -790,7 +829,7 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
         className="fixed inset-0 z-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(circle at 50% 42%, rgba(245,158,11,0.16), rgba(2,3,8,0.99) 62%)',
+            'radial-gradient(circle at 50% 42%, rgba(245,158,11,0.18), rgba(2,3,8,0.99) 62%)',
         }}
       />
     );

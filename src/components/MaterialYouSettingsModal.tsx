@@ -91,7 +91,12 @@ export const MaterialYouSettingsContent: React.FC<{
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto p-4 sm:p-6 md:p-8 space-y-6">
+    <div
+      className={cn(
+        'w-full p-4 sm:p-6 md:p-8 space-y-6',
+        onClose ? 'h-full overflow-y-auto' : ''
+      )}
+    >
       {/* Top Expressive Hero Banner */}
       <div className="m3-card-xl p-6 sm:p-8 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-2 max-w-xl">
