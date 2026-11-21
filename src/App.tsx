@@ -91,7 +91,13 @@ export default function App() {
     try {
       const saved = localStorage.getItem('quantum_m3_theme');
       if (saved) {
-        return { ...DEFAULT_MATERIAL_THEME, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        return {
+          ...DEFAULT_MATERIAL_THEME,
+          ...parsed,
+          backgroundScene: parsed?.backgroundScene === 'cyberpunk' ? 'cyberpunk' : 'space',
+          simpleMode: Boolean(parsed?.simpleMode),
+        };
       }
     } catch {}
     return DEFAULT_MATERIAL_THEME;
@@ -99,7 +105,7 @@ export default function App() {
   const [showThemeModal, setShowThemeModal] = useState(false);
 
   // --- Offline 3D Spatial Stage, Scroll Flight & Kinetic Intro State ---
-  const [showPreloader, setShowPreloader] = useState(true);
+  const [showPreloader, setShowPreloader] = useState(() => !materialTheme.simpleMode);
   const [stageChapter, setStageChapter] = useState<StageChapterId>(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [hoverRole, setHoverRole] = useState<'host' | 'join' | null>(null);
@@ -3104,20 +3110,25 @@ export default function App() {
         onClose={() => setShowThemeModal(false)}
       />
 
-      <KineticPreloader
-        visible={showPreloader}
-        onComplete={() => setShowPreloader(false)}
-      />
+      {!materialTheme.simpleMode && (
+        <KineticPreloader
+          visible={showPreloader}
+          onComplete={() => setShowPreloader(false)}
+        />
+      )}
 
-      <QuantumWebGLStage
-        chapter={stageChapter}
-        scrollProgress={scrollProgress}
-        seedHex={materialTheme.seedHex}
-        isDark={materialTheme.mode === 'dark'}
-        connectedCount={connectedCount}
-        isWorkspaceFocused={Boolean(role)}
-        hoverRole={hoverRole}
-      />
+      {!materialTheme.simpleMode && (
+        <QuantumWebGLStage
+          chapter={stageChapter}
+          scrollProgress={scrollProgress}
+          seedHex={materialTheme.seedHex}
+          isDark={materialTheme.mode === 'dark'}
+          connectedCount={connectedCount}
+          isWorkspaceFocused={Boolean(role)}
+          hoverRole={hoverRole}
+          backgroundScene={materialTheme.backgroundScene || 'space'}
+        />
+      )}
       
       {/* Sticky Android 16 Material You (M3 Expressive) Top App Bar */}
       <header
@@ -3247,6 +3258,27 @@ export default function App() {
           >
             <MaterialSymbol name="colors" size={17} />
             <span className="hidden xl:inline whitespace-nowrap">Theme</span>
+          </button>
+
+          {/* Simple Mode Toggle (Hide 3D Models & Effects) */}
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('medium', materialTheme.hapticsEnabled);
+              setMaterialTheme(prev => ({ ...prev, simpleMode: !prev.simpleMode }));
+            }}
+            aria-pressed={Boolean(materialTheme.simpleMode)}
+            className={cn(
+              "w-8.5 h-8.5 sm:w-9 sm:h-9 xl:w-auto xl:px-3 flex items-center justify-center gap-1.5 rounded-full border cursor-pointer flex-shrink-0 text-xs font-semibold active:scale-[0.97]",
+              materialTheme.simpleMode ? "m3-btn-filled" : "m3-surface-interactive"
+            )}
+            title={materialTheme.simpleMode ? "Simple Mode is ON (Click to restore 3D models & effects)" : "Enable Simple Mode (Hide 3D models & visual effects)"}
+            aria-label={materialTheme.simpleMode ? "Disable Simple Mode" : "Enable Simple Mode"}
+          >
+            <MaterialSymbol name="visibility_off" size={16} filled={Boolean(materialTheme.simpleMode)} />
+            <span className="hidden xl:inline whitespace-nowrap">
+              {materialTheme.simpleMode ? "Simple: ON" : "Simple"}
+            </span>
           </button>
 
           {/* Help / Guide Button */}
@@ -3817,7 +3849,7 @@ export default function App() {
                               : "m3-surface-interactive"
                         )}
                       >
-                        <DataStream active={isTransferring} />
+                        {!materialTheme.simpleMode && <DataStream active={isTransferring} />}
                         <input 
                           type="file" 
                           multiple 
@@ -4059,16 +4091,32 @@ export default function App() {
               <div className="flex items-start justify-between gap-4 pointer-events-none">
                 <div className="space-y-1.5">
                   <div className="text-[10px] sm:text-[11px] font-mono tracking-[0.22em] uppercase text-[color:var(--md-sys-color-primary)]">
-                    01 · Event Horizon Singularity
+                    {materialTheme.simpleMode
+                      ? '01 · Direct Peer Transceiver'
+                      : materialTheme.backgroundScene === 'cyberpunk'
+                        ? '01 · Megacorp Skyline Overlook'
+                        : '01 · Event Horizon Singularity'}
                   </div>
-                  <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-text leading-[1.03] max-w-2xl text-balance drop-shadow-[0_6px_28px_rgba(0,0,0,0.65)]">
+                  <h2
+                    className={cn(
+                      "text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-text leading-[1.03] max-w-2xl text-balance",
+                      !materialTheme.simpleMode && "drop-shadow-[0_6px_28px_rgba(0,0,0,0.65)]"
+                    )}
+                  >
                     Direct peer sharing, sculpted in real time.
                   </h2>
                 </div>
               </div>
 
-              {/* Middle Breathing Space: Leaves Gargantua Prime Ray-Marched Black Hole 100% Unobstructed */}
-              <div className="min-h-[180px] sm:min-h-[250px] lg:min-h-[300px] flex-1 pointer-events-none" />
+              {/* Middle Breathing Space: Leaves 3D background stage unobstructed (collapsed in Simple Mode) */}
+              <div
+                className={cn(
+                  "pointer-events-none",
+                  materialTheme.simpleMode
+                    ? "h-6 sm:h-10"
+                    : "min-h-[180px] sm:min-h-[250px] lg:min-h-[300px] flex-1"
+                )}
+              />
 
               {/* Lower Spatial Action Monoliths & Scroll Prompt */}
               <div className="space-y-4 pb-2">
@@ -4138,7 +4186,7 @@ export default function App() {
                       className="m3-btn-tonal flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer active:scale-[0.97]"
                     >
                       <span>Scroll Sections</span>
-                      <ChevronDown size={14} className="animate-bounce" />
+                      <ChevronDown size={14} className={materialTheme.simpleMode ? undefined : "animate-bounce"} />
                     </button>
                   </div>
                 </div>
@@ -4155,7 +4203,11 @@ export default function App() {
           <div className="flex flex-wrap items-end justify-between gap-3 px-1">
             <div>
               <div className="text-[11px] font-mono tracking-[0.22em] uppercase text-[color:var(--md-sys-color-primary)]">
-                02 · Ionized Nebula Passage
+                {materialTheme.simpleMode
+                  ? '02 · Encrypted Mesh Channel'
+                  : materialTheme.backgroundScene === 'cyberpunk'
+                    ? '02 · Kabuki Neon Rain Alley'
+                    : '02 · Ionized Nebula Passage'}
               </div>
               <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-text">
                 Encrypted Chat & HD Calls
@@ -4212,7 +4264,11 @@ export default function App() {
         >
           <div className="px-1">
             <div className="text-[11px] font-mono tracking-[0.22em] uppercase text-[color:var(--md-sys-color-primary)]">
-              03 · Barred Spiral Galaxy Core
+              {materialTheme.simpleMode
+                ? '03 · Optical Matrix Utility'
+                : materialTheme.backgroundScene === 'cyberpunk'
+                  ? '03 · Elevated Transit Interchange'
+                  : '03 · Barred Spiral Galaxy Core'}
             </div>
             <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-text">
               QR Customisation Studio
@@ -4229,7 +4285,11 @@ export default function App() {
         >
           <div className="px-1">
             <div className="text-[11px] font-mono tracking-[0.22em] uppercase text-[color:var(--md-sys-color-primary)]">
-              04 · Binary Black Hole Jets
+              {materialTheme.simpleMode
+                ? '04 · Cryptographic Codec'
+                : materialTheme.backgroundScene === 'cyberpunk'
+                  ? '04 · Twin Corporate Spires'
+                  : '04 · Binary Black Hole Jets'}
             </div>
             <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-text">
               Base64 & AES-256-GCM Encoder
@@ -4246,7 +4306,11 @@ export default function App() {
         >
           <div className="px-1">
             <div className="text-[11px] font-mono tracking-[0.22em] uppercase text-[color:var(--md-sys-color-primary)]">
-              05 · Crimson Quasar Horizon
+              {materialTheme.simpleMode
+                ? '05 · Interface & Identity'
+                : materialTheme.backgroundScene === 'cyberpunk'
+                  ? '05 · Crimson Industrial Harbor'
+                  : '05 · Crimson Quasar Horizon'}
             </div>
             <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-text">
               Customise Appearance & App Icon

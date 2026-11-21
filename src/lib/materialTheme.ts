@@ -69,6 +69,7 @@ import {
 
 export type ThemeMode = 'light' | 'dark';
 export type ContrastLevel = 'standard' | 'high';
+export type BackgroundSceneTheme = 'space' | 'cyberpunk';
 export type AppIconPresetId = 'monochrome' | 'dynamic-adaptive' | 'quantum-core' | 'obsidian-pulse' | 'solar-flare' | 'cyber-blueprint';
 export type AppIconShape = 'squircle' | 'circle' | 'cookie' | 'teardrop' | 'rounded-square';
 
@@ -86,6 +87,8 @@ export interface MaterialThemeState {
   seedHex: string;
   mode: ThemeMode;
   contrast: ContrastLevel;
+  backgroundScene: BackgroundSceneTheme;
+  simpleMode: boolean;
   source: 'seed' | 'wallpaper';
   wallpaperId: string;
   customWallpaperUrl?: string;
@@ -149,6 +152,8 @@ export const DEFAULT_MATERIAL_THEME: MaterialThemeState = {
   seedHex: '#1B6EF3',
   mode: 'dark',
   contrast: 'standard',
+  backgroundScene: 'space',
+  simpleMode: false,
   source: 'seed',
   wallpaperId: 'pixel-horizon',
   appIconPreset: 'dynamic-adaptive',
@@ -415,6 +420,7 @@ export function applyMaterialThemeToDOM(state: MaterialThemeState) {
   } else {
     root.classList.remove('dark');
   }
+  root.classList.toggle('ql-simple-mode', Boolean(state.simpleMode));
 
   const tokens = computeM3Tokens(state.seedHex, state.mode, state.contrast);
 

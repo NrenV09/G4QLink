@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   MaterialThemeState,
+  BackgroundSceneTheme,
   MATERIAL_SEED_PRESETS,
   WALLPAPER_PRESETS,
   AppIconPresetId,
@@ -234,6 +235,115 @@ export const MaterialYouSettingsContent: React.FC<{
                   </div>
                 </div>
               </button>
+            </div>
+
+            {/* Simple Mode Toggle (Hide all 3D models & visual effects) */}
+            <div
+              className="pt-4 border-t flex items-center justify-between gap-4"
+              style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
+            >
+              <div className="flex items-center gap-3">
+                <MaterialSymbol
+                  name="visibility_off"
+                  filled={Boolean(themeState.simpleMode)}
+                  className="text-[color:var(--md-sys-color-primary)]"
+                />
+                <div>
+                  <div className="text-sm font-semibold text-text">Simple Mode (Hide 3D & Effects)</div>
+                  <div className="text-xs text-muted">
+                    Hides all 3D models, shaders, glass blur, and visual animations for minimal distraction & battery savings
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                aria-pressed={Boolean(themeState.simpleMode)}
+                onClick={() => {
+                  const next = !themeState.simpleMode;
+                  triggerHaptic('medium', themeState.hapticsEnabled);
+                  onUpdateTheme((prev) => ({ ...prev, simpleMode: next }));
+                }}
+                className={cn(
+                  'px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0',
+                  themeState.simpleMode ? 'm3-btn-filled' : 'm3-surface-interactive border'
+                )}
+              >
+                {themeState.simpleMode ? 'Simple Mode ON' : 'Simple Mode OFF'}
+              </button>
+            </div>
+
+            {/* 3D Spatial Background Theme Selector */}
+            <div
+              className={cn(
+                'pt-4 border-t space-y-3 transition-opacity',
+                themeState.simpleMode && 'opacity-65'
+              )}
+              style={{ borderColor: 'var(--md-sys-color-outline-variant)' }}
+            >
+              <div className="flex items-center gap-2.5">
+                <MaterialSymbol name="layers" className="text-[color:var(--md-sys-color-primary)]" />
+                <div>
+                  <div className="text-sm font-semibold text-text">3D Background Theme</div>
+                  <div className="text-xs text-muted">
+                    {themeState.simpleMode
+                      ? 'Simple Mode active — choose a 3D world below to re-enable 3D effects'
+                      : 'Choose the live WebGL spatial world behind the interface'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {(
+                  [
+                    {
+                      id: 'space' as BackgroundSceneTheme,
+                      title: 'Cosmic Space',
+                      desc: 'Ray-marched singularities, ringed gas giant & spiral galaxy',
+                      icon: 'explore',
+                    },
+                    {
+                      id: 'cyberpunk' as BackgroundSceneTheme,
+                      title: 'Cyberpunk City',
+                      desc: 'Rain-slicked neon canyon, monorail, holograms & flying traffic',
+                      icon: 'domain',
+                    },
+                  ]
+                ).map((sceneOpt) => {
+                  const active =
+                    !themeState.simpleMode &&
+                    (themeState.backgroundScene || 'space') === sceneOpt.id;
+                  return (
+                    <button
+                      key={sceneOpt.id}
+                      type="button"
+                      onClick={() => {
+                        triggerHaptic('medium', themeState.hapticsEnabled);
+                        onUpdateTheme((prev) => ({
+                          ...prev,
+                          backgroundScene: sceneOpt.id,
+                          simpleMode: false,
+                        }));
+                      }}
+                      className={cn(
+                        'p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 active:scale-[0.98]',
+                        active ? 'm3-tonal-active' : 'm3-surface-interactive'
+                      )}
+                    >
+                      <MaterialSymbol
+                        name={sceneOpt.icon}
+                        filled={active}
+                        className="mt-0.5"
+                      />
+                      <div className="min-w-0">
+                        <div className="text-sm font-bold">{sceneOpt.title}</div>
+                        <div className="text-[11px] opacity-75 leading-snug mt-0.5">
+                          {sceneOpt.desc}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Haptic Feedback Hook Toggle */}
