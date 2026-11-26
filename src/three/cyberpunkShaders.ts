@@ -191,8 +191,8 @@ export function createRainStreakShaderMaterial(): THREE.ShaderMaterial {
       void main() {
         // Thin diagonal raindrop streak inside point sprite
         vec2 uv = gl_PointCoord - 0.5;
-        float dx = abs(uv.x + uv.y * 0.14);
-        float streak = exp(-pow(dx * 24.0, 2.0)) * smoothstep(0.5, 0.05, abs(uv.y));
+        float dx = abs(uv.x + uv.y * 0.14) * 24.0;
+        float streak = exp(-(dx * dx)) * smoothstep(0.5, 0.05, abs(uv.y));
         float alpha = streak * vAlpha * uOpacity;
         if (alpha < 0.01) discard;
         gl_FragColor = vec4(vColor * 1.25, alpha);
@@ -230,7 +230,8 @@ export function createSteamVentShaderMaterial(colorHex = '#38bdf8'): THREE.Shade
       ${CYBER_NOISE_GLSL}
 
       void main() {
-        float xFade = exp(-pow((vUv.x - 0.5) * 3.4, 2.0));
+        float xD = (vUv.x - 0.5) * 3.4;
+        float xFade = exp(-(xD * xD));
         float yFade = smoothstep(0.0, 0.18, vUv.y) * (1.0 - smoothstep(0.45, 1.0, vUv.y));
         float billow = fbm(vec2(vUv.x * 3.8, vUv.y * 3.2 - uTime * 0.42));
         float alpha = xFade * yFade * billow * uOpacity;
@@ -269,8 +270,9 @@ export function createSearchlightConeShaderMaterial(colorHex = '#38bdf8'): THREE
       varying vec2 vUv;
 
       void main() {
-        float xFade = exp(-pow((vUv.x - 0.5) * 4.2, 2.0));
-        float yFade = smoothstep(0.0, 0.08, vUv.y) * pow(1.0 - vUv.y, 1.45);
+        float xD = (vUv.x - 0.5) * 4.2;
+        float xFade = exp(-(xD * xD));
+        float yFade = smoothstep(0.0, 0.08, vUv.y) * pow(max(1.0 - vUv.y, 0.0001), 1.45);
         float haze = 0.8 + 0.2 * sin(vUv.y * 12.0 - uTime * 1.4);
         float alpha = xFade * yFade * haze * uOpacity;
         if (alpha < 0.004) discard;

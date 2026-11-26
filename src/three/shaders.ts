@@ -216,7 +216,8 @@ export function createRayMarchedBlackHoleMaterial(opts: {
         vec3 starCol = mix(vec3(0.68, 0.84, 1.0), vec3(1.0, 0.82, 0.62), hash31(cell + 19.3));
 
         // Faint lensed galactic band glow wrapping around the Einstein ring
-        float band = exp(-pow((worldDir.y + 0.12 * worldDir.x) * 5.2, 2.0));
+        float bD = (worldDir.y + 0.12 * worldDir.x) * 5.2;
+        float band = exp(-(bD * bD));
         vec3 lensedGlow = vec3(0.06, 0.10, 0.20) * band * 0.75 + starCol * star * 1.45;
         return lensedGlow * lensWeight;
       }
@@ -240,11 +241,12 @@ export function createRayMarchedBlackHoleMaterial(opts: {
         float wisps = fbm(vec2(normR * 22.0 + turb * 1.4, swirl * 2.2 - uTime * 0.38));
         float spiralShear = 0.72 + 0.28 * sin(angle * 3.0 + normR * 14.0 - uTime * keplerRate + turb * 3.2);
 
-        float radialEnvelope = smoothstep(0.0, 0.075, normR) * pow(1.0 - normR, 1.75);
+        float radialEnvelope = smoothstep(0.0, 0.075, normR) * pow(max(1.0 - normR, 0.0001), 1.75);
         float density = radialEnvelope * (0.28 + 0.74 * turb) * (0.55 + 0.55 * wisps) * spiralShear;
 
         // Inner ISCO superheated corona band
-        float isco = exp(-pow((normR - 0.03) * 24.0, 2.0)) * 1.95;
+        float iscoD = (normR - 0.03) * 24.0;
+        float isco = exp(-(iscoD * iscoD)) * 1.95;
 
         // Relativistic Doppler beaming + gravitational redshift sqrt(1 - rs/r)
         float gravRedshift = sqrt(clamp(1.0 - 0.85 / max(rDisk, 0.95), 0.16, 1.0));
@@ -312,7 +314,8 @@ export function createRayMarchedBlackHoleMaterial(opts: {
           // Grazing photon-sphere glow weighted by angular momentum so radial center rays stay pure #000000
           if (r < 1.48) {
             float grazeWeight = smoothstep(0.92, 1.52, sqrt(h2));
-            photonGlow += exp(-pow((r - 0.97) * 14.0, 2.0)) * dt * 1.65 * grazeWeight;
+            float pgD = (r - 0.97) * 14.0;
+            photonGlow += exp(-(pgD * pgD)) * dt * 1.65 * grazeWeight;
           }
 
           // Exact continuous equatorial accretion disk plane crossing (zero step-ring slicing)
@@ -334,7 +337,8 @@ export function createRayMarchedBlackHoleMaterial(opts: {
 
         // Photon ring emission strictly outside the captured event horizon shadow
         if (!captured) {
-          float analyticalRing = exp(-pow((minR - 0.94) * 16.0, 2.0)) * 1.35;
+          float arD = (minR - 0.94) * 16.0;
+          float analyticalRing = exp(-(arD * arD)) * 1.35;
           float totalRing = clamp(max(photonGlow, analyticalRing), 0.0, 2.35);
           vec3 ringCol = uColorRing * totalRing;
           accumColor += ringCol * (1.0 - accumAlpha * 0.45);
@@ -409,10 +413,11 @@ export function createAtmosphereRimShaderMaterial(opts: {
       void main() {
         vec3 viewDir = normalize(cameraPosition - vWorldPos);
         // BackSide normals point outward; rim peaks toward grazing edge
-        float fresnel = pow(clamp(1.0 + dot(vWorldNormal, viewDir), 0.0, 1.0), 3.1);
+        float fresnel = pow(clamp(1.0 + dot(vWorldNormal, viewDir), 0.0001, 1.0), 3.1);
         float sunDot = dot(vWorldNormal, normalize(uSunDir));
         float dayWeight = smoothstep(-0.28, 0.65, sunDot);
-        float terminator = exp(-pow(sunDot * 4.5, 2.0));
+        float termD = sunDot * 4.5;
+        float terminator = exp(-(termD * termD));
 
         vec3 col = mix(uDayColor, uTwilightColor, terminator * 0.65);
         float alpha = fresnel * (0.04 + 0.96 * dayWeight) * uOpacity;
@@ -698,7 +703,8 @@ export function createVolumetricBeamShaderMaterial(colorHex = '#7dd3fc'): THREE.
       void main() {
         float distFromCenter = abs(vUv.y - 0.5) * 2.0;
         float corePinch = mix(7.0, 1.6, distFromCenter);
-        float xFade = exp(-pow((vUv.x - 0.5) * corePinch, 2.0));
+        float xD = (vUv.x - 0.5) * corePinch;
+        float xFade = exp(-(xD * xD));
         float yFade = smoothstep(1.0, 0.04, distFromCenter) * smoothstep(0.0, 0.06, distFromCenter);
         float helix = 0.68 + 0.32 * sin(distFromCenter * 24.0 - uTime * 3.8 + (vUv.x - 0.5) * 9.0);
         float plasmaKnot = 0.58 + 0.42 * fbm(vec2(vUv.x * 4.5, distFromCenter * 11.0 - uTime * 2.6));

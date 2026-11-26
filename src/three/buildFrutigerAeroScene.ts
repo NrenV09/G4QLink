@@ -60,8 +60,8 @@ function meadowHeightAt(x: number, z: number): number {
   const basinCarve = -5.6 * Math.exp(-Math.pow(lagoonDist / 0.74, 2.4));
   const shoreLift = 1.1 * Math.exp(-Math.pow((lagoonDist - 1.06) / 0.36, 2.0));
 
-  // Foreground corridor gentle downward sweep so hero view looks cleanly across lagoon & hills
-  const foregroundEase = z > -4 ? -Math.min(1, (z + 4) / 22) * 3.4 : 0;
+  // Foreground corridor gentle downward sweep only well south of lagoon bank so meadow stays cleanly above water
+  const foregroundEase = z > 8 ? -Math.min(1, (z - 8) / 20) * 1.4 : 0;
 
   // Scenic distant left/back eco-city ridge & right meadow slope
   const ecoRidge =
@@ -202,11 +202,11 @@ export function buildFrutigerAeroScene(opts: {
     map: meadowTex.map,
     roughnessMap: meadowTex.roughnessMap,
     bumpMap: meadowTex.bumpMap,
-    bumpScale: 0.08,
+    bumpScale: 0.025,
     vertexColors: true,
-    roughness: 0.94,
+    roughness: 0.96,
     metalness: 0.0,
-    envMapIntensity: 0.18,
+    envMapIntensity: 0.10,
   });
   terrainMat.color.copy(_dayMeadowTint).lerp(_darkMeadowTint, initDark);
   geometries.push(terrainGeo);
@@ -215,8 +215,8 @@ export function buildFrutigerAeroScene(opts: {
   const meadowTerrain = new THREE.Mesh(terrainGeo, terrainMat);
   scene.add(meadowTerrain);
 
-  // Crystal-clear turquoise lagoon surface plane bounded cleanly to lagoon basin at y = 0.02
-  const waterGeo = new THREE.PlaneGeometry(78, 78, 64, 64);
+  // Crystal-clear turquoise lagoon surface strictly bounded to the carved basin at y = 0.02
+  const waterGeo = new THREE.PlaneGeometry(52, 46, 48, 48);
   const waterMat = createCrystalWaterShaderMaterial();
   waterMat.uniforms.uSunDir.value.copy(sunDir);
   waterMat.uniforms.uDarkFactor.value = initDark;
@@ -353,26 +353,20 @@ export function buildFrutigerAeroScene(opts: {
   const fishFinMats = {
     clownfish: new THREE.MeshPhysicalMaterial({
       color: '#ff922b',
-      roughness: 0.22,
-      clearcoat: 0.8,
-      transparent: true,
-      opacity: 0.88,
+      roughness: 0.24,
+      clearcoat: 0.7,
       side: THREE.DoubleSide,
     }),
     bluetang: new THREE.MeshPhysicalMaterial({
       color: '#ffe033',
-      roughness: 0.22,
-      clearcoat: 0.85,
-      transparent: true,
-      opacity: 0.9,
+      roughness: 0.24,
+      clearcoat: 0.75,
       side: THREE.DoubleSide,
     }),
     goldkoi: new THREE.MeshPhysicalMaterial({
       color: '#a5f3fc',
-      roughness: 0.18,
-      clearcoat: 0.9,
-      transparent: true,
-      opacity: 0.84,
+      roughness: 0.20,
+      clearcoat: 0.8,
       side: THREE.DoubleSide,
     }),
   };
@@ -490,6 +484,7 @@ export function buildFrutigerAeroScene(opts: {
   const outerRingGeo = new THREE.TorusGeometry(2.82, 0.068, 16, 96);
   const outerRing = new THREE.Mesh(outerRingGeo, aquaGlassMat);
   outerRing.rotation.set(1.38, -0.35, -0.18);
+  outerRing.renderOrder = 8;
   heroOrbGroup.add(outerRing);
 
   const satOrbGeo = new THREE.SphereGeometry(0.28, 24, 18);
@@ -499,7 +494,7 @@ export function buildFrutigerAeroScene(opts: {
     const bead = new THREE.Mesh(satOrbGeo, i % 2 === 0 ? mintBubbleMat : skyBubbleMat);
     bead.position.set(Math.cos(ang) * 2.82, Math.sin(ang * 2) * 0.48, Math.sin(ang) * 2.82);
     bead.scale.setScalar(0.75 + (i % 3) * 0.28);
-    bead.renderOrder = 9;
+    bead.renderOrder = 8;
     heroOrbitBeads.add(bead);
   }
   heroOrbGroup.add(heroOrbitBeads);
@@ -538,7 +533,25 @@ export function buildFrutigerAeroScene(opts: {
     [19.5, 13.8, -38.5, 0.94],
   ];
 
-  for (let i = 0; i < 42; i++) {
+  const placedBubbles: [number, number, number, number][] = [
+    [0.5, 4.65, 0.4, 3.2],       // Reserve space around Hero Crystal Orb
+    [0.0, 3.45, -24.0, 2.2],     // Reserve space around Lagoon Pavilion Orb
+    [18.5, 14.5, -45.0, 5.8],    // Reserve space around Floating Terrarium Orb
+  ];
+
+  const overlapsExisting = (bx: number, by: number, bz: number, sc: number) => {
+    for (let k = 0; k < placedBubbles.length; k++) {
+      const [ox, oy, oz, or] = placedBubbles[k];
+      const dx = bx - ox;
+      const dy = by - oy;
+      const dz = bz - oz;
+      const minDist = sc + or + 0.65;
+      if (dx * dx + dy * dy + dz * dz < minDist * minDist) return true;
+    }
+    return false;
+  };
+
+  for (let i = 0; i < 46 && floatingBubbles.length < 36; i++) {
     let bx: number;
     let by: number;
     let bz: number;
@@ -547,10 +560,13 @@ export function buildFrutigerAeroScene(opts: {
       [bx, by, bz, sc] = curatedBubbleSpots[i];
     } else {
       bx = (hashA(i * 3.7 + 1) - 0.5) * 44;
-      by = 2.6 + hashA(i * 5.1 + 2) * 15.0;
+      by = 2.8 + hashA(i * 5.1 + 2) * 14.5;
       bz = 6.0 - hashA(i * 7.3 + 3) * 52.0;
-      sc = 0.24 + hashA(i * 9.7 + 4) * 0.72;
+      sc = 0.24 + hashA(i * 9.7 + 4) * 0.68;
     }
+
+    if (overlapsExisting(bx, by, bz, sc)) continue;
+    placedBubbles.push([bx, by, bz, sc]);
 
     const mat = i % 3 === 0 ? heroBubbleMat : i % 3 === 1 ? mintBubbleMat : skyBubbleMat;
     const mesh = new THREE.Mesh(bubbleGeo, mat);
@@ -562,9 +578,9 @@ export function buildFrutigerAeroScene(opts: {
     floatingBubbles.push({
       mesh,
       basePos: new THREE.Vector3(bx, by, bz),
-      bobAmp: 0.28 + hashA(i * 11.3) * 0.45,
-      bobSpeed: 0.42 + hashA(i * 13.1) * 0.48,
-      driftSpeed: 0.2 + hashA(i * 17.7) * 0.35,
+      bobAmp: 0.20 + hashA(i * 11.3) * 0.28,
+      bobSpeed: 0.36 + hashA(i * 13.1) * 0.36,
+      driftSpeed: 0.16 + hashA(i * 17.7) * 0.24,
       phase: hashA(i * 19.3) * Math.PI * 2,
       baseScale: sc,
     });
@@ -755,11 +771,11 @@ export function buildFrutigerAeroScene(opts: {
   const ecoCurtainMat = new THREE.MeshPhysicalMaterial({
     map: ecoTowerTex.map,
     roughnessMap: ecoTowerTex.roughnessMap,
-    roughness: 0.22,
-    metalness: 0.14,
-    clearcoat: 0.95,
-    clearcoatRoughness: 0.08,
-    envMapIntensity: 1.15,
+    roughness: 0.34,
+    metalness: 0.12,
+    clearcoat: 0.45,
+    clearcoatRoughness: 0.24,
+    envMapIntensity: 0.75,
   });
   materials.push(ecoCurtainMat);
 

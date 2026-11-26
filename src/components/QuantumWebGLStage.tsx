@@ -276,29 +276,29 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       );
     const initialScroll = getLiveScroll();
 
-    // Optical HDR Bloom on GPU WebGL (thresholds tuned to avoid shimmer/strobing)
+    // Optical HDR Bloom on GPU WebGL for nocturnal Space & Cyberpunk scenes.
+    // Frutiger Aero is a bright daylight scene that renders directly through native hardware MSAA
+    // to eliminate bloom luminance pumping and edge shimmer on thin turbine blades & glass towers.
     let composer: EffectComposer | null = null;
+    let composerRT: THREE.WebGLRenderTarget | null = null;
     let bloomPass: UnrealBloomPass | null = null;
-    if (!isSoftwareGl) {
-      composer = new EffectComposer(renderer);
+    if (!isSoftwareGl && backgroundScene !== 'frutiger-aero') {
+      const pr = renderer.getPixelRatio();
+      composerRT = new THREE.WebGLRenderTarget(
+        Math.max(1, Math.floor(initW * pr)),
+        Math.max(1, Math.floor(initH * pr)),
+        {
+          type: THREE.HalfFloatType,
+          samples: renderer.capabilities.isWebGL2 ? 4 : 0,
+        }
+      );
+      composer = new EffectComposer(renderer, composerRT);
       composer.addPass(new RenderPass(scene, camera));
       bloomPass = new UnrealBloomPass(
         new THREE.Vector2(initW, initH),
-        backgroundScene === 'cyberpunk'
-          ? 0.48
-          : backgroundScene === 'frutiger-aero'
-            ? 0.26
-            : 0.40,
-        backgroundScene === 'cyberpunk'
-          ? 0.50
-          : backgroundScene === 'frutiger-aero'
-            ? 0.55
-            : 0.48,
-        backgroundScene === 'cyberpunk'
-          ? 0.78
-          : backgroundScene === 'frutiger-aero'
-            ? 0.88
-            : 0.82
+        backgroundScene === 'cyberpunk' ? 0.48 : 0.40,
+        backgroundScene === 'cyberpunk' ? 0.50 : 0.48,
+        backgroundScene === 'cyberpunk' ? 0.78 : 0.82
       );
       composer.addPass(bloomPass);
       composer.addPass(new OutputPass());
@@ -1223,6 +1223,7 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       const pr = isSoftwareGl ? 1 : Math.min(window.devicePixelRatio || 1, 2);
       renderer.setPixelRatio(pr);
       renderer.setSize(w, h);
+      composer?.setPixelRatio(pr);
       composer?.setSize(w, h);
       bloomPass?.resolution.set(w, h);
       spaceSetPixelRatioFn?.(pr);
@@ -1363,6 +1364,7 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       materials.forEach((m) => m.dispose());
       textures.forEach((t) => t.dispose());
       composer?.dispose();
+      composerRT?.dispose();
       envRT.dispose();
       renderer.dispose();
       container.innerHTML = '';

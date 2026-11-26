@@ -105,19 +105,13 @@ export function createAeroMeadowTextures(maxAniso: number): {
     cCtx.lineTo(x + tilt, y - len);
     cCtx.stroke();
 
-    const bv = Math.round(110 + n * 95);
-    bCtx.strokeStyle = `rgba(${bv}, ${bv}, ${bv}, 0.55)`;
+    const bv = Math.round(118 + n * 48);
+    bCtx.strokeStyle = `rgba(${bv}, ${bv}, ${bv}, 0.35)`;
     bCtx.lineWidth = 1;
     bCtx.beginPath();
     bCtx.moveTo(x, y);
     bCtx.lineTo(x + tilt, y - len);
     bCtx.stroke();
-
-    // Subtle dewy glossy glints on blades
-    if (i % 19 === 0) {
-      rCtx.fillStyle = 'rgba(55, 55, 55, 0.45)';
-      rCtx.fillRect(x, y - len * 0.6, 3, 3);
-    }
   }
 
   const map = new THREE.CanvasTexture(colorCanvas);
