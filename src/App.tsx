@@ -95,7 +95,12 @@ export default function App() {
         return {
           ...DEFAULT_MATERIAL_THEME,
           ...parsed,
-          backgroundScene: parsed?.backgroundScene === 'cyberpunk' ? 'cyberpunk' : 'space',
+          backgroundScene:
+            parsed?.backgroundScene === 'cyberpunk'
+              ? 'cyberpunk'
+              : parsed?.backgroundScene === 'frutiger-aero'
+                ? 'frutiger-aero'
+                : 'space',
           simpleMode: Boolean(parsed?.simpleMode),
         };
       }
@@ -4095,7 +4100,9 @@ export default function App() {
                       ? '01 · Direct Peer Transceiver'
                       : materialTheme.backgroundScene === 'cyberpunk'
                         ? '01 · Megacorp Skyline Overlook'
-                        : '01 · Event Horizon Singularity'}
+                        : materialTheme.backgroundScene === 'frutiger-aero'
+                          ? '01 · Sunlit Aqua Horizon'
+                          : '01 · Event Horizon Singularity'}
                   </div>
                   <h2
                     className={cn(
@@ -4207,7 +4214,9 @@ export default function App() {
                   ? '02 · Encrypted Mesh Channel'
                   : materialTheme.backgroundScene === 'cyberpunk'
                     ? '02 · Kabuki Neon Rain Alley'
-                    : '02 · Ionized Nebula Passage'}
+                    : materialTheme.backgroundScene === 'frutiger-aero'
+                      ? '02 · Iridescent Bubble Reef'
+                      : '02 · Ionized Nebula Passage'}
               </div>
               <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-text">
                 Encrypted Chat & HD Calls
@@ -4268,7 +4277,9 @@ export default function App() {
                 ? '03 · Optical Matrix Utility'
                 : materialTheme.backgroundScene === 'cyberpunk'
                   ? '03 · Elevated Transit Interchange'
-                  : '03 · Barred Spiral Galaxy Core'}
+                  : materialTheme.backgroundScene === 'frutiger-aero'
+                    ? '03 · Crystal Lagoon Pavilion'
+                    : '03 · Barred Spiral Galaxy Core'}
             </div>
             <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-text">
               QR Customisation Studio
@@ -4289,7 +4300,9 @@ export default function App() {
                 ? '04 · Cryptographic Codec'
                 : materialTheme.backgroundScene === 'cyberpunk'
                   ? '04 · Twin Corporate Spires'
-                  : '04 · Binary Black Hole Jets'}
+                  : materialTheme.backgroundScene === 'frutiger-aero'
+                    ? '04 · Emerald Eco-Utopia Skyline'
+                    : '04 · Binary Black Hole Jets'}
             </div>
             <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-text">
               Base64 & AES-256-GCM Encoder
@@ -4310,7 +4323,9 @@ export default function App() {
                 ? '05 · Interface & Identity'
                 : materialTheme.backgroundScene === 'cyberpunk'
                   ? '05 · Crimson Industrial Harbor'
-                  : '05 · Crimson Quasar Horizon'}
+                  : materialTheme.backgroundScene === 'frutiger-aero'
+                    ? '05 · Aurora Sky Sanctuary'
+                    : '05 · Crimson Quasar Horizon'}
             </div>
             <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-text">
               Customise Appearance & App Icon

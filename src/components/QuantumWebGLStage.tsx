@@ -28,6 +28,7 @@ import {
 } from '../three/shaders';
 import type { BackgroundSceneTheme } from '../lib/materialTheme';
 import { buildCyberpunkCityScene, type CityController } from '../three/buildCyberpunkCityScene';
+import { buildFrutigerAeroScene } from '../three/buildFrutigerAeroScene';
 
 export type StageChapterId = 0 | 1 | 2 | 3 | 4;
 
@@ -273,9 +274,21 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       composer.addPass(new RenderPass(scene, camera));
       bloomPass = new UnrealBloomPass(
         new THREE.Vector2(initW, initH),
-        backgroundScene === 'cyberpunk' ? 0.58 : 0.44,
-        backgroundScene === 'cyberpunk' ? 0.52 : 0.48,
-        backgroundScene === 'cyberpunk' ? 0.72 : 0.78
+        backgroundScene === 'cyberpunk'
+          ? 0.58
+          : backgroundScene === 'frutiger-aero'
+            ? 0.34
+            : 0.44,
+        backgroundScene === 'cyberpunk'
+          ? 0.52
+          : backgroundScene === 'frutiger-aero'
+            ? 0.62
+            : 0.48,
+        backgroundScene === 'cyberpunk'
+          ? 0.72
+          : backgroundScene === 'frutiger-aero'
+            ? 0.84
+            : 0.78
       );
       composer.addPass(bloomPass);
       composer.addPass(new OutputPass());
@@ -293,6 +306,23 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
         fog,
         maxAniso,
         pixelRatio: renderer.getPixelRatio(),
+        geometries,
+        materials,
+        textures,
+      });
+      activeCamSpline = cityCtrl.camSpline;
+      activeLookSpline = cityCtrl.lookSpline;
+      activeCamSpline.getPointAt(initialScroll, camera.position);
+      activeLookSpline.getPointAt(initialScroll, _currentLook);
+      camera.lookAt(_currentLook);
+    } else if (backgroundScene === 'frutiger-aero') {
+      cityCtrl = buildFrutigerAeroScene({
+        scene,
+        fog,
+        maxAniso,
+        pixelRatio: renderer.getPixelRatio(),
+        isSoftwareGl,
+        initialIsDark: liveStateRef.current.isDark,
         geometries,
         materials,
         textures,
@@ -1241,7 +1271,12 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
 
       const roleShiftX = st.hoverRole === 'host' ? -0.95 : st.hoverRole === 'join' ? 0.95 : 0;
       const gentleBreath = prefersReducedMotion ? 0 : Math.sin(elapsed * 0.35) * 0.16;
-      const parallaxMul = backgroundScene === 'cyberpunk' ? 0.72 : 1.0;
+      const parallaxMul =
+        backgroundScene === 'cyberpunk'
+          ? 0.72
+          : backgroundScene === 'frutiger-aero'
+            ? 0.82
+            : 1.0;
 
       _camTargetPos.x += mouseNdc.smoothX * 1.9 * parallaxMul + roleShiftX * parallaxMul;
       _camTargetPos.y += mouseNdc.smoothY * 1.0 * parallaxMul + gentleBreath;
@@ -1261,7 +1296,9 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
         ? 0.86
         : backgroundScene === 'cyberpunk'
           ? 1.18
-          : 1.14;
+          : backgroundScene === 'frutiger-aero'
+            ? 1.05
+            : 1.14;
       renderer.toneMappingExposure = THREE.MathUtils.damp(
         renderer.toneMappingExposure,
         targetExp,
@@ -1329,7 +1366,9 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
           background:
             backgroundScene === 'cyberpunk'
               ? 'radial-gradient(circle at 50% 42%, rgba(34,211,238,0.18), rgba(236,72,153,0.12) 34%, rgba(4,7,17,0.99) 70%)'
-              : 'radial-gradient(circle at 50% 42%, rgba(245,158,11,0.18), rgba(2,3,8,0.99) 62%)',
+              : backgroundScene === 'frutiger-aero'
+                ? 'linear-gradient(180deg, #0284c7 0%, #38bdf8 48%, #34d399 100%)'
+                : 'radial-gradient(circle at 50% 42%, rgba(245,158,11,0.18), rgba(2,3,8,0.99) 62%)',
         }}
       />
     );

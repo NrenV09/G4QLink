@@ -69,7 +69,7 @@ import {
 
 export type ThemeMode = 'light' | 'dark';
 export type ContrastLevel = 'standard' | 'high';
-export type BackgroundSceneTheme = 'space' | 'cyberpunk';
+export type BackgroundSceneTheme = 'space' | 'cyberpunk' | 'frutiger-aero';
 export type AppIconPresetId = 'monochrome' | 'dynamic-adaptive' | 'quantum-core' | 'obsidian-pulse' | 'solar-flare' | 'cyber-blueprint';
 export type AppIconShape = 'squircle' | 'circle' | 'cookie' | 'teardrop' | 'rounded-square';
 

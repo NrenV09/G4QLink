@@ -292,7 +292,7 @@ export const MaterialYouSettingsContent: React.FC<{
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {(
                   [
                     {
@@ -306,6 +306,12 @@ export const MaterialYouSettingsContent: React.FC<{
                       title: 'Cyberpunk City',
                       desc: 'Rain-slicked neon canyon, monorail, holograms & flying traffic',
                       icon: 'domain',
+                    },
+                    {
+                      id: 'frutiger-aero' as BackgroundSceneTheme,
+                      title: 'Frutiger Aero',
+                      desc: 'Sunlit emerald hills, iridescent glass bubbles, tropical fish & aqua aurora',
+                      icon: 'water_drop',
                     },
                   ]
                 ).map((sceneOpt) => {
@@ -325,7 +331,7 @@ export const MaterialYouSettingsContent: React.FC<{
                         }));
                       }}
                       className={cn(
-                        'p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 active:scale-[0.98]',
+                        'p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-2.5 active:scale-[0.98]',
                         active ? 'm3-tonal-active' : 'm3-surface-interactive'
                       )}
                     >
@@ -335,8 +341,8 @@ export const MaterialYouSettingsContent: React.FC<{
                         className="mt-0.5"
                       />
                       <div className="min-w-0">
-                        <div className="text-sm font-bold">{sceneOpt.title}</div>
-                        <div className="text-[11px] opacity-75 leading-snug mt-0.5">
+                        <div className="text-[13px] font-bold leading-tight whitespace-nowrap">{sceneOpt.title}</div>
+                        <div className="text-[11px] opacity-75 leading-snug mt-1">
                           {sceneOpt.desc}
                         </div>
                       </div>
