@@ -223,7 +223,7 @@ export function createSoapBubbleShaderMaterial(tintHex = '#7ce8ff'): THREE.Shade
       void main() {
         vLocalPos = position;
         vec3 pos = position;
-        float wobble = sin(position.x * 3.8 + uTime * 1.4) * cos(position.y * 3.4 - uTime * 1.1) * 0.015;
+        float wobble = sin(position.x * 3.8 + uTime * 1.4) * cos(position.y * 3.4 - uTime * 1.1) * 0.008;
         pos += normal * wobble;
 
         vec4 worldPos = modelMatrix * vec4(pos, 1.0);
@@ -258,33 +258,33 @@ export function createSoapBubbleShaderMaterial(tintHex = '#7ce8ff'): THREE.Shade
         float swirl = sin(vLocalPos.y * 4.5 + uTime * 0.55) * 0.16 + cos(vLocalPos.x * 3.8 - uTime * 0.4) * 0.14;
         vec3 irid = thinFilmIridescence((1.0 - ndotv) * 1.55 + swirl + uTime * 0.04);
 
-        // Iconic glossy Frutiger Aero dual curved sun-window specular highlights
-        float specMain = pow(max(dot(N, H), 0.0), 110.0);
+        // Iconic glossy Frutiger Aero dual curved sun-window specular highlights (bloom-safe smoothness)
+        float specMain = pow(max(dot(N, H), 0.0), 46.0);
         // Classic Aero top-left glossy curved crescent reflection
         vec3 Lwin = normalize(vec3(-0.36, 0.72, 0.60));
         vec3 Hwin = normalize(Lwin + V);
-        float specWindow = smoothstep(0.92, 0.975, max(dot(N, Hwin), 0.0)) * 0.78;
+        float specWindow = smoothstep(0.89, 0.965, max(dot(N, Hwin), 0.0)) * 0.72;
 
         vec3 L2 = normalize(vec3(-0.62, -0.35, 0.70));
         vec3 H2 = normalize(L2 + V);
-        float specRimBounce = pow(max(dot(N, H2), 0.0), 22.0) * 0.45;
+        float specRimBounce = pow(max(dot(N, H2), 0.0), 22.0) * 0.40;
 
         // Soft upper-hemisphere glossy glass dome highlight
         float topGloss = smoothstep(0.56, 0.90, N.y) * smoothstep(0.18, 0.65, ndotv) * 0.28;
 
         // Bottom emerald meadow bounce inside the water sphere
-        float groundBounce = smoothstep(-0.12, -0.85, N.y) * 0.38;
+        float groundBounce = smoothstep(-0.12, -0.85, N.y) * 0.36;
 
-        vec3 col = mix(uTint, irid, 0.66) * (0.45 + 0.82 * fresnel);
+        vec3 col = mix(uTint, irid, 0.64) * (0.45 + 0.80 * fresnel);
         col += vec3(0.20, 0.92, 0.52) * groundBounce * (0.35 + 0.65 * fresnel);
-        col += vec3(0.90, 0.99, 1.0) * (topGloss + specWindow * 0.95);
+        col += vec3(0.90, 0.99, 1.0) * (topGloss + specWindow * 0.82);
         col += vec3(0.60, 0.95, 1.0) * specRimBounce;
-        col += vec3(1.0, 1.0, 1.0) * specMain * 1.9;
+        col += vec3(1.0, 1.0, 1.0) * specMain * 0.95;
 
         float alpha = clamp(
-          0.09 + fresnel * 0.80 + specMain * 0.95 + specWindow * 0.72 + topGloss * 0.48 + specRimBounce * 0.32,
+          0.09 + fresnel * 0.78 + specMain * 0.75 + specWindow * 0.68 + topGloss * 0.45 + specRimBounce * 0.30,
           0.0,
-          0.96
+          0.95
         ) * uOpacity;
         gl_FragColor = vec4(col, alpha);
       }
@@ -300,6 +300,9 @@ export function createCrystalWaterShaderMaterial(): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -1,
     uniforms: {
       uTime: { value: 0 },
       uDarkFactor: { value: 0.0 },
@@ -313,9 +316,11 @@ export function createCrystalWaterShaderMaterial(): THREE.ShaderMaterial {
       void main() {
         vUv = uv;
         vec3 pos = position;
-        float w1 = sin(pos.x * 0.28 + uTime * 1.15) * 0.08;
-        float w2 = cos(pos.y * 0.34 - uTime * 0.92) * 0.06;
-        pos.z += w1 + w2;
+        float r = length(pos.xy);
+        float edgeDamp = 1.0 - smoothstep(18.0, 34.0, r);
+        float w1 = sin(pos.x * 0.28 + uTime * 1.05) * 0.05;
+        float w2 = cos(pos.y * 0.34 - uTime * 0.85) * 0.04;
+        pos.z += (w1 + w2) * edgeDamp;
         vec4 wp = modelMatrix * vec4(pos, 1.0);
         vWorldPos = wp.xyz;
         gl_Position = projectionMatrix * viewMatrix * wp;
@@ -339,28 +344,31 @@ export function createCrystalWaterShaderMaterial(): THREE.ShaderMaterial {
             cos(tt - i.x) + sin(tt + i.y),
             sin(tt - i.y) + cos(tt + i.x)
           );
-          c += 1.0 / max(length(vec2(p.x / (sin(i.x + tt) / inten), p.y / (cos(i.y + tt) / inten))), 0.001);
+          c += 1.0 / max(length(vec2(p.x / (sin(i.x + tt) / inten), p.y / (cos(i.y + tt) / inten))), 0.008);
         }
         c /= 4.0;
         c = 1.18 - pow(c, 1.38);
-        return clamp(pow(abs(c), 6.2), 0.0, 1.0);
+        return clamp(pow(abs(c), 4.0), 0.0, 1.0);
       }
 
       void main() {
         vec2 p = vWorldPos.xz * 0.16;
-        float cA = causticPattern(p, uTime * 0.72);
-        float cB = causticPattern(p * 1.35 + vec2(2.4, -1.7), -uTime * 0.55);
-        float caustics = clamp(cA * 0.7 + cB * 0.45, 0.0, 1.0);
+        float camDist = length(cameraPosition - vWorldPos);
+        float distFade = 1.0 - smoothstep(20.0, 52.0, camDist);
 
-        float nx = cos(vWorldPos.x * 0.48 + uTime * 1.35) * 0.08 + sin(vWorldPos.z * 0.62 - uTime * 1.1) * 0.06;
-        float nz = sin(vWorldPos.z * 0.52 + uTime * 1.2) * 0.08 + cos(vWorldPos.x * 0.44 + uTime * 0.95) * 0.06;
+        float cA = causticPattern(p, uTime * 0.65);
+        float cB = causticPattern(p * 1.35 + vec2(2.4, -1.7), -uTime * 0.50);
+        float caustics = clamp((cA * 0.62 + cB * 0.38) * distFade, 0.0, 0.85);
+
+        float nx = (cos(vWorldPos.x * 0.44 + uTime * 1.15) * 0.06 + sin(vWorldPos.z * 0.54 - uTime * 0.95) * 0.05) * distFade;
+        float nz = (sin(vWorldPos.z * 0.48 + uTime * 1.05) * 0.06 + cos(vWorldPos.x * 0.40 + uTime * 0.85) * 0.05) * distFade;
         vec3 N = normalize(vec3(nx, 1.0, nz));
         vec3 V = normalize(cameraPosition - vWorldPos);
         vec3 L = normalize(uSunDir);
         vec3 H = normalize(L + V);
 
         float fresnel = pow(1.0 - max(dot(N, V), 0.0), 3.0);
-        float spec = pow(max(dot(N, H), 0.0), 120.0);
+        float spec = pow(max(dot(N, H), 0.0), 42.0) * distFade;
 
         vec3 shallowDay = vec3(0.03, 0.82, 0.90);
         vec3 deepDay    = vec3(0.00, 0.42, 0.78);
@@ -372,15 +380,15 @@ export function createCrystalWaterShaderMaterial(): THREE.ShaderMaterial {
         vec3 skyRefl = mix(vec3(0.55, 0.94, 1.0), vec3(0.08, 0.44, 0.66), uDarkFactor);
 
         float distCenter = length(vWorldPos.xz - vec2(0.0, -18.0));
-        float depthMix = smoothstep(4.0, 26.0, distCenter);
+        float depthMix = smoothstep(4.0, 22.0, distCenter);
         vec3 waterCol = mix(shallow, deep, depthMix * 0.68);
 
-        // Shimmering aqua pool caustics
-        waterCol += vec3(0.45, 0.98, 1.0) * caustics * mix(0.62, 0.44, uDarkFactor);
-        waterCol = mix(waterCol, skyRefl, clamp(fresnel * 0.68, 0.0, 0.74));
-        waterCol += vec3(1.0, 1.0, 0.96) * spec * mix(1.35, 0.85, uDarkFactor);
+        // Shimmering aqua pool caustics & bloom-safe sunlit water specular
+        waterCol += vec3(0.45, 0.98, 1.0) * caustics * mix(0.46, 0.34, uDarkFactor);
+        waterCol = mix(waterCol, skyRefl, clamp(fresnel * 0.64, 0.0, 0.72));
+        waterCol += vec3(1.0, 1.0, 0.96) * spec * mix(0.75, 0.48, uDarkFactor);
 
-        float edgeFade = 1.0 - smoothstep(44.0, 70.0, distCenter);
+        float edgeFade = 1.0 - smoothstep(23.0, 36.0, distCenter);
         gl_FragColor = vec4(waterCol, clamp(0.88 * edgeFade, 0.0, 0.92));
       }
     `,

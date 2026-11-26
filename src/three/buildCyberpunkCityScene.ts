@@ -157,6 +157,9 @@ export function buildCyberpunkCityScene(opts: {
     opacity: 0.24,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -1,
   });
   const puddleMatMagenta = new THREE.MeshBasicMaterial({
     map: neonPoolTex,
@@ -165,6 +168,9 @@ export function buildCyberpunkCityScene(opts: {
     opacity: 0.22,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -1,
   });
   const puddleMatAmber = new THREE.MeshBasicMaterial({
     map: neonPoolTex,
@@ -173,6 +179,9 @@ export function buildCyberpunkCityScene(opts: {
     opacity: 0.20,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -1,
   });
   materials.push(puddleMatCyan, puddleMatMagenta, puddleMatAmber);
 
@@ -186,7 +195,7 @@ export function buildCyberpunkCityScene(opts: {
   ].forEach(([px, pz, sx, sz, mat]) => {
     const p = new THREE.Mesh(puddleGeo, mat as THREE.Material);
     p.rotation.x = -Math.PI / 2;
-    p.position.set(px as number, 0.03, pz as number);
+    p.position.set(px as number, 0.05, pz as number);
     p.scale.set(sx as number, sz as number, 1);
     p.renderOrder = 1;
     scene.add(p);
@@ -302,22 +311,22 @@ export function buildCyberpunkCityScene(opts: {
       const upperGeo = new THREE.BoxGeometry(cfg.w * 0.68, upperH, cfg.d * 0.68);
       geometries.push(upperGeo);
       const upper = new THREE.Mesh(upperGeo, facadeMats[cfg.style]);
-      upper.position.set(cfg.x, cfg.h + upperH * 0.5, cfg.z);
+      upper.position.set(cfg.x, cfg.h + upperH * 0.5 - 0.08, cfg.z);
       scene.add(upper);
-      topY += upperH;
+      topY += upperH - 0.08;
     }
 
-    // Rooftop HVAC penthouses & mechanical trim
+    // Rooftop HVAC penthouses & mechanical trim (separated vertically from crown cap)
     const hvac = new THREE.Mesh(roofGeo, darkMetalMat);
     hvac.scale.set(cfg.w * 0.42, 1.3, cfg.d * 0.42);
-    hvac.position.set(cfg.x + cfg.w * 0.12, topY + 0.65, cfg.z);
+    hvac.position.set(cfg.x + cfg.w * 0.12, topY + 0.80, cfg.z);
     scene.add(hvac);
 
     // Architectural glowing crown rim
     if (cfg.accentMat) {
       const crown = new THREE.Mesh(roofGeo, cfg.accentMat);
       crown.scale.set(cfg.w * 0.74, 0.22, cfg.d * 0.74);
-      crown.position.set(cfg.x, topY + 0.12, cfg.z);
+      crown.position.set(cfg.x, topY + 0.14, cfg.z);
       scene.add(crown);
     }
 
@@ -345,7 +354,7 @@ export function buildCyberpunkCityScene(opts: {
   const skybridge = new THREE.Mesh(skybridgeGeo, facadeMats[1]);
   skybridge.position.set(0, 22.0, -56);
   const skybridgeTrim = new THREE.Mesh(skybridgeTrimGeo, neonEdgeCyanMat);
-  skybridgeTrim.position.set(0, 20.9, -56);
+  skybridgeTrim.position.set(0, 20.78, -56);
   scene.add(skybridge, skybridgeTrim);
 
   // Flanking Megacity Canyon Buildings (widened canyon +-12m for dramatic depth & skyline vistas)
@@ -721,9 +730,9 @@ export function buildCyberpunkCityScene(opts: {
           sl.mesh.rotation.y = Math.cos(elapsed * 0.3 + sl.phase) * 0.4;
         }
 
-        // Aviation rooftop beacon blink
-        const blinkOn = Math.sin(elapsed * 3.6) > 0.15;
-        rooftopBeaconMat.color.set(blinkOn ? '#ff1e42' : '#3b0812');
+        // Smooth aviation rooftop beacon glow pulse (no jarring binary strobe)
+        const beaconPulse = 0.28 + 0.72 * (0.5 + 0.5 * Math.sin(elapsed * 2.8));
+        rooftopBeaconMat.color.setRGB(beaconPulse, 0.11 * beaconPulse, 0.25 * beaconPulse);
 
         // Steam panels gently face camera Y
         for (let i = 0; i < steamMeshes.length; i++) {

@@ -52,22 +52,23 @@ function meadowHeightAt(x: number, z: number): number {
 
   // Smooth rolling sinusoidal pasture hills (classic Windows Bliss contours)
   const rolling =
-    Math.sin(x * 0.048 + 0.5) * Math.cos(z * 0.042 - 0.3) * 3.1 +
-    Math.sin(x * 0.092 - z * 0.064) * 1.1 +
-    Math.cos((x + z) * 0.025) * 1.65;
+    Math.sin(x * 0.048 + 0.5) * Math.cos(z * 0.042 - 0.3) * 2.8 +
+    Math.sin(x * 0.092 - z * 0.064) * 0.95 +
+    Math.cos((x + z) * 0.025) * 1.45;
 
-  // Basin depression for the central crystal turquoise lagoon
-  const basinCarve = -6.2 * Math.exp(-lagoonDist * lagoonDist * 1.4);
+  // Crisp basin carve for central crystal turquoise lagoon so seabed stays deeply submerged and banks rise cleanly
+  const basinCarve = -5.6 * Math.exp(-Math.pow(lagoonDist / 0.74, 2.4));
+  const shoreLift = 1.1 * Math.exp(-Math.pow((lagoonDist - 1.06) / 0.36, 2.0));
 
   // Foreground corridor gentle downward sweep so hero view looks cleanly across lagoon & hills
-  const foregroundEase = z > -4 ? -Math.min(1, (z + 4) / 22) * 3.8 : 0;
+  const foregroundEase = z > -4 ? -Math.min(1, (z + 4) / 22) * 3.4 : 0;
 
   // Scenic distant left/back eco-city ridge & right meadow slope
   const ecoRidge =
     5.4 * Math.exp(-(((x + 22) * (x + 22)) / 520 + ((z + 44) * (z + 44)) / 420)) +
     4.0 * Math.exp(-(((x - 28) * (x - 28)) / 480 + ((z + 36) * (z + 36)) / 460));
 
-  return 0.95 + rolling + basinCarve + foregroundEase + ecoRidge;
+  return 0.95 + rolling + basinCarve + shoreLift + foregroundEase + ecoRidge;
 }
 
 const _dummy = new THREE.Object3D();
@@ -214,8 +215,8 @@ export function buildFrutigerAeroScene(opts: {
   const meadowTerrain = new THREE.Mesh(terrainGeo, terrainMat);
   scene.add(meadowTerrain);
 
-  // Crystal-clear turquoise lagoon surface plane at y = 0.02
-  const waterGeo = new THREE.PlaneGeometry(148, 148, 72, 72);
+  // Crystal-clear turquoise lagoon surface plane bounded cleanly to lagoon basin at y = 0.02
+  const waterGeo = new THREE.PlaneGeometry(78, 78, 64, 64);
   const waterMat = createCrystalWaterShaderMaterial();
   waterMat.uniforms.uSunDir.value.copy(sunDir);
   waterMat.uniforms.uDarkFactor.value = initDark;
@@ -246,15 +247,13 @@ export function buildFrutigerAeroScene(opts: {
   const aquaGlassMat = new THREE.MeshPhysicalMaterial({
     color: '#38d8f8',
     roughness: 0.06,
-    metalness: 0.06,
+    metalness: 0.08,
     clearcoat: 1.0,
     clearcoatRoughness: 0.04,
-    transmission: isSoftwareGl ? 0 : 0.72,
-    thickness: 1.2,
-    ior: 1.38,
     transparent: true,
-    opacity: isSoftwareGl ? 0.44 : 0.88,
-    envMapIntensity: 1.3,
+    opacity: 0.56,
+    depthWrite: false,
+    envMapIntensity: 1.25,
   });
   const lushFoliageMat = new THREE.MeshStandardMaterial({
     color: '#1eb84c',
@@ -697,9 +696,10 @@ export function buildFrutigerAeroScene(opts: {
   deckBase.position.y = 0.45;
   pavilionGroup.add(deckBase);
 
-  const deckGlassGeo = new THREE.CylinderGeometry(3.8, 3.8, 0.52, 36);
+  const deckGlassGeo = new THREE.CylinderGeometry(3.8, 3.8, 0.46, 36);
   const deckGlass = new THREE.Mesh(deckGlassGeo, aquaGlassMat);
-  deckGlass.position.y = 0.47;
+  deckGlass.position.y = 0.52;
+  deckGlass.renderOrder = 3;
   pavilionGroup.add(deckGlass);
 
   const trimRingGeo = new THREE.TorusGeometry(5.55, 0.12, 14, 64);
@@ -729,13 +729,17 @@ export function buildFrutigerAeroScene(opts: {
   const rippleMat = new THREE.MeshBasicMaterial({
     map: rippleTex,
     transparent: true,
-    opacity: 0.48,
+    opacity: 0.46,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -2,
   });
   const rippleMesh = new THREE.Mesh(rippleGeo, rippleMat);
   rippleMesh.rotation.x = -Math.PI / 2;
-  rippleMesh.position.y = 0.08;
+  rippleMesh.position.y = 0.19;
+  rippleMesh.renderOrder = 3;
   pavilionGroup.add(rippleMesh);
 
   geometries.push(deckBaseGeo, deckGlassGeo, trimRingGeo, archGeo, pavOrbGeo, rippleGeo);
@@ -978,21 +982,34 @@ export function buildFrutigerAeroScene(opts: {
   terOrb.renderOrder = 8;
   terrariumGroup.add(terOrb);
 
-  const islandTopGeo = new THREE.SphereGeometry(3.2, 28, 18, 0, Math.PI * 2, 0, Math.PI * 0.42);
-  const islandTop = new THREE.Mesh(islandTopGeo, terrainMat);
-  islandTop.scale.set(1.0, 0.55, 1.0);
-  islandTop.position.y = -0.9;
+  const islandGrassMat = new THREE.MeshStandardMaterial({
+    map: meadowTex.map,
+    roughnessMap: meadowTex.roughnessMap,
+    bumpMap: meadowTex.bumpMap,
+    bumpScale: 0.05,
+    color: '#28c758',
+    roughness: 0.88,
+    metalness: 0.0,
+    envMapIntensity: 0.25,
+  });
+  materials.push(islandGrassMat);
+
+  const islandTopGeo = new THREE.SphereGeometry(3.15, 28, 18, 0, Math.PI * 2, 0, Math.PI * 0.46);
+  const islandTop = new THREE.Mesh(islandTopGeo, islandGrassMat);
+  islandTop.scale.set(1.0, 0.50, 1.0);
+  islandTop.position.y = -0.82;
   terrariumGroup.add(islandTop);
 
-  const islandKeelGeo = new THREE.ConeGeometry(2.95, 2.3, 24);
+  const islandKeelGeo = new THREE.ConeGeometry(3.12, 2.35, 28);
   islandKeelGeo.rotateX(Math.PI);
   const islandKeel = new THREE.Mesh(islandKeelGeo, glossyWhiteMat);
-  islandKeel.position.y = -1.95;
+  islandKeel.position.y = -1.78;
   terrariumGroup.add(islandKeel);
 
   const miniSpireGeo = new THREE.ConeGeometry(0.65, 2.4, 16);
   const miniSpire = new THREE.Mesh(miniSpireGeo, aquaGlassMat);
   miniSpire.position.set(0, 1.45, 0);
+  miniSpire.renderOrder = 7;
   terrariumGroup.add(miniSpire);
 
   const terRingGeo = new THREE.TorusGeometry(5.5, 0.11, 14, 80);

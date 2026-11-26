@@ -29,7 +29,7 @@ export function DataStream({ active }: { active: boolean }) {
   if (!active) return null;
 
   return (
-    <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center overflow-hidden bg-black/50 backdrop-blur-xs rounded-[inherit]">
+    <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center overflow-hidden bg-black/60 rounded-[inherit]">
       <div className="text-accent text-[10px] sm:text-xs font-mono break-all opacity-40 leading-tight h-full w-full p-4 overflow-hidden mask-fade text-center flex flex-col justify-center" style={{ maskImage: 'radial-gradient(circle, black 30%, transparent 80%)', WebkitMaskImage: 'radial-gradient(circle, black 30%, transparent 80%)' }}>
         {binaryChars.repeat(10)}
       </div>

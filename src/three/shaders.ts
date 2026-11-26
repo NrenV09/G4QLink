@@ -126,11 +126,11 @@ export function createDeepSpaceSkyShaderMaterial(): THREE.ShaderMaterial {
         float lmc = exp(-pow(length(gDir - normalize(vec3(-0.62, -0.42, -0.66))) * 6.8, 2.0)) * 0.24;
         float smc = exp(-pow(length(gDir - normalize(vec3(-0.42, -0.58, -0.69))) * 10.5, 2.0)) * 0.16;
 
-        // Unresolved distant Milky Way pinpoint dust
-        vec3 starCell = floor(gDir * 240.0);
+        // Unresolved distant Milky Way pinpoint dust (smooth cell falloff prevents rotation aliasing flicker)
+        vec3 starCell = floor(gDir * 160.0);
         float starRand = hash31(starCell);
-        vec3 starFrac = fract(gDir * 240.0) - 0.5;
-        float microStar = step(0.968, starRand) * smoothstep(0.45, 0.05, length(starFrac)) * (0.25 + 0.75 * band);
+        vec3 starFrac = fract(gDir * 160.0) - 0.5;
+        float microStar = smoothstep(0.968, 0.996, starRand) * smoothstep(0.48, 0.12, length(starFrac)) * (0.25 + 0.75 * band);
 
         vec3 outerTint = vec3(0.035, 0.065, 0.14);
         vec3 armTint = vec3(0.11, 0.19, 0.34);
@@ -526,8 +526,8 @@ export function createStarfieldShaderMaterial(starTexture: THREE.Texture): THREE
         vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
         float scintillation = 0.78 + 0.22 * sin(uTime * (0.85 + fract(aPhase) * 1.9) + aPhase * 6.2831);
         vTwinkle = scintillation;
-        float size = aScale * uPixelRatio * (215.0 / max(10.0, -mvPosition.z)) * (0.92 + 0.14 * scintillation);
-        gl_PointSize = clamp(size, 1.0, 36.0);
+        float size = aScale * uPixelRatio * (215.0 / max(10.0, -mvPosition.z)) * (0.94 + 0.10 * scintillation);
+        gl_PointSize = clamp(size, 1.8, 36.0);
         gl_Position = projectionMatrix * mvPosition;
       }
     `,
@@ -591,7 +591,7 @@ export function createSpiralGalaxyShaderMaterial(glowTexture: THREE.Texture): TH
 
         vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
         float size = aScale * uPixelRatio * (76.0 / max(5.0, -mvPosition.z));
-        gl_PointSize = clamp(size, 1.0, 14.0);
+        gl_PointSize = clamp(size, 1.8, 14.0);
         gl_Position = projectionMatrix * mvPosition;
 
         vColor = mix(aColor, uSeedTint, 0.08);

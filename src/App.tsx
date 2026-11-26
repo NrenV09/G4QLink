@@ -112,7 +112,7 @@ export default function App() {
   // --- Offline 3D Spatial Stage, Scroll Flight & Kinetic Intro State ---
   const [showPreloader, setShowPreloader] = useState(() => !materialTheme.simpleMode);
   const [stageChapter, setStageChapter] = useState<StageChapterId>(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const scrollProgressRef = useRef(0);
   const [hoverRole, setHoverRole] = useState<'host' | 'join' | null>(null);
   const manualScrollLockRef = useRef<number>(0);
 
@@ -192,7 +192,7 @@ export default function App() {
       const doc = document.documentElement;
       const maxScroll = Math.max(1, doc.scrollHeight - window.innerHeight);
       const progress = Math.min(1, Math.max(0, window.scrollY / maxScroll));
-      setScrollProgress(progress);
+      scrollProgressRef.current = progress;
 
       if (Date.now() < manualScrollLockRef.current) return;
 
@@ -3125,7 +3125,7 @@ export default function App() {
       {!materialTheme.simpleMode && (
         <QuantumWebGLStage
           chapter={stageChapter}
-          scrollProgress={scrollProgress}
+          scrollProgressRef={scrollProgressRef}
           seedHex={materialTheme.seedHex}
           isDark={materialTheme.mode === 'dark'}
           connectedCount={connectedCount}
@@ -4389,7 +4389,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-6 lg:p-8 bg-black/60 backdrop-blur-xs"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-6 lg:p-8 bg-black/72"
           >
             <motion.div 
               initial={{ scale: 0.98, y: 8 }}
@@ -4478,7 +4478,7 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-6 lg:p-8 bg-black/60 backdrop-blur-xs"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-6 lg:p-8 bg-black/72"
           >
             <motion.div 
               initial={{ scale: 0.98, y: 8 }}
@@ -4526,7 +4526,7 @@ export default function App() {
         {showSimWarning && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+            className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/72"
           >
             <div className="m3-card-xl max-w-md p-6 sm:p-7 shadow-2xl">
               <h3 className="text-lg font-bold mb-2 flex items-center gap-2 text-text">

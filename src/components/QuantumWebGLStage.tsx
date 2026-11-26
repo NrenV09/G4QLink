@@ -34,7 +34,8 @@ export type StageChapterId = 0 | 1 | 2 | 3 | 4;
 
 export interface QuantumWebGLStageProps {
   chapter: StageChapterId;
-  scrollProgress: number;
+  scrollProgress?: number;
+  scrollProgressRef?: React.MutableRefObject<number>;
   seedHex: string;
   isDark: boolean;
   connectedCount: number;
@@ -171,7 +172,8 @@ interface AsteroidOrbitData {
 
 export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
   chapter,
-  scrollProgress,
+  scrollProgress = 0,
+  scrollProgressRef,
   seedHex,
   isDark,
   connectedCount,
@@ -185,6 +187,7 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
   const liveStateRef = useRef({
     chapter,
     scrollProgress,
+    scrollProgressRef,
     seedHex,
     isDark,
     connectedCount,
@@ -194,6 +197,7 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
   liveStateRef.current = {
     chapter,
     scrollProgress,
+    scrollProgressRef,
     seedHex,
     isDark,
     connectedCount,
@@ -234,6 +238,7 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
     renderer.domElement.style.display = 'block';
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
+    renderer.domElement.style.transform = 'translate3d(0, 0, 0)';
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
@@ -263,10 +268,15 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
     roomEnv.dispose();
     pmremGenerator.dispose();
 
-    const camera = new THREE.PerspectiveCamera(52, initW / initH, 0.1, 560);
-    const initialScroll = Math.min(1, Math.max(0, liveStateRef.current.scrollProgress));
+    const camera = new THREE.PerspectiveCamera(52, initW / initH, 0.5, 560);
+    const getLiveScroll = () =>
+      Math.min(
+        1,
+        Math.max(0, liveStateRef.current.scrollProgressRef?.current ?? liveStateRef.current.scrollProgress)
+      );
+    const initialScroll = getLiveScroll();
 
-    // Optical HDR Bloom on GPU WebGL
+    // Optical HDR Bloom on GPU WebGL (thresholds tuned to avoid shimmer/strobing)
     let composer: EffectComposer | null = null;
     let bloomPass: UnrealBloomPass | null = null;
     if (!isSoftwareGl) {
@@ -275,20 +285,20 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       bloomPass = new UnrealBloomPass(
         new THREE.Vector2(initW, initH),
         backgroundScene === 'cyberpunk'
-          ? 0.58
+          ? 0.48
           : backgroundScene === 'frutiger-aero'
-            ? 0.34
-            : 0.44,
+            ? 0.26
+            : 0.40,
         backgroundScene === 'cyberpunk'
-          ? 0.52
+          ? 0.50
           : backgroundScene === 'frutiger-aero'
-            ? 0.62
+            ? 0.55
             : 0.48,
         backgroundScene === 'cyberpunk'
-          ? 0.72
+          ? 0.78
           : backgroundScene === 'frutiger-aero'
-            ? 0.84
-            : 0.78
+            ? 0.88
+            : 0.82
       );
       composer.addPass(bloomPass);
       composer.addPass(new OutputPass());
@@ -1221,15 +1231,16 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
     window.addEventListener('resize', handleResize);
 
     const clock = new THREE.Clock();
-    let frameId = 0;
+    let rafId = 0;
+    let timerId = 0;
     let disposed = false;
-    let smoothScroll = liveStateRef.current.scrollProgress;
+    let smoothScroll = initialScroll;
 
     function afterDraw(cb: () => void) {
       if (disposed) return;
       const gl = renderer.getContext() as WebGL2RenderingContext;
       if (!gl.fenceSync) {
-        frameId = window.setTimeout(cb, 80);
+        timerId = window.setTimeout(cb, 80);
         return;
       }
       const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -1238,13 +1249,13 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
         if (disposed) return;
         const st = sync ? gl.getSyncParameter(sync, gl.SYNC_STATUS) : gl.SIGNALED;
         if (st === gl.UNSIGNALED) {
-          frameId = window.setTimeout(poll, 5);
+          timerId = window.setTimeout(poll, 5);
         } else {
           if (sync) gl.deleteSync(sync);
-          frameId = window.setTimeout(cb, 80);
+          timerId = window.setTimeout(cb, 80);
         }
       };
-      frameId = window.setTimeout(poll, 5);
+      timerId = window.setTimeout(poll, 5);
     }
 
     const animate = () => {
@@ -1258,7 +1269,7 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
 
       smoothScroll = THREE.MathUtils.damp(
         smoothScroll,
-        Math.min(1, Math.max(0, st.scrollProgress)),
+        getLiveScroll(),
         4.0,
         delta
       );
@@ -1333,7 +1344,7 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
       if (isSoftwareGl) {
         afterDraw(animate);
       } else {
-        frameId = requestAnimationFrame(animate);
+        rafId = requestAnimationFrame(animate);
       }
     };
 
@@ -1341,8 +1352,8 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
 
     return () => {
       disposed = true;
-      cancelAnimationFrame(frameId);
-      clearTimeout(frameId);
+      cancelAnimationFrame(rafId);
+      clearTimeout(timerId);
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('resize', handleResize);
       renderer.domElement.removeEventListener('webglcontextlost', onContextLost);
@@ -1378,6 +1389,7 @@ export const QuantumWebGLStage: React.FC<QuantumWebGLStageProps> = ({
     <div
       ref={mountRef}
       className="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none"
+      style={{ transform: 'translate3d(0, 0, 0)', contain: 'layout paint' }}
       aria-hidden="true"
     />
   );

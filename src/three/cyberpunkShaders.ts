@@ -83,8 +83,8 @@ export function createCyberSkyDomeShaderMaterial(): THREE.ShaderMaterial {
         float cloudMask = smoothstep(0.36, 0.78, cloud) * smoothstep(-0.05, 0.25, elev) * exp(-max(0.0, elev) * 1.8);
         sky += horizonCol * cloudMask * 0.92;
 
-        // Subtle high-altitude lightning/neon flicker in smog clouds
-        float cityBounce = 0.88 + 0.12 * sin(uTime * 0.7 + azim * 3.0);
+        // Gentle high-altitude atmospheric light diffusion in smog clouds
+        float cityBounce = 0.94 + 0.06 * sin(uTime * 0.55 + azim * 2.5);
         sky *= cityBounce;
 
         gl_FragColor = vec4(sky, uOpacity);
@@ -126,20 +126,20 @@ export function createHologramAdShaderMaterial(
       varying vec2 vUv;
 
       void main() {
-        // Subtle horizontal holo-jitter
-        float glitch = step(0.985, sin(uTime * 5.2 + vUv.y * 18.0)) * 0.012;
-        vec2 uv = vec2(vUv.x + glitch, vUv.y);
+        // Gentle holographic phase drift (zero discontinuous step flicker)
+        float drift = sin(uTime * 1.6 + vUv.y * 6.0) * 0.002;
+        vec2 uv = vec2(vUv.x + drift, vUv.y);
         vec4 tex = texture2D(uTex, uv);
 
-        float scan = 0.76 + 0.24 * sin(vUv.y * 210.0 - uTime * 7.5);
-        float pulse = 0.90 + 0.10 * sin(uTime * 2.4 + vUv.y * 4.0);
+        float scan = 0.86 + 0.14 * sin(vUv.y * 92.0 - uTime * 3.2);
+        float pulse = 0.94 + 0.06 * sin(uTime * 1.8 + vUv.y * 3.0);
         float edgeFade = smoothstep(0.0, 0.05, vUv.x) * (1.0 - smoothstep(0.95, 1.0, vUv.x))
                        * smoothstep(0.0, 0.05, vUv.y) * (1.0 - smoothstep(0.95, 1.0, vUv.y));
 
-        vec3 col = mix(tex.rgb, tex.rgb * uTint * 1.4, 0.28) * scan * pulse;
+        vec3 col = mix(tex.rgb, tex.rgb * uTint * 1.35, 0.28) * scan * pulse;
         float alpha = (0.25 + 0.75 * max(tex.r, max(tex.g, tex.b))) * edgeFade * uOpacity;
         if (alpha < 0.015) discard;
-        gl_FragColor = vec4(col * 1.25, alpha);
+        gl_FragColor = vec4(col * 1.04, alpha);
       }
     `,
   });

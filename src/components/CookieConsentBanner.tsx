@@ -54,11 +54,7 @@ export const CookieConsentBanner: React.FC<CookieConsentBannerProps> = ({ onOpen
           className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-md z-[200]"
         >
           <div
-            className="m3-card-xl rounded-[28px] p-5 shadow-2xl backdrop-blur-xl text-text space-y-3.5 border"
-            style={{
-              backgroundColor: 'var(--md-sys-color-surface-container-high)',
-              borderColor: 'var(--md-sys-color-outline-variant)',
-            }}
+            className="m3-card-xl rounded-[28px] p-5 shadow-2xl text-text space-y-3.5 border"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
